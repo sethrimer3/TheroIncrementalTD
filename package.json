@@ -14,7 +14,7 @@
     "lint": "eslint .",
     "check:migration-roadmap": "node scripts/check-migration-roadmap.cjs",
     "test": "node scripts/smoke-test.cjs",
-    "test:unit": "node scripts/unit-test-core.cjs && node scripts/test-retired-spires.cjs"
+    "test:unit": "node scripts/unit-test-core.cjs && node scripts/test-retired-spires.cjs && node scripts/test-algebraic-upgrades.cjs"
   },
   "repository": {
     "type": "git",

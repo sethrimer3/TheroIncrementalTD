@@ -135,6 +135,10 @@ import { flushPendingMoteDrops } from './powderDropQueue.js';
 import { createSpireResourceState } from './state/spireResourceState.js';
 import { createPowderStateContext } from './powder/powderState.js';
 import { createSpireResourcePersistence } from './spireResourcePersistence.js';
+import {
+  getAlgebraicUpgradeStateSnapshot,
+  applyAlgebraicUpgradeStateSnapshot,
+} from './algebraicUpgrades.js';
 import { createLevelCombatController } from './levelCombatController.js';
 // Alpha tower sprite tint cache builder for palette-synced shot particles.
 import { refreshAlphaShotSpritePaletteCache } from '../scripts/features/towers/alphaTower.js';
@@ -741,6 +745,8 @@ import { createSpireCameraController } from './spireCameraController.js';
     getAlephChainUpgrades,
     applyAlephChainUpgradeSnapshot,
     getPlayfield: () => playfield,
+    getAlgebraicUpgradeStateSnapshot,
+    applyAlgebraicUpgradeStateSnapshot,
   });
 
   // Ensure compact autosave remains the active basin persistence strategy.
@@ -1260,6 +1266,10 @@ import { createSpireCameraController } from './spireCameraController.js';
     getPowderCurrency,
     onPowderCurrencyLoaded: (value) => {
       setPowderCurrency(value);
+    },
+    getGlyphCurrency,
+    onGlyphCurrencyLoaded: (value) => {
+      setGlyphCurrency(value);
     },
     getPowderBasinSnapshot,
     applyPowderBasinSnapshot,

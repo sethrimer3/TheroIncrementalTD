@@ -22,6 +22,8 @@ export const GAME_STATS_STORAGE_KEY = 'glyph-defense-idle:stats';
 export const POWDER_BASIN_STORAGE_KEY = 'glyph-defense-idle:powder-basin';
 // Storage key used to persist tower upgrade progress (glyph allocations).
 export const TOWER_UPGRADE_STORAGE_KEY = 'glyph-defense-idle:tower-upgrades';
+// Storage key used to persist the spendable Aleph Glyph (Well glyph) balance.
+export const GLYPH_CURRENCY_STORAGE_KEY = 'glyph-defense-idle:glyph-currency';
 // Retired storage keys remain exported so old data can be identified or cleared safely.
 export const SHIN_STATE_STORAGE_KEY = 'glyph-defense-idle:shin-state';
 export const KUF_STATE_STORAGE_KEY = 'glyph-defense-idle:kuf-state';
@@ -85,6 +87,8 @@ const dependencies = {
     applySpireResourceStateSnapshot: null,
     getLevelProgressSnapshot: null,
     applyLevelProgressSnapshot: null,
+    getGlyphCurrency: null,
+    onGlyphCurrencyLoaded: null,
 };
 let statKeys = [];
 let powderSaveHandle = null;
@@ -225,6 +229,12 @@ export function loadPersistentState() {
         const storedProgress = readStorageJson(LEVEL_PROGRESS_STORAGE_KEY);
         if (storedProgress && typeof storedProgress === 'object') {
             dependencies.applyLevelProgressSnapshot(storedProgress);
+        }
+    }
+    if (typeof dependencies.onGlyphCurrencyLoaded === 'function') {
+        const storedGlyphCurrency = readStorageJson(GLYPH_CURRENCY_STORAGE_KEY);
+        if (Number.isFinite(storedGlyphCurrency)) {
+            dependencies.onGlyphCurrencyLoaded(Math.max(0, storedGlyphCurrency));
         }
     }
     if (dependencies.audioStorageKey && typeof dependencies.applyStoredAudioSettings === 'function') {
@@ -374,6 +384,16 @@ function persistLevelProgress() {
     }
     writeStorageJson(LEVEL_PROGRESS_STORAGE_KEY, snapshot);
 }
+function persistGlyphCurrency() {
+    if (typeof dependencies.getGlyphCurrency !== 'function') {
+        return;
+    }
+    const currentGlyphs = Number(dependencies.getGlyphCurrency());
+    if (!Number.isFinite(currentGlyphs)) {
+        return;
+    }
+    writeStorageJson(GLYPH_CURRENCY_STORAGE_KEY, Math.max(0, currentGlyphs));
+}
 function performAutoSave() {
     savePowderCurrency();
     if (powderBasinSaveHandle) {
@@ -386,6 +406,7 @@ function performAutoSave() {
     persistTowerUpgrades();
     persistSpireResourceState();
     persistLevelProgress();
+    persistGlyphCurrency();
 }
 /**
  * Starts the recurring autosave timer so progress snapshots are refreshed on a

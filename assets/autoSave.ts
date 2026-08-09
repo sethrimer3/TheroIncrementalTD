@@ -46,6 +46,8 @@ export const GAME_STATS_STORAGE_KEY = 'glyph-defense-idle:stats';
 export const POWDER_BASIN_STORAGE_KEY = 'glyph-defense-idle:powder-basin';
 // Storage key used to persist tower upgrade progress (glyph allocations).
 export const TOWER_UPGRADE_STORAGE_KEY = 'glyph-defense-idle:tower-upgrades';
+// Storage key used to persist the spendable Aleph Glyph (Well glyph) balance.
+export const GLYPH_CURRENCY_STORAGE_KEY = 'glyph-defense-idle:glyph-currency';
 // Retired storage keys remain exported so old data can be identified or cleared safely.
 export const SHIN_STATE_STORAGE_KEY = 'glyph-defense-idle:shin-state';
 export const KUF_STATE_STORAGE_KEY = 'glyph-defense-idle:kuf-state';
@@ -148,6 +150,8 @@ export interface AutoSaveDependencies {
   applySpireResourceStateSnapshot: ((snapshot: SpireResourceStateSnapshotInput) => void) | null;
   getLevelProgressSnapshot: (() => AutoSaveSnapshot) | null;
   applyLevelProgressSnapshot: ((snapshot: AutoSaveSnapshot) => void) | null;
+  getGlyphCurrency: (() => number) | null;
+  onGlyphCurrencyLoaded: ((value: number) => void) | null;
 }
 
 /**
@@ -188,6 +192,8 @@ const dependencies: AutoSaveDependencies = {
   applySpireResourceStateSnapshot: null,
   getLevelProgressSnapshot: null,
   applyLevelProgressSnapshot: null,
+  getGlyphCurrency: null,
+  onGlyphCurrencyLoaded: null,
 };
 
 let statKeys: string[] = [];
@@ -338,6 +344,13 @@ export function loadPersistentState(): void {
     const storedProgress = readStorageJson<AutoSaveSnapshot>(LEVEL_PROGRESS_STORAGE_KEY);
     if (storedProgress && typeof storedProgress === 'object') {
       dependencies.applyLevelProgressSnapshot(storedProgress);
+    }
+  }
+
+  if (typeof dependencies.onGlyphCurrencyLoaded === 'function') {
+    const storedGlyphCurrency = readStorageJson<number>(GLYPH_CURRENCY_STORAGE_KEY);
+    if (Number.isFinite(storedGlyphCurrency)) {
+      dependencies.onGlyphCurrencyLoaded(Math.max(0, storedGlyphCurrency as number));
     }
   }
 
@@ -501,6 +514,17 @@ function persistLevelProgress(): void {
   writeStorageJson(LEVEL_PROGRESS_STORAGE_KEY, snapshot);
 }
 
+function persistGlyphCurrency(): void {
+  if (typeof dependencies.getGlyphCurrency !== 'function') {
+    return;
+  }
+  const currentGlyphs = Number(dependencies.getGlyphCurrency());
+  if (!Number.isFinite(currentGlyphs)) {
+    return;
+  }
+  writeStorageJson(GLYPH_CURRENCY_STORAGE_KEY, Math.max(0, currentGlyphs));
+}
+
 function performAutoSave(): void {
   savePowderCurrency();
   if (powderBasinSaveHandle) {
@@ -513,6 +537,7 @@ function performAutoSave(): void {
   persistTowerUpgrades();
   persistSpireResourceState();
   persistLevelProgress();
+  persistGlyphCurrency();
 }
 
 /**

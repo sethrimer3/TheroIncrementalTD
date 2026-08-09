@@ -3333,6 +3333,7 @@ async function run() {
     assert.deepEqual(snapshot, {
       ...harness.baseTowerSnapshot,
       alephChainUpgrades: harness.alephSnapshot,
+      algebraicUpgrades: {},
     });
     assert.equal(snapshot.alpha, harness.baseTowerSnapshot.alpha);
     assert.equal(snapshot.alephChainUpgrades, harness.alephSnapshot);

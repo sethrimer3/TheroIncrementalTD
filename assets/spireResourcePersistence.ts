@@ -8,6 +8,7 @@ import type {
   TowerUpgradeStateSnapshot,
   TowerUpgradeStateSnapshotInput,
 } from './towerBlueprintPresenter.js';
+import type { AlgebraicUpgradeStateSnapshot } from './algebraicUpgrades.js';
 
 /** Mutable story flag owned by the surviving Well and Achievements state branches. */
 export interface MutableStoryState {
@@ -64,8 +65,9 @@ export type SpireResourceStateSnapshotInput =
 
 /** Exact persistence-owned wrapper emitted after adding Aleph state to base tower entries. */
 export interface TowerUpgradeSnapshotWithAleph {
-  [towerId: string]: SerializedTowerUpgradeState | AlephChainUpgradeSnapshot;
+  [towerId: string]: SerializedTowerUpgradeState | AlephChainUpgradeSnapshot | AlgebraicUpgradeStateSnapshot;
   alephChainUpgrades: AlephChainUpgradeSnapshot;
+  algebraicUpgrades: AlgebraicUpgradeStateSnapshot;
 }
 
 /** Autosave tower-upgrade input, including historical snapshots without Aleph data. */
@@ -82,6 +84,8 @@ export interface SpireResourcePersistenceDependencies {
     options: AlephChainUpgradeApplyOptions,
   ) => AlephChainUpgradeSnapshot;
   getPlayfield: () => AlephChainUpgradePlayfield | null;
+  getAlgebraicUpgradeStateSnapshot?: () => AlgebraicUpgradeStateSnapshot;
+  applyAlgebraicUpgradeStateSnapshot?: (snapshot: unknown) => void;
 }
 
 /** Public controller returned to the bootstrap and then wired into autosave. */
@@ -113,22 +117,29 @@ export function createSpireResourcePersistence({
   getAlephChainUpgrades,
   applyAlephChainUpgradeSnapshot,
   getPlayfield,
+  getAlgebraicUpgradeStateSnapshot = () => ({}),
+  applyAlgebraicUpgradeStateSnapshot = () => {},
 }: SpireResourcePersistenceDependencies): SpireResourcePersistenceController {
-  /** Preserve the base tower snapshot while adding the Aleph-chain branch. */
+  /** Preserve the base tower snapshot while adding the Aleph-chain and algebraic-upgrade branches. */
   function getTowerUpgradeStateSnapshotWithAleph(): TowerUpgradeSnapshotWithAleph {
     return {
       ...getTowerUpgradeStateSnapshot(),
       alephChainUpgrades: getAlephChainUpgrades(),
+      algebraicUpgrades: getAlgebraicUpgradeStateSnapshot(),
     };
   }
 
-  /** Restore base tower upgrades first, then restore a valid Aleph-chain branch. */
+  /** Restore base tower upgrades first, then restore the Aleph-chain and algebraic-upgrade branches. */
   function applyTowerUpgradeStateSnapshotWithAleph(snapshot: unknown): void {
     if (!isObjectRecord(snapshot)) return;
     applyTowerUpgradeStateSnapshot(snapshot);
     const alephChainUpgrades = snapshot.alephChainUpgrades;
     if (alephChainUpgrades && isObjectRecord(alephChainUpgrades)) {
       applyAlephChainUpgradeSnapshot(alephChainUpgrades, { playfield: getPlayfield() });
+    }
+    const algebraicUpgrades = snapshot.algebraicUpgrades;
+    if (algebraicUpgrades && isObjectRecord(algebraicUpgrades)) {
+      applyAlgebraicUpgradeStateSnapshot(algebraicUpgrades);
     }
   }
 
