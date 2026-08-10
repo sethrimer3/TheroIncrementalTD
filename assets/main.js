@@ -1,3 +1,5 @@
+window.__mainJsLoadVersion = 'debug-v3';
+console.log('[main.js] module evaluating, version debug-v3');
 import {
   alephChainUpgradeState,
   getAlephChainUpgrades,
