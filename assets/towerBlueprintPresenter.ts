@@ -128,6 +128,8 @@ export interface TowerEquationVariable {
   baseValue?: number;
   getStep?: (level: number, context: TowerVariableDefinitionContext) => number;
   step?: number;
+  /** Highest purchasable level; the overlay disables further purchases once reached. */
+  maxLevel?: number;
 }
 
 /** Golden-equation formatting helpers supplied by the Towers-tab UI. */
@@ -143,6 +145,8 @@ export interface TowerEquationBlueprint {
   masterEquationLatex?: unknown;
   baseEquation?: string;
   variables?: readonly TowerEquationVariable[];
+  /** Opt out of the generic five-slot Algebraic Upgrades filler (e.g. blueprints with their own real glyph variables). */
+  hideAlgebraicUpgrades?: boolean;
   computeResult?: (
     values: TowerEquationValueMap,
     context: TowerResultComputationContext,

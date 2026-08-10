@@ -229,6 +229,7 @@ export function createLevelCombatController(deps) {
   }
 
   function handleLevelSelection(level) {
+    console.debug('[levelCombat] handleLevelSelection:', level?.id);
     const state = levelState.get(level.id) || { entered: false, running: false };
     const activeElement = document.activeElement;
     if (activeElement && typeof activeElement.focus === 'function') {
@@ -363,7 +364,9 @@ export function createLevelCombatController(deps) {
   }
 
   function confirmPendingLevel() {
+    console.debug('[levelCombat] confirmPendingLevel: pendingLevel =', pendingLevel?.id ?? null);
     if (!pendingLevel) {
+      console.warn('[levelCombat] confirmPendingLevel: no pendingLevel set, just hiding overlay');
       const levelOverlayController = getLevelOverlayController();
       if (levelOverlayController) {
         levelOverlayController.hideLevelOverlay();
@@ -383,6 +386,7 @@ export function createLevelCombatController(deps) {
   }
 
   function startLevel(level) {
+    console.debug('[levelCombat] startLevel:', level?.id);
     deactivateDeveloperMapTools({ force: true, silent: true });
     const currentState = levelState.get(level.id) || {
       entered: false,
@@ -391,12 +395,14 @@ export function createLevelCombatController(deps) {
     };
     const isInteractive = isInteractiveLevel(level.id);
     if (!isInteractive) {
+      console.warn('[levelCombat] startLevel: aborting, level is not interactive', level?.id);
       return;
     }
     const levelConfig = levelConfigs.get(level.id);
     const forceEndlessMode = Boolean(level?.forceEndlessMode || levelConfig?.forceEndlessMode);
     const endlessCampaign = level?.campaign === 'Ladder';
     if (isInteractive && !isLevelUnlocked(level.id)) {
+      console.warn('[levelCombat] startLevel: aborting, level is locked', level?.id);
       const playfield = getPlayfield();
       if (playfield?.messageEl) {
         const requiredId = getPreviousInteractiveLevelId(level.id);
@@ -407,6 +413,9 @@ export function createLevelCombatController(deps) {
         playfield.messageEl.textContent = `Seal ${requirementLabel} to unlock this path.`;
       }
       return;
+    }
+    if (!getPlayfield()) {
+      console.warn('[levelCombat] startLevel: playfield is not initialized yet, level state updated but canvas will not render', level?.id);
     }
     const updatedState = {
       ...currentState,

@@ -1021,7 +1021,9 @@ export function createTowerUpgradeOverlayController({
     container.append(fragment);
     mathElements.forEach((element) => renderMathElement(element));
 
-    renderAlgebraicUpgradeSection(towerId, container);
+    if (!blueprint?.hideAlgebraicUpgrades) {
+      renderAlgebraicUpgradeSection(towerId, container);
+    }
 
     // Ensure freshly rendered variable cards inherit the correct visibility state
     // so their sub-equation stacks do not remain hidden after re-renders.

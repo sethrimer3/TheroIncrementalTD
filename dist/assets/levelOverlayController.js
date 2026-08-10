@@ -38,6 +38,8 @@ export function createLevelOverlayController({
   function handleConfirmRequest() {
     if (typeof confirmHandler === 'function') {
       confirmHandler();
+    } else {
+      console.warn('[levelOverlay] handleConfirmRequest: no confirmHandler registered, ignoring click');
     }
   }
 

@@ -8117,8 +8117,11 @@ body.playfield-fullscreen .playfield canvas {
   position: fixed;
   inset: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: max(24px, 4vh) 16px;
   background: rgba(0, 0, 0, 0.85);
   opacity: 0;
   pointer-events: none;
@@ -9743,8 +9746,7 @@ body.show-glyph-equations .tower-upgrade-variable-equations {
 
 .tab-bar {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(92px, 14vw) minmax(0, 1fr)
-    minmax(0, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
   padding: 16px clamp(12px, 3vw, 24px);
   border-radius: 16px;
@@ -9765,8 +9767,7 @@ body.show-glyph-equations .tower-upgrade-variable-equations {
     background: rgba(10, 10, 16, 0.95);
     /* Compress the edge padding so the wider spire column fits comfortably on small screens. */
     padding: 12px clamp(10px, 4vw, 18px);
-    /* Allocate additional width to the spire stack so its nested buttons remain legible. */
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 2.5fr) minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 8px;
   }
 

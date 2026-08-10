@@ -9,6 +9,35 @@ import {
   registerEnemyEncounter,
 } from '../../codex.js';
 
+import {
+  computeTowerVariableValue,
+  getTowerEquationBlueprint,
+} from '../../towersTab.js';
+
+// The Shadow Gate's curse variables (see assets/towerEquations/shadowGate.ts) are purchased
+// like any tower's glyph variables, but their levels are read here to scale enemy stats
+// directly rather than feeding a combat-output equation.
+const SHADOW_GATE_TOWER_ID = 'shadow-gate';
+
+/** Current gate curse levels as [0, cap]-clamped multipliers applied to spawned enemies. */
+function getGateCurseMultipliers() {
+  const blueprint = getTowerEquationBlueprint(SHADOW_GATE_TOWER_ID);
+  const hpReductionPct = Number(
+    computeTowerVariableValue(SHADOW_GATE_TOWER_ID, 'enemyHpReduction', blueprint),
+  ) || 0;
+  const speedReductionPct = Number(
+    computeTowerVariableValue(SHADOW_GATE_TOWER_ID, 'enemySpeedReduction', blueprint),
+  ) || 0;
+  const damageReductionPct = Number(
+    computeTowerVariableValue(SHADOW_GATE_TOWER_ID, 'enemyDamageReduction', blueprint),
+  ) || 0;
+  return {
+    hpMultiplier: 1 - Math.min(50, Math.max(0, hpReductionPct)) / 100,
+    speedMultiplier: 1 - Math.min(50, Math.max(0, speedReductionPct)) / 100,
+    damageMultiplier: 1 - Math.min(90, Math.max(0, damageReductionPct)) / 100,
+  };
+}
+
 /**
  * Creates a combat state manager that handles wave progression and enemy lifecycle.
  * This manager is a stateful factory that encapsulates combat logic previously
@@ -140,6 +169,7 @@ export function createCombatStateManager(config) {
    */
   function startCombat(options = {}) {
     // Reset state
+    combatActive = true;
     waveIndex = options.startingWaveIndex || 0;
     lives = options.startingLives || levelConfig.lives || 20;
     energy = options.startingEnergy || 0;
@@ -286,12 +316,13 @@ export function createCombatStateManager(config) {
         const baseHp = enemyConfig.hp || 100;
         const baseSpeed = enemyConfig.speed || 1;
         const baseReward = enemyConfig.reward || 10;
-        
+        const curseMultipliers = getGateCurseMultipliers();
+
         const enemy = {
           id: ++enemyIdCounter,
-          hp: baseHp * cycleMultiplier,
-          maxHp: baseHp * cycleMultiplier,
-          speed: baseSpeed * cycleSpeedScalar,
+          hp: baseHp * cycleMultiplier * curseMultipliers.hpMultiplier,
+          maxHp: baseHp * cycleMultiplier * curseMultipliers.hpMultiplier,
+          speed: baseSpeed * cycleSpeedScalar * curseMultipliers.speedMultiplier,
           reward: baseReward * cycleMultiplier,
           symbol: enemyConfig.symbol || '○',
           pathMode: enemyConfig.pathMode || 'follow',
@@ -385,8 +416,8 @@ export function createCombatStateManager(config) {
 
       // Check if enemy reached the end (breach)
       if (enemy.progress >= 1.0) {
-        // Apply breach damage
-        const breachDamage = Math.max(0, enemy.hp);
+        // Apply breach damage, curbed by the Shadow Gate's Enemy Damage Reduction curse.
+        const breachDamage = Math.max(0, enemy.hp) * getGateCurseMultipliers().damageMultiplier;
         if (!levelConfig.ignoreBreachDamage) {
           lives -= breachDamage;
         }

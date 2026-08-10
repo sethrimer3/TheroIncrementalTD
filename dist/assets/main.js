@@ -981,11 +981,6 @@ import { createSpireCameraController } from './spireCameraController.js';
   const leaveActiveLevel = levelCombatCtrl.leaveActiveLevel;
   const _focusLeaveLevelButton = levelCombatCtrl.focusLeaveLevelButton;
 
-  // Allow the overlay confirmation gesture to begin levels through the shared controller.
-  if (levelOverlayController) {
-    levelOverlayController.setConfirmHandler(confirmPendingLevel);
-  }
-
   const { initializeManualDropHandlers } = createManualDropController({
     getActiveTabId,
     getSandSimulation: () => sandSimulation,
@@ -1327,6 +1322,11 @@ import { createSpireCameraController } from './spireCameraController.js';
     revealOverlay,
     scheduleOverlayHide,
   });
+
+  // Allow the overlay confirmation gesture to begin levels through the shared controller.
+  // (Must run after levelOverlayController is assigned above; levelCombatCtrl is created
+  // earlier in this function while levelOverlayController is still null.)
+  levelOverlayController.setConfirmHandler(confirmPendingLevel);
 
   const levelStoryScreen = createLevelStoryScreen({
     levelState,
