@@ -43,7 +43,7 @@ export function createResourceHud({
     if (resourceElements.tabGlyphBadge) {
       const label = formatWholeNumber(unusedGlyphs);
       resourceElements.tabGlyphBadge.textContent = label;
-      resourceElements.tabGlyphBadge.setAttribute('aria-label', `${label} unused Well glyphs`);
+      resourceElements.tabGlyphBadge.setAttribute('aria-label', `${label} unused Tower glyphs`);
       resourceElements.tabGlyphBadge.toggleAttribute('hidden', unusedGlyphs <= 0);
       resourceElements.tabGlyphBadge.setAttribute('aria-hidden', unusedGlyphs > 0 ? 'false' : 'true');
     }

@@ -8,7 +8,7 @@
 
 // Narrative targets for each spire tab so the shared story overlay can surface their briefings.
 export const SPIRE_STORY_TARGETS = {
-  powder: { id: 'spire-powder', title: 'Well of Inspiration' },
+  powder: { id: 'spire-powder', title: 'Tower of Inspiration' },
   achievements: { id: 'achievements', title: 'Achievements' },
 };
 

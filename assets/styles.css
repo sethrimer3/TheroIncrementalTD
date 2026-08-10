@@ -10013,6 +10013,11 @@ body.show-glyph-equations .tower-upgrade-variable-equations {
   pointer-events: none;
 }
 
+/* Remove empty resource badges completely so zero values leave no border or footprint. */
+.tab-icon-badge[hidden] {
+  display: none;
+}
+
 /* Accent the glyph badge with the same amber glow used in the tower panel. */
 .tab-icon-badge--glyphs {
   color: var(--accent-3);

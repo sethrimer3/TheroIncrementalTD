@@ -480,7 +480,7 @@ export function createTowerUpgradeOverlayController({
       return;
     }
     const alephAvailable = Math.max(0, Math.floor(towerTabState.glyphCurrency));
-    glyphs.textContent = `Available Well Glyphs: ${formatWholeNumber(alephAvailable)} ℵ`;
+    glyphs.textContent = `Available Tower Glyphs: ${formatWholeNumber(alephAvailable)} ℵ`;
   }
 
   /** Present contextual messaging below the variable list. */
@@ -581,7 +581,7 @@ export function createTowerUpgradeOverlayController({
   }
 
   function getCurrencyMeta(_currencyKey = 'aleph') {
-    return { singular: 'Well glyph', plural: 'Well glyphs', short: 'Well Glyphs', symbol: 'ℵ' };
+    return { singular: 'Tower glyph', plural: 'Tower glyphs', short: 'Tower Glyphs', symbol: 'ℵ' };
   }
 
   function getAvailableCurrency(_currencyKey = 'aleph') {
@@ -1032,7 +1032,7 @@ export function createTowerUpgradeOverlayController({
     towerTabState.towerUpgradeElements.lastRenderedTowerId = towerId;
   }
 
-  /** Render the five per-tower algebraic upgrade rows (level/cost/buy), purchased with Well Glyphs. */
+  /** Render the five per-tower algebraic upgrade rows (level/cost/buy), purchased with Tower Glyphs. */
   function renderAlgebraicUpgradeSection(towerId, container) {
     if (!towerId || !container) {
       return;

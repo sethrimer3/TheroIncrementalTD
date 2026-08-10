@@ -1,4 +1,4 @@
-// Maintain the Well of Inspiration's recent active-action ledger.
+// Maintain the Tower of Inspiration's recent active-action ledger.
 
 const POWDER_LOG_LIMIT = 6;
 const powderLog = [];
@@ -83,7 +83,7 @@ export function recordPowderEvent(type, context = {}) {
       break;
     }
     case 'mode-switch':
-      entry = 'Well of Inspiration simulation engaged.';
+      entry = 'Tower of Inspiration simulation engaged.';
       break;
     default:
       return;
