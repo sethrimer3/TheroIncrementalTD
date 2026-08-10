@@ -5,7 +5,7 @@ const path = require('path');
 const rootDir = path.resolve(__dirname, '..');
 const distIndex = path.join(rootDir, 'dist', 'index.html');
 const sourceIndex = path.join(rootDir, 'index.html');
-const appIconPath = path.join(rootDir, 'assets', 'icon', 'Thero_icon.ico');
+const appIconPath = path.join(rootDir, 'assets', 'icon', 'TheroMathTD_Icon.ico');
 
 function resolveGameIndex() {
   return fs.existsSync(distIndex) ? distIndex : sourceIndex;
