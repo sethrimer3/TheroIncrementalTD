@@ -13,9 +13,13 @@ if not exist node_modules (
   if errorlevel 1 goto error
 )
 
-echo ERROR: package.json does not define an npm "dev" script.
-echo Browser dev mode cannot be started until a dev script is added.
-goto error
+echo Starting Thero Idle at http://127.0.0.1:8000/ ...
+echo The browser will refresh automatically when game files change.
+call npm run dev -- --open
+if errorlevel 1 goto error
+
+popd
+exit /b 0
 
 :error
 echo.

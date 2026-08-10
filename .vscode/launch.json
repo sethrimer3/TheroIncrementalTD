@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Thero Idle: Browser (hot refresh)",
+      "type": "pwa-chrome",
+      "request": "launch",
+      "url": "http://127.0.0.1:8000/",
+      "webRoot": "${workspaceFolder}",
+      "preLaunchTask": "Thero Idle: Dev Server"
+    }
+  ]
+}
