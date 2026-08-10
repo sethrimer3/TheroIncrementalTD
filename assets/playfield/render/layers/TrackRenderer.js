@@ -24,13 +24,13 @@ const ULTRA_DPI_EFFECT_PIXEL_RATIO = 2.5;
 
 // Gate sprite assets loaded eagerly so they are ready before first render.
 // Using PNG symbol sprites uploaded to the gates&track sprite folder.
-const MIND_GATE_SPRITE_URL = 'assets/sprites/gates%26track/mindGate/mindGateSymbol.png';
+const MIND_GATE_SPRITE_URL = 'assets/sprites/gates&track/mindGate/mindGateSymbol.png';
 const mindGateSprite = new Image();
 mindGateSprite.src = MIND_GATE_SPRITE_URL;
 mindGateSprite.decoding = 'async';
 mindGateSprite.loading = 'eager';
 
-const ENEMY_GATE_SPRITE_URL = 'assets/sprites/gates%26track/enemyGate/enemyGateSymbol.png';
+const ENEMY_GATE_SPRITE_URL = 'assets/sprites/gates&track/enemyGate/enemyGateSymbol.png';
 const enemyGateSprite = new Image();
 enemyGateSprite.src = ENEMY_GATE_SPRITE_URL;
 enemyGateSprite.decoding = 'async';
@@ -38,13 +38,13 @@ enemyGateSprite.loading = 'eager';
 
 // Shadow Gate background layers animate as alternating clockwise/counter-clockwise rings.
 const SHADOW_GATE_BACKGROUND_LAYERS = [
-  { url: 'assets/sprites/gates%26track/enemyGate/gateBackground/ShadowGateBackgroundLayer%20(1).png', speed: 0, direction: 1 },
-  { url: 'assets/sprites/gates%26track/enemyGate/gateBackground/ShadowGateBackgroundLayer%20(2).png', speed: 0.1, direction: 1 },
-  { url: 'assets/sprites/gates%26track/enemyGate/gateBackground/ShadowGateBackgroundLayer%20(3).png', speed: 0.1, direction: -1 },
-  { url: 'assets/sprites/gates%26track/enemyGate/gateBackground/ShadowGateBackgroundLayer%20(4).png', speed: 0.2, direction: 1 },
-  { url: 'assets/sprites/gates%26track/enemyGate/gateBackground/ShadowGateBackgroundLayer%20(5).png', speed: 0.2, direction: -1 },
-  { url: 'assets/sprites/gates%26track/enemyGate/gateBackground/ShadowGateBackgroundLayer%20(6).png', speed: 0.3, direction: 1 },
-  { url: 'assets/sprites/gates%26track/enemyGate/gateBackground/ShadowGateBackgroundLayer%20(7).png', speed: 0.3, direction: -1 },
+  { url: 'assets/sprites/gates&track/enemyGate/gateBackground/ShadowGateBackgroundLayer%20(1).png', speed: 0, direction: 1 },
+  { url: 'assets/sprites/gates&track/enemyGate/gateBackground/ShadowGateBackgroundLayer%20(2).png', speed: 0.1, direction: 1 },
+  { url: 'assets/sprites/gates&track/enemyGate/gateBackground/ShadowGateBackgroundLayer%20(3).png', speed: 0.1, direction: -1 },
+  { url: 'assets/sprites/gates&track/enemyGate/gateBackground/ShadowGateBackgroundLayer%20(4).png', speed: 0.2, direction: 1 },
+  { url: 'assets/sprites/gates&track/enemyGate/gateBackground/ShadowGateBackgroundLayer%20(5).png', speed: 0.2, direction: -1 },
+  { url: 'assets/sprites/gates&track/enemyGate/gateBackground/ShadowGateBackgroundLayer%20(6).png', speed: 0.3, direction: 1 },
+  { url: 'assets/sprites/gates&track/enemyGate/gateBackground/ShadowGateBackgroundLayer%20(7).png', speed: 0.3, direction: -1 },
 ].map((entry) => {
   // Preload each ring sprite once so per-frame rendering only performs blits.
   const image = new Image();
@@ -59,14 +59,14 @@ const SHADOW_GATE_BACKGROUND_LAYERS = [
 
 // Mind Gate background layers spin in alternating directions with progressively faster outer rings.
 const MIND_GATE_BACKGROUND_LAYERS = [
-  { url: 'assets/sprites/gates%26track/mindGate/gateBackground/MindGateBackgroundLayer%20(1).png', speed: 0.1, direction: 1 },
-  { url: 'assets/sprites/gates%26track/mindGate/gateBackground/MindGateBackgroundLayer%20(2).png', speed: 0.1, direction: -1 },
-  { url: 'assets/sprites/gates%26track/mindGate/gateBackground/MindGateBackgroundLayer%20(3).png', speed: 0.2, direction: 1 },
-  { url: 'assets/sprites/gates%26track/mindGate/gateBackground/MindGateBackgroundLayer%20(4).png', speed: 0.2, direction: -1 },
-  { url: 'assets/sprites/gates%26track/mindGate/gateBackground/MindGateBackgroundLayer%20(5).png', speed: 0.3, direction: 1 },
-  { url: 'assets/sprites/gates%26track/mindGate/gateBackground/MindGateBackgroundLayer%20(6).png', speed: 0.3, direction: -1 },
-  { url: 'assets/sprites/gates%26track/mindGate/gateBackground/MindGateBackgroundLayer%20(7).png', speed: 0.4, direction: 1 },
-  { url: 'assets/sprites/gates%26track/mindGate/gateBackground/MindGateBackgroundLayer%20(8).png', speed: 0.4, direction: -1 },
+  { url: 'assets/sprites/gates&track/mindGate/gateBackground/MindGateBackgroundLayer%20(1).png', speed: 0.1, direction: 1 },
+  { url: 'assets/sprites/gates&track/mindGate/gateBackground/MindGateBackgroundLayer%20(2).png', speed: 0.1, direction: -1 },
+  { url: 'assets/sprites/gates&track/mindGate/gateBackground/MindGateBackgroundLayer%20(3).png', speed: 0.2, direction: 1 },
+  { url: 'assets/sprites/gates&track/mindGate/gateBackground/MindGateBackgroundLayer%20(4).png', speed: 0.2, direction: -1 },
+  { url: 'assets/sprites/gates&track/mindGate/gateBackground/MindGateBackgroundLayer%20(5).png', speed: 0.3, direction: 1 },
+  { url: 'assets/sprites/gates&track/mindGate/gateBackground/MindGateBackgroundLayer%20(6).png', speed: 0.3, direction: -1 },
+  { url: 'assets/sprites/gates&track/mindGate/gateBackground/MindGateBackgroundLayer%20(7).png', speed: 0.4, direction: 1 },
+  { url: 'assets/sprites/gates&track/mindGate/gateBackground/MindGateBackgroundLayer%20(8).png', speed: 0.4, direction: -1 },
 ].map((entry) => {
   // Preload each ring sprite once so per-frame rendering only performs blits.
   const image = new Image();

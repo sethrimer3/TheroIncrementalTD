@@ -169,6 +169,7 @@ import {
   notifyAchievementsTabVisibilityChange,
 } from './achievementsTab.js';
 import { initializeBoostsSection } from './boostsSection.js';
+import { bindDefenseLeaderboardNotice } from './defenseLeaderboardNotice.js';
 import {
   loadMonetizationState,
 } from './state/monetizationState.js';
@@ -1851,6 +1852,8 @@ import { createSpireCameraController } from './spireCameraController.js';
     bindPowderSpireOptions();
     initializeColorScheme();
     bindAudioControls();
+    // Wire the Defense leaderboard placeholder after its static DOM is available.
+    bindDefenseLeaderboardNotice();
 
     const towerPanel = document.getElementById('panel-tower');
     const towersPanel = document.getElementById('panel-towers');

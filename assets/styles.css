@@ -2429,6 +2429,37 @@ body.playfield-fullscreen .playfield canvas {
   transform: translateY(-1px);
 }
 
+/* Present the temporary leaderboard message beneath the sword shortcut without blocking input. */
+.defense-leaderboard-notice {
+  position: absolute;
+  top: 62px;
+  right: 14px;
+  z-index: 4;
+  max-width: min(240px, calc(100% - 28px));
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 215, 100, 0.35);
+  border-radius: 10px;
+  background: rgba(10, 8, 6, 0.92);
+  color: rgba(255, 230, 150, 0.96);
+  font-size: 0.86rem;
+  letter-spacing: 0.04em;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+
+.defense-leaderboard-notice[hidden] {
+  display: none;
+}
+
+.defense-leaderboard-notice--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .level-grid {
   display: flex;
   flex-direction: column;

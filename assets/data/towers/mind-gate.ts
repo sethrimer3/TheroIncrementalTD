@@ -15,7 +15,7 @@ export const MIND_GATE_TOWER = Object.freeze({
   rate: 0,
   range: 0,
   diameterMeters: 2.4,
-  icon: 'assets/sprites/gates%26track/mindGate/mindGateSymbol.png',
+  icon: 'assets/sprites/gates&track/mindGate/mindGateSymbol.png',
   description:
     'Anchors the defense core—when the Mind Gate folds, inspiration and glyph conduits collapse.',
 } as const satisfies TowerDefinition);
