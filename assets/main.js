@@ -2039,8 +2039,6 @@ import { createSpireCameraController } from './spireCameraController.js';
         onCombatStart: handlePlayfieldCombatStart,
       });
       setTowersPlayfield(playfield);
-      window.__setGlyphCurrency = setGlyphCurrency;
-      window.__pf = playfield;
       playfield.draw();
       if (playfieldMenuController) {
         playfieldMenuController.syncStatsPanelVisibility();
