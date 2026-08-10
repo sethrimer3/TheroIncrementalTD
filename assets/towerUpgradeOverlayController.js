@@ -1,4 +1,5 @@
 import { generateMasterEquationText } from './towerEquations/masterEquationUtils.js';
+import { parseEquationLabel } from '../scripts/core/mathTokens.js';
 
 /**
  * Tower upgrade overlay controller responsible for rendering the equation panel,
@@ -175,27 +176,27 @@ export function createTowerUpgradeOverlayController({
     });
   }
 
-  /**
-   * Render an equation variable, splitting the first character so it can animate
-   * separately from the trailing glyph.
-   */
+  /** Render one variable while preserving identifiers and authored TeX scripts. */
   function appendEquationVariable(target, label) {
     if (!target) {
       return;
     }
-    const text = normalizeEquationLabel(label);
-    if (!text) {
+    const parts = parseEquationLabel(label, convertMathExpressionToPlainText);
+    if (!parts.base) {
       appendEquationText(target, label);
       return;
     }
-    const [firstChar, ...restChars] = Array.from(text);
-    appendEquationText(target, firstChar);
-    if (restChars.length) {
-      const tail = document.createElement('span');
-      tail.className = 'tower-upgrade-formula-part-tail';
-      appendEquationText(tail, restChars.join(''));
-      target.append(tail);
-    }
+    appendEquationText(target, parts.base);
+    [
+      ['subscript', parts.subscript],
+      ['superscript', parts.superscript],
+    ].forEach(([kind, text]) => {
+      if (!text) return;
+      const script = document.createElement('span');
+      script.className = `tower-upgrade-formula-part-tail tower-upgrade-formula-part-tail--${kind}`;
+      appendEquationText(script, text);
+      target.append(script);
+    });
   }
 
   /**

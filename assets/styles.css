@@ -8719,6 +8719,16 @@ body.playfield-fullscreen .playfield canvas {
   margin-left: 0.14ch;
   letter-spacing: 0.08em;
   transform-origin: left center;
+  align-self: center;
+}
+
+/* Script only authored _/^ groups; ordinary identifier letters stay inline. */
+.tower-upgrade-formula-part-tail--subscript {
+  transform: translateY(0.42em);
+}
+
+.tower-upgrade-formula-part-tail--superscript {
+  transform: translateY(-0.52em);
 }
 
 .tower-upgrade-formula-part--dynamic {
@@ -8762,6 +8772,8 @@ body.playfield-fullscreen .playfield canvas {
 .tower-upgrade-variables {
   display: grid;
   gap: 16px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .tower-upgrade-variables[data-tower-id='mind-gate'] {
@@ -8772,6 +8784,9 @@ body.playfield-fullscreen .playfield canvas {
 .tower-upgrade-variable { 
   display: grid;
   gap: 12px;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
   padding: 18px 22px;
   border-radius: 18px;
   background: rgba(16, 16, 24, 0.68);
@@ -8790,6 +8805,10 @@ body.playfield-fullscreen .playfield canvas {
 .tower-upgrade-variable-equations {
   display: grid;
   gap: 6px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
   padding: 10px 16px;
   border-radius: 14px;
   border-left: 3px solid rgba(255, 215, 0, 0.28);
@@ -8798,6 +8817,9 @@ body.playfield-fullscreen .playfield canvas {
   color: rgba(255, 255, 255, 0.82);
   opacity: 0;
   transform: translateY(8px);
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
   transition: opacity 240ms ease, transform 240ms ease;
 }
 
@@ -8814,6 +8836,8 @@ body.playfield-fullscreen .playfield canvas {
 
 .tower-upgrade-variable-equation-line {
   margin: 0;
+  min-width: 0;
+  max-width: 100%;
   font-size: 0.92rem;
   letter-spacing: 0.04em;
   text-align: left;
@@ -8859,6 +8883,9 @@ body.show-glyph-equations .tower-upgrade-variable-equations {
 /* Ensure MathJax breakdown lines stay readable against the dark lattice card. */
 .tower-upgrade-variable-equations mjx-container {
   display: flex;
+  width: max-content;
+  min-width: 100%;
+  max-width: none;
   justify-content: flex-start;
   color: inherit;
   text-shadow: 0 0 8px rgba(255, 246, 180, 0.35);

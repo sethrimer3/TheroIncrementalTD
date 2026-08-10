@@ -186,6 +186,6 @@ export const xi = {
     },
     formatBaseEquationValues({ values, result, formatComponent }) {
         const nuValue = Math.max(0, isFiniteNumber(values.nu) ? values.nu : 0);
-        return `${formatComponent(result)} = ${formatComponent(nuValue)} × (\\text{chain}^{\\text{exp}})`;
+        return String.raw`\( ${formatComponent(result)} = ${formatComponent(nuValue)} \times (\text{chain}^{\text{exp}}) \)`;
     },
 };
