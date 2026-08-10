@@ -229,7 +229,7 @@ export function createLevelCombatController(deps) {
   }
 
   function handleLevelSelection(level) {
-    console.log('[levelCombat] handleLevelSelection', level?.id, level);
+    console.debug('[levelCombat] handleLevelSelection:', level?.id);
     const state = levelState.get(level.id) || { entered: false, running: false };
     const activeElement = document.activeElement;
     if (activeElement && typeof activeElement.focus === 'function') {
@@ -364,7 +364,7 @@ export function createLevelCombatController(deps) {
   }
 
   function confirmPendingLevel() {
-    console.log('[levelCombat] confirmPendingLevel called, pendingLevel =', pendingLevel?.id ?? null);
+    console.debug('[levelCombat] confirmPendingLevel: pendingLevel =', pendingLevel?.id ?? null);
     if (!pendingLevel) {
       console.warn('[levelCombat] confirmPendingLevel: no pendingLevel set, just hiding overlay');
       const levelOverlayController = getLevelOverlayController();
@@ -386,7 +386,7 @@ export function createLevelCombatController(deps) {
   }
 
   function startLevel(level) {
-    console.log('[levelCombat] startLevel', level?.id);
+    console.debug('[levelCombat] startLevel:', level?.id);
     deactivateDeveloperMapTools({ force: true, silent: true });
     const currentState = levelState.get(level.id) || {
       entered: false,
@@ -414,7 +414,9 @@ export function createLevelCombatController(deps) {
       }
       return;
     }
-    console.log('[levelCombat] startLevel: proceeding, playfield =', Boolean(getPlayfield()));
+    if (!getPlayfield()) {
+      console.warn('[levelCombat] startLevel: playfield is not initialized yet, level state updated but canvas will not render', level?.id);
+    }
     const updatedState = {
       ...currentState,
       entered: true,

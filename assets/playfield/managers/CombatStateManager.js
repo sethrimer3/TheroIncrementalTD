@@ -140,6 +140,7 @@ export function createCombatStateManager(config) {
    */
   function startCombat(options = {}) {
     // Reset state
+    combatActive = true;
     waveIndex = options.startingWaveIndex || 0;
     lives = options.startingLives || levelConfig.lives || 20;
     energy = options.startingEnergy || 0;

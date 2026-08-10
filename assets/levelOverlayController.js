@@ -36,9 +36,10 @@ export function createLevelOverlayController({
    * Executes the currently configured confirmation handler when the overlay is activated.
    */
   function handleConfirmRequest() {
-    console.log('[levelOverlay] handleConfirmRequest, confirmHandler set =', typeof confirmHandler === 'function');
     if (typeof confirmHandler === 'function') {
       confirmHandler();
+    } else {
+      console.warn('[levelOverlay] handleConfirmRequest: no confirmHandler registered, ignoring click');
     }
   }
 
