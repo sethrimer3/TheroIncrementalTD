@@ -28,8 +28,6 @@ export const shadowGate = {
   mathSymbol: String.raw`\wp`,
   baseEquation: String.raw`\( \wp = x \)`,
   // The gate's curses below are real gameplay multipliers (read by CombatStateManager),
-  // not decorative filler, so the generic five-slot Algebraic Upgrades list is redundant here.
-  hideAlgebraicUpgrades: true,
   variables: [
     {
       key: 'enemies',

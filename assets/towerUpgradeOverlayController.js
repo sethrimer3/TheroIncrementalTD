@@ -1,10 +1,4 @@
 import { generateMasterEquationText } from './towerEquations/masterEquationUtils.js';
-import {
-  ALGEBRAIC_VARIABLES,
-  getAlgebraicVariable,
-  getTowerVariableUpgradeCost,
-  purchaseAlgebraicUpgrade,
-} from './algebraicUpgrades.js';
 
 /**
  * Tower upgrade overlay controller responsible for rendering the equation panel,
@@ -1021,94 +1015,11 @@ export function createTowerUpgradeOverlayController({
     container.append(fragment);
     mathElements.forEach((element) => renderMathElement(element));
 
-    if (!blueprint?.hideAlgebraicUpgrades) {
-      renderAlgebraicUpgradeSection(towerId, container);
-    }
-
     // Ensure freshly rendered variable cards inherit the correct visibility state
     // so their sub-equation stacks do not remain hidden after re-renders.
     syncTowerVariableCardVisibility();
 
     towerTabState.towerUpgradeElements.lastRenderedTowerId = towerId;
-  }
-
-  /** Render the five per-tower algebraic upgrade rows (level/cost/buy), purchased with Tower Glyphs. */
-  function renderAlgebraicUpgradeSection(towerId, container) {
-    if (!towerId || !container) {
-      return;
-    }
-
-    const section = document.createElement('div');
-    section.className = 'tower-upgrade-algebraic-section';
-    section.dataset.towerId = towerId;
-
-    const heading = document.createElement('p');
-    heading.className = 'tower-upgrade-algebraic-heading';
-    heading.textContent = 'Algebraic Upgrades';
-    section.append(heading);
-
-    const balance = document.createElement('p');
-    balance.className = 'tower-upgrade-algebraic-balance';
-    const availableGlyphs = getAvailableCurrency('aleph');
-    balance.textContent = `Available Aleph Glyphs: ${formatWholeNumber(availableGlyphs)} ℵ`;
-    section.append(balance);
-
-    const list = document.createElement('div');
-    list.className = 'tower-upgrade-algebraic-list';
-    list.setAttribute('role', 'list');
-
-    ALGEBRAIC_VARIABLES.forEach((variable) => {
-      const level = getAlgebraicVariable(towerId, variable.id);
-      const cost = getTowerVariableUpgradeCost(variable.id, level);
-
-      const row = document.createElement('div');
-      row.className = 'tower-upgrade-algebraic-row';
-      row.setAttribute('role', 'listitem');
-      row.dataset.algebraicVariable = variable.id;
-
-      const label = document.createElement('span');
-      label.className = 'tower-upgrade-algebraic-label';
-      label.textContent = variable.label;
-      row.append(label);
-
-      const levelLabel = document.createElement('span');
-      levelLabel.className = 'tower-upgrade-algebraic-level';
-      levelLabel.textContent = `LV ${formatWholeNumber(level)}`;
-      row.append(levelLabel);
-
-      const costLabel = document.createElement('span');
-      costLabel.className = 'tower-upgrade-algebraic-cost';
-      costLabel.textContent = `COST: ${formatWholeNumber(cost)} ℵ`;
-      row.append(costLabel);
-
-      const buyButton = document.createElement('button');
-      buyButton.type = 'button';
-      buyButton.className = 'tower-upgrade-algebraic-buy';
-      buyButton.textContent = 'Upgrade';
-      buyButton.disabled = availableGlyphs < cost;
-      buyButton.setAttribute('aria-label', `Upgrade ${variable.label}`);
-      buyButton.addEventListener('click', () => handleAlgebraicVariableUpgrade(towerId, variable.id));
-      row.append(buyButton);
-
-      list.append(row);
-    });
-
-    section.append(list);
-    container.append(section);
-  }
-
-  /** Spend Aleph Glyphs to raise one algebraic upgrade, then refresh the panel. */
-  function handleAlgebraicVariableUpgrade(towerId, variableId) {
-    const result = purchaseAlgebraicUpgrade(towerId, variableId, {
-      getGlyphCurrency: () => getAvailableCurrency('aleph'),
-      spendGlyphCurrency: (amount) => adjustCurrencyBalance('aleph', -amount),
-    });
-    if (!result.success) {
-      return;
-    }
-    invalidateTowerEquationCache();
-    renderTowerUpgradeOverlay(towerId, { resetScroll: false });
-    updateTowerUpgradeGlyphDisplay();
   }
 
   function formatTowerEquationResultValue(value) {
