@@ -2573,7 +2573,11 @@ export class SimplePlayfield {
   get waveTimer() {
     return this.combatStateManager ? this.combatStateManager.getWaveTimer() : 0;
   }
-  
+
+  set waveTimer(value) {
+    // No-op setter for backward compatibility. The combat manager owns this state.
+  }
+
   get activeWave() {
     return this.combatStateManager ? this.combatStateManager.getCurrentWave() : null;
   }
@@ -2702,17 +2706,41 @@ export class SimplePlayfield {
   get developerCrystals() {
     return this.developerTools ? this.developerTools.crystals : [];
   }
-  
+
+  set developerCrystals(value) {
+    if (this.developerTools) {
+      this.developerTools.crystals = value;
+    }
+  }
+
   get crystalShards() {
     return this.developerTools ? this.developerTools.shards : [];
   }
-  
+
+  set crystalShards(value) {
+    if (this.developerTools) {
+      this.developerTools.shards = value;
+    }
+  }
+
   get crystalIdCounter() {
     return this.developerTools ? this.developerTools.crystalIdCounter : 0;
   }
-  
+
+  set crystalIdCounter(value) {
+    if (this.developerTools) {
+      this.developerTools.crystalIdCounter = value;
+    }
+  }
+
   get focusedCrystalId() {
     return this.developerTools ? this.developerTools.focusedCrystalId : null;
+  }
+
+  set focusedCrystalId(value) {
+    if (this.developerTools) {
+      this.developerTools.focusedCrystalId = value;
+    }
   }
   
   // Crystal management methods
