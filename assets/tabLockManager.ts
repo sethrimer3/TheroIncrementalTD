@@ -81,7 +81,7 @@ export function updateTabLockStates(tutorialCompleted: boolean): void {
     });
   }
 
-  // Lock the Well of Inspiration until the tutorial is complete.
+  // Lock the Tower of Inspiration until the tutorial is complete.
   const powderTab = document.getElementById('tab-powder') as HTMLButtonElement | null;
   if (powderTab) {
     setTabButtonState(powderTab, {

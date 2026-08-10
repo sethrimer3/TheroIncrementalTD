@@ -185,9 +185,9 @@ Spending nothing compounds into a nearly limitless multiplier, rewarding an "idl
 
 ---
 
-## Well of Inspiration
+## Tower of Inspiration
 
-The Well is an active falling-mote simulation, not an idle game. Motes earned through active defenses enter its cellular-automata basin; rising powder illuminates Aleph glyphs (ℵ) used to alter tower equations.
+The Tower is an active falling-mote simulation, not an idle game. Motes earned through active defenses enter its cellular-automata chamber; rising powder illuminates Aleph glyphs (ℵ) used to alter tower equations.
 
 ---
 

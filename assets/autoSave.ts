@@ -46,7 +46,7 @@ export const GAME_STATS_STORAGE_KEY = 'glyph-defense-idle:stats';
 export const POWDER_BASIN_STORAGE_KEY = 'glyph-defense-idle:powder-basin';
 // Storage key used to persist tower upgrade progress (glyph allocations).
 export const TOWER_UPGRADE_STORAGE_KEY = 'glyph-defense-idle:tower-upgrades';
-// Storage key used to persist the spendable Aleph Glyph (Well glyph) balance.
+// Storage key used to persist the spendable Aleph Glyph (Tower glyph) balance.
 export const GLYPH_CURRENCY_STORAGE_KEY = 'glyph-defense-idle:glyph-currency';
 // Retired storage keys remain exported so old data can be identified or cleared safely.
 export const SHIN_STATE_STORAGE_KEY = 'glyph-defense-idle:shin-state';
@@ -60,7 +60,7 @@ export const LAMED_VISUAL_SETTINGS_STORAGE_KEY = 'glyph-defense-idle:lamed-visua
 export const KUF_VISUAL_SETTINGS_STORAGE_KEY = 'glyph-defense-idle:kuf-visual-settings';
 export const TSADI_VISUAL_SETTINGS_STORAGE_KEY = 'glyph-defense-idle:tsadi-visual-settings';
 export const SHIN_VISUAL_SETTINGS_STORAGE_KEY = 'glyph-defense-idle:shin-visual-settings';
-// Compatibility key used to persist Well of Inspiration mote glow settings.
+// Compatibility key used to persist Tower of Inspiration mote glow settings.
 export const POWDER_VISUAL_SETTINGS_STORAGE_KEY = 'glyph-defense-idle:powder-visual-settings';
 // Storage key used to persist the frame rate limit preference.
 export const FRAME_RATE_LIMIT_STORAGE_KEY = 'glyph-defense-idle:frame-rate-limit';

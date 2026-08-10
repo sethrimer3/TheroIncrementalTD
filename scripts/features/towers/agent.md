@@ -22,7 +22,7 @@ Individual tower implementations for Thero Idle's Greek-letter-themed defense sy
 
 **Special Towers:**
 - `alephChain.js` - Aleph (ℵ) series: Cardinality-based tower system
-- `powderTower.js` - Well of Inspiration falling-mote simulation and shared palette helpers
+- `powderTower.js` - Tower of Inspiration falling-mote simulation and shared palette helpers
 
 **Math Modules:**
 - `betaMath.js` - Dedicated math utilities for β tower calculations

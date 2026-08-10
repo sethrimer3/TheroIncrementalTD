@@ -1,6 +1,6 @@
 # main.js Refactoring Guide
 
-> Current product note (2026-07-13): references below to Bet, Lamed, Tsadi, Shin, Kuf, multi-Spire visibility, or floating-menu integration are historical. Those Spires are retired from the active game. The surviving Aleph runtime is presented as the **Well of Inspiration**; compatibility-sensitive internal names remain. See `SPIRE_RETIREMENT.md` before following an older extraction entry.
+> Current product note (2026-08-10): references below to Bet, Lamed, Tsadi, Shin, Kuf, multi-Spire visibility, or floating-menu integration are historical. Those Spires are retired from the active game. The surviving Aleph runtime is presented as the **Tower of Inspiration**; compatibility-sensitive internal names remain. See `SPIRE_RETIREMENT.md` before following an older extraction entry.
 
 > Build 736 also removed automated level runs, offline rewards, passive mote banks,
 > Terrarium idle source/assets, achievement rate bonuses, and idle time boosts.

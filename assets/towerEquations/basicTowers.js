@@ -160,7 +160,7 @@ export const beta = {
         ];
       },
     },
-    // Well glyph sink that fuels beta's slowing field potency.
+    // Tower glyph sink that fuels beta's slowing field potency.
     {
       key: 'betSlow',
       symbol: BET1_GLYPH,

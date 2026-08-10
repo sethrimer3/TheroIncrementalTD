@@ -896,7 +896,7 @@ async function run() {
     });
   });
 
-  await test('createSpireResourceState: accepts the current Well override', () => {
+  await test('createSpireResourceState: accepts the current Tower override', () => {
     const state = spireResourceStateModule.createSpireResourceState({
       wellOfInspiration: { storySeen: true },
       achievements: { storySeen: true },
@@ -933,8 +933,8 @@ async function run() {
 
   const saveCompatibility = await importAsEsm('assets/saveCompatibility.js');
 
-  await test('migrateWellOfInspirationSave: old retired branches are ignored without blocking startup data', () => {
-    const migrated = saveCompatibility.migrateWellOfInspirationSave({
+  await test('migrateTowerOfInspirationSave: old retired branches are ignored without blocking startup data', () => {
+    const migrated = saveCompatibility.migrateTowerOfInspirationSave({
       powder: { storySeen: true },
       fluid: { grainCount: 999 },
       lamed: { unlocked: true },
@@ -947,8 +947,8 @@ async function run() {
     });
   });
 
-  await test('migrateWellOfInspirationSave: preserves a valid legacy simulation snapshot', () => {
-    const migrated = saveCompatibility.migrateWellOfInspirationSave({
+  await test('migrateTowerOfInspirationSave: preserves a valid legacy simulation snapshot', () => {
+    const migrated = saveCompatibility.migrateTowerOfInspirationSave({
       alephSpire: { storySeen: true },
       loadedSimulationState: { grains: [] },
     });
@@ -3316,7 +3316,7 @@ async function run() {
     assert.deepEqual(snapshot.achievements, { storySeen: true });
   });
 
-  await test('spire serialization: falls back from a missing Well branch to compatibility `powder`', () => {
+  await test('spire serialization: falls back from a missing Tower branch to compatibility `powder`', () => {
     const harness = createSpirePersistenceHarness(spirePersistence, {
       spireResourceState: {
         wellOfInspiration: null,

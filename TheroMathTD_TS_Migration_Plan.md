@@ -24,7 +24,7 @@
 > at `assets/legacy/achievementsTerrarium/README.md`; they are preserved JavaScript, excluded from
 > the active application graph, and are not an active migration target. The active remaining backlog
 > is therefore 235 JavaScript modules. The obsolete typed `spireFloatingMenu` and
-> `spireTabVisibility` managers were removed with the multi-Spire navigation. The surviving Aleph system is presented as the Well of
+> `spireTabVisibility` managers were removed with the multi-Spire navigation. The surviving Aleph system is presented as the Tower of
 > Inspiration, while compatibility-sensitive internal names remain unchanged.
 
 - **Build tooling:** Plain `tsc` (no bundler). `tsconfig.json` is `strict: true`, `allowJs: true`,
@@ -261,7 +261,7 @@ requires exhaustive inspection of serialization/deserialization fallback branche
 ### Revised Phase 6 — Post-Retirement Spire Resource Persistence (COMPLETE, 2026-07-15)
 **Scope executed:** `assets/spireResourcePersistence.js` → `.ts`; compatibility-only type narrowing
 in `assets/autoSave.ts`; 17 deterministic compiled-output tests in `scripts/unit-test-core.cjs`.
-**Actual live ownership:** Well of Inspiration and Achievements story flags, and the base
+**Actual live ownership:** Tower of Inspiration and Achievements story flags, and the base
 tower-upgrade snapshot augmented with Aleph-chain upgrades. The
 historical multi-Spire recommendation was superseded because retired Bet/Lamed/Tsadi/Shin/Kuf save
 branches are intentionally ignored by the current 93-line module.

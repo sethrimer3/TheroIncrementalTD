@@ -10,7 +10,7 @@ import type {
 } from './towerBlueprintPresenter.js';
 import type { AlgebraicUpgradeStateSnapshot } from './algebraicUpgrades.js';
 
-/** Mutable story flag owned by the surviving Well and Achievements state branches. */
+/** Mutable story flag owned by the surviving Tower and Achievements state branches. */
 export interface MutableStoryState {
   storySeen: boolean;
 }
@@ -27,8 +27,8 @@ export interface SpireResourcePersistenceState {
   achievements: MutableStoryState;
 }
 
-/** Exact serialized Well story branch emitted by this module. */
-export interface SerializedWellStoryState {
+/** Exact serialized Tower story branch emitted by this module. */
+export interface SerializedTowerStoryState {
   unlocked: true;
   storySeen: boolean;
 }
@@ -40,7 +40,7 @@ export interface SerializedAchievementStoryState {
 
 /** Complete Spire-resource snapshot currently owned by the post-retirement module. */
 export interface SpireResourceStateSnapshot {
-  wellOfInspiration: SerializedWellStoryState;
+  wellOfInspiration: SerializedTowerStoryState;
   achievements: SerializedAchievementStoryState;
 }
 
@@ -107,7 +107,7 @@ function readLegacyProperty(value: unknown, key: string): unknown {
 }
 
 /**
- * Persist the surviving Well of Inspiration story state and tower upgrades.
+ * Persist the surviving Tower of Inspiration story state and tower upgrades.
  * Legacy snapshots may contain retired spire branches; those branches are intentionally ignored.
  */
 export function createSpireResourcePersistence({
@@ -145,11 +145,11 @@ export function createSpireResourcePersistence({
 
   /** Serialize the surviving story state. */
   function getSpireResourceStateSnapshot(): SpireResourceStateSnapshot {
-    const wellState = spireResourceState.wellOfInspiration || spireResourceState.powder || {};
+    const towerState = spireResourceState.wellOfInspiration || spireResourceState.powder || {};
     return {
       wellOfInspiration: {
         unlocked: true,
-        storySeen: Boolean(readLegacyProperty(wellState, 'storySeen')),
+        storySeen: Boolean(readLegacyProperty(towerState, 'storySeen')),
       },
       achievements: {
         storySeen: Boolean(spireResourceState.achievements?.storySeen),
@@ -160,13 +160,13 @@ export function createSpireResourcePersistence({
   /** Restore current and legacy story snapshots with the existing normalization rules. */
   function applySpireResourceStateSnapshot(snapshot: unknown): void {
     if (!isObjectRecord(snapshot)) return;
-    const legacyWell =
+    const legacyTower =
       snapshot.wellOfInspiration || snapshot.powder || snapshot.alephSpire || snapshot.aleph || {};
 
     // The live state factory always creates this mutable branch. It is optional
     // in the dependency interface only so serialization can preserve its powder fallback.
-    const liveWell = spireResourceState.wellOfInspiration as MutableStoryState;
-    liveWell.storySeen = Boolean(readLegacyProperty(legacyWell, 'storySeen') || liveWell.storySeen);
+    const liveTower = spireResourceState.wellOfInspiration as MutableStoryState;
+    liveTower.storySeen = Boolean(readLegacyProperty(legacyTower, 'storySeen') || liveTower.storySeen);
     spireResourceState.achievements.storySeen = Boolean(
       readLegacyProperty(snapshot.achievements, 'storySeen') || spireResourceState.achievements.storySeen,
     );

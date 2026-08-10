@@ -40,7 +40,7 @@ function formatDeveloperFloat(value, precision = 2) {
   return Number.isInteger(normalized) ? String(normalized) : normalized.toFixed(precision);
 }
 
-function refreshWellDisplay() {
+function refreshTowerDisplay() {
   const context = getContext();
   context.updateStatusDisplays?.();
   context.updatePowderDisplay?.();
@@ -97,8 +97,8 @@ function setDeveloperGlyphs(value) {
     context.gameStats.enemiesDefeated = normalized;
     context.gameStats.towersPlaced = Math.min(context.gameStats.towersPlaced, normalized);
   }
-  recordDeveloperAdjustment('glyphs-well', normalized);
-  refreshWellDisplay();
+  recordDeveloperAdjustment('glyphs-tower', normalized);
+  refreshTowerDisplay();
 }
 
 const developerFieldHandlers = {

@@ -31,11 +31,11 @@ Quick lookup table for all implemented towers in Thero Idle.
 
 ## Active Spire Experience
 
-The Well of Inspiration is the only active Spire experience. Its internal `powder` and Aleph names remain for save compatibility.
+The Tower of Inspiration is the only active Spire experience. Its internal `wellOfInspiration`, `powder`, and Aleph names remain for save compatibility.
 
 | Name | File | Description |
 |------|------|-------------|
-| Well of Inspiration | `powderTower.js` | Active falling-mote simulation producing Well glyphs (ℵ) |
+| Tower of Inspiration | `powderTower.js` | Active falling-mote simulation producing Tower glyphs (ℵ) |
 
 Bet, Lamed, Tsadi, Shin, and Kuf Spires are retired. The Achievements Terrarium is disabled legacy JavaScript; see `../../../assets/legacy/achievementsTerrarium/README.md`.
 
@@ -70,13 +70,13 @@ The Pi Tower (π) is a beam-based tower that locks onto enemies and deals increa
 
 **Key Features:**
 - **Range**: 4m (fixed)
-- **Max Lasers**: 2 + the retained internal Lamed₁ variable (number of simultaneous enemy lock-ons; purchased with Well glyphs)
+- **Max Lasers**: 2 + the retained internal Lamed₁ variable (number of simultaneous enemy lock-ons; purchased with Tower glyphs)
 - **Damage Scaling**: Damage increases exponentially based on rotation degrees
 - **Visual Feedback**: Beam color and intensity scale with rotation
 
 **Sub-Equations:**
-- **Atk**: `atk = omicron^(|degrees|/(100-Bet₁))` - Damage per beam; Bet₁ remains an internal equation-variable name purchased with Well glyphs
-- **numLaser**: `numLaser = 2 + Lamed₁` - Maximum simultaneous beams; Lamed₁ remains an internal equation-variable name purchased with Well glyphs
+- **Atk**: `atk = omicron^(|degrees|/(100-Bet₁))` - Damage per beam; Bet₁ remains an internal equation-variable name purchased with Tower glyphs
+- **numLaser**: `numLaser = 2 + Lamed₁` - Maximum simultaneous beams; Lamed₁ remains an internal equation-variable name purchased with Tower glyphs
 - **Bet₁**: Reduces divisor, making damage scale faster with rotation (max 50)
 - **Lamed₁**: Increases max laser count (max 10)
 

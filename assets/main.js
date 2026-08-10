@@ -873,7 +873,7 @@ import { createSpireCameraController } from './spireCameraController.js';
     updatePlayfieldDevLayerTogglesVisibility,
   });
 
-  // Keep the active Well ledger isolated from persistence and reward systems.
+  // Keep the active Tower ledger isolated from persistence and reward systems.
   configurePowderEventLog({
     formatGameNumber,
     formatDecimal,

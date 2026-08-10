@@ -12,18 +12,18 @@ export interface LegacySpireSaveSnapshot {
   [key: string]: unknown;
 }
 
-export interface WellOfInspirationSaveSnapshot {
+export interface TowerOfInspirationSaveSnapshot {
   wellOfInspiration: Record<string, unknown>;
   simulation?: Record<string, unknown>;
 }
 
 /**
- * Convert every historical Aleph/Well snapshot shape into the active schema.
+ * Convert every historical Aleph/Tower snapshot shape into the active schema.
  * The operation is idempotent and intentionally ignores retired-spire fields.
  */
-export function migrateWellOfInspirationSave(
+export function migrateTowerOfInspirationSave(
   snapshot: LegacySpireSaveSnapshot | null | undefined,
-): WellOfInspirationSaveSnapshot | null {
+): TowerOfInspirationSaveSnapshot | null {
   if (!snapshot || typeof snapshot !== 'object') {
     return null;
   }

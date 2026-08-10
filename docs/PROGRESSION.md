@@ -1,6 +1,6 @@
 # Thero Idle – Progression Notes
 
-> Current product note (2026-07-15): Bet, Lamed, Tsadi, Shin, and Kuf Spires are retired. Aleph is presented as the **Well of Inspiration**. Achievements remains active, while the Achievements Terrarium is disabled legacy JavaScript. The former Collective Unconscious/Cognitive Realm map is also retired and removed. Older sections below describe historical designs and are not active progression.
+> Current product note (2026-08-10): Bet, Lamed, Tsadi, Shin, and Kuf Spires are retired. Aleph is presented as the **Tower of Inspiration**. Achievements remains active, while the Achievements Terrarium is disabled legacy JavaScript. The former Collective Unconscious/Cognitive Realm map is also retired and removed. Older sections below describe historical designs and are not active progression.
 
 ## Level Structure
 - The game now features **30 total levels** grouped into six five-level sets.
@@ -169,10 +169,10 @@ All enemies adopt a shared **power-of-ten health notation** that appends a brigh
 
 Future symbol variants will continue to draw from global mathematical alphabets (Cyrillic, Hebrew, kana, operator glyphs, etc.), ensuring each enemy feels fresh while still harmonizing with Thero Idle's mystic numeracy.
 
-## Achievements & Well Progression
+## Achievements & Tower Progression
 
 - Achievement seals record completed proofs but do not generate passive resources.
-- The Well of Inspiration advances only through motes earned during active defenses and direct Well interactions.
+- The Tower of Inspiration advances only through motes earned during active defenses and direct Tower interactions.
 - Powder height illuminates wall glyphs that become upgrade currency for tower research.
 - No offline rewards, automated level runs, passive banks, or background spire simulations remain.
 

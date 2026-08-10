@@ -34,7 +34,7 @@ export function createSpireStoryManager({
 }) {
   /**
    * Retrieve or initialize the persistent story branch for a spire so unlock flow and autosave share state.
-   * @param {string} spireId - Identifier for the surviving Well or achievements tab.
+   * @param {string} spireId - Identifier for the surviving Tower or achievements tab.
    * @returns {Object|null} Reference to the spire story state branch.
    */
   function getSpireStoryBranch(spireId) {

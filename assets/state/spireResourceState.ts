@@ -19,12 +19,12 @@ export interface SpireResourceStateOverrides {
 
 /** Build only the surviving spire state while safely ignoring obsolete save branches. */
 export function createSpireResourceState(overrides: SpireResourceStateOverrides = {}): SpireResourceState {
-  const legacyWell =
+  const legacyTower =
     overrides.wellOfInspiration ?? overrides.powder ?? overrides.alephSpire ?? overrides.aleph ?? {};
   return {
     wellOfInspiration: {
       unlocked: true,
-      storySeen: Boolean(legacyWell.storySeen),
+      storySeen: Boolean(legacyTower.storySeen),
     },
     achievements: {
       storySeen: Boolean(overrides.achievements?.storySeen),

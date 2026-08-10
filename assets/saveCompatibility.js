@@ -1,10 +1,10 @@
 /** Save branches owned by spires that have been permanently retired. */
 export const RETIRED_SPIRE_SAVE_KEYS = ['fluid', 'bet', 'betSpire', 'lamed', 'tsadi', 'shin', 'kuf'];
 /**
- * Convert every historical Aleph/Well snapshot shape into the active schema.
+ * Convert every historical Aleph/Tower snapshot shape into the active schema.
  * The operation is idempotent and intentionally ignores retired-spire fields.
  */
-export function migrateWellOfInspirationSave(snapshot) {
+export function migrateTowerOfInspirationSave(snapshot) {
     if (!snapshot || typeof snapshot !== 'object') {
         return null;
     }

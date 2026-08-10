@@ -1,6 +1,6 @@
 import { DEFAULT_MOTE_PALETTE, mergeMotePalette } from '../../scripts/features/towers/powderTower.js';
 
-/** Build the runtime state for the sole surviving spire, the Well of Inspiration. */
+/** Build the runtime state for the sole surviving spire, the Tower of Inspiration. */
 export function createPowderStateContext() {
   const powderConfig = {
     sandOffsetInactive: 0,
