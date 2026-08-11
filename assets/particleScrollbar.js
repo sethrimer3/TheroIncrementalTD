@@ -177,6 +177,14 @@ function resolveOverlayActive() {
   return Boolean(overlay && overlay.classList.contains('active') && overlay.getAttribute('aria-hidden') !== 'true');
 }
 
+// The Tower of Inspiration already provides a visually complete edge-to-edge
+// simulation; suppress the global particle scrollbar so its gold track does not
+// appear as a detached black strip beside the spire.
+function isTowerOfInspirationPanelActive() {
+  const panel = document.getElementById('panel-tower');
+  return Boolean(panel && panel.classList.contains('active') && isVisibleElement(panel));
+}
+
 function createScrollbarInstance({
   id,
   ariaLabel,
@@ -552,7 +560,7 @@ export function initParticleScrollbar() {
     ariaLabel: 'primary',
     right: 0,
     resolveActiveScrollableElement: resolvePrimaryScrollableElement,
-    isVisible: () => !resolveOverlayActive(),
+    isVisible: () => !resolveOverlayActive() && !isTowerOfInspirationPanelActive(),
   });
 
   // The secondary scrollbar appears only for the tower upgrade cards.

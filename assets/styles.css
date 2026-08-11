@@ -4011,6 +4011,8 @@ body.playfield-fullscreen .playfield canvas {
   justify-content: center;
   gap: 12px;
   overflow-x: auto;
+  /* Preserve the full pill border when hover/focus lifts a button by one pixel. */
+  padding-top: 2px;
   padding-bottom: 4px;
 }
 
