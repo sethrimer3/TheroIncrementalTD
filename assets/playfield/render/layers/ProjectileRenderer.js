@@ -345,7 +345,7 @@ export function drawProjectiles() {
   }
 
   this.projectiles.forEach((projectile) => {
-    if (!projectile) {
+    if (!projectile || projectile.hidden) {
       return;
     }
 

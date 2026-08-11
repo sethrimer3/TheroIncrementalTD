@@ -50,6 +50,8 @@ const BETA_PARTICLE_CONFIG = {
   idPrefix: 'beta',
   colors: BETA_PARTICLE_COLORS,
   colorResolver: resolveBetaParticleColors,
+  // Trail color follows each palette-derived projectile unless individually overridden.
+  trailStyle: { length: 8, width: 5.5, sampleDistance: 5, outerAlpha: 0.11, innerAlpha: 0.28, coreAlpha: 0.68 },
   behavior: 'triangle',
   homing: true,
   particleCountRange: { min: 5, max: 10 },

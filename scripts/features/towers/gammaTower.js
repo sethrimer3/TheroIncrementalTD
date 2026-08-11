@@ -50,6 +50,8 @@ const GAMMA_PARTICLE_CONFIG = {
   idPrefix: 'gamma',
   colors: GAMMA_PARTICLE_COLORS,
   colorResolver: resolveGammaParticleColors,
+  // A slightly narrower trail preserves Gamma's precise piercing silhouette.
+  trailStyle: { length: 9, width: 4.8, sampleDistance: 5, outerAlpha: 0.12, innerAlpha: 0.3, coreAlpha: 0.72 },
   // Send γ motes straight to the target before tracing a tight star on impact.
   behavior: 'impactStar',
   particleCountRange: { min: 5, max: 10 },
