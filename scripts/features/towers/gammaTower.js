@@ -8,6 +8,7 @@ import {
 } from './alphaTower.js';
 import { samplePaletteGradient } from '../../../assets/colorSchemeUtils.js';
 import { createShotSpriteCache } from './shared/TowerRenderHelpers.js';
+import { PROJECTILE_TRAIL_STYLES } from './shared/ProjectileTrails.js';
 
 // γ shot sprite path points at the white particle art that will be tinted by the active palette.
 // Note: Gamma projectile sprite is oriented with "forward" pointing upward (see docs/TOWER_SPRITE_ORIENTATION.md)
@@ -51,7 +52,7 @@ const GAMMA_PARTICLE_CONFIG = {
   colors: GAMMA_PARTICLE_COLORS,
   colorResolver: resolveGammaParticleColors,
   // A slightly narrower trail preserves Gamma's precise piercing silhouette.
-  trailStyle: { length: 9, width: 4.8, sampleDistance: 5, outerAlpha: 0.12, innerAlpha: 0.3, coreAlpha: 0.72 },
+  trailStyle: PROJECTILE_TRAIL_STYLES.gamma,
   // Send γ motes straight to the target before tracing a tight star on impact.
   behavior: 'impactStar',
   particleCountRange: { min: 5, max: 10 },

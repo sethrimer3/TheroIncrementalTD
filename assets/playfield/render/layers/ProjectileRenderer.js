@@ -32,6 +32,7 @@ import { drawBetaBursts as drawBetaBurstsHelper } from '../../../../scripts/feat
 import { drawGammaBursts as drawGammaBurstsHelper } from '../../../../scripts/features/towers/gammaTower.js';
 import { drawNuBursts as drawNuBurstsHelper } from '../../../../scripts/features/towers/nuTower.js';
 import { drawOmegaParticles as drawOmegaParticlesHelper } from '../../../../scripts/features/towers/omegaTower.js';
+import { drawProjectileTrail } from '../../../../scripts/features/towers/shared/ProjectileTrails.js';
 
 // Pre-calculated constants for performance in tight render loops
 const TWO_PI = Math.PI * 2;
@@ -401,6 +402,8 @@ export function drawProjectiles() {
       if (!position) {
         return;
       }
+
+      drawProjectileTrail(ctx, projectile, projectile.trailColor || projectile.color, projectile.trailStyle);
 
       const radius = Number.isFinite(projectile.parameters?.radius)
         ? projectile.parameters.radius

@@ -10,6 +10,7 @@ import {
 } from './DecimalSwarmSystem.js';
 // Hypernode polygon blocking for projectiles.
 import { doesProjectileHitPolygon } from './HypernodeBossSystem.js';
+import { recordProjectileTrail } from '../../../scripts/features/towers/shared/ProjectileTrails.js';
 
 // Pre-calculated constants for performance
 const PI = Math.PI;
@@ -195,6 +196,7 @@ function updateProjectiles(delta) {
         x: (projectile.origin?.x || 0) + offsetX,
         y: (projectile.origin?.y || 0) + offsetY,
       };
+      recordProjectileTrail(projectile, projectile.position.x, projectile.position.y, projectile.trailStyle);
       continue;
     }
 

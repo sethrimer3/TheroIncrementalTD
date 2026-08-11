@@ -3,6 +3,7 @@ import { metersToPixels } from '../../../assets/gameUnits.js';
 import { samplePaletteGradient } from '../../../assets/colorSchemeUtils.js';
 import { clamp, normalizeParticleColor, easeInCubic, easeOutCubic } from './shared/TowerUtils.js';
 import { createShotSpriteCache } from './shared/TowerRenderHelpers.js';
+import { PROJECTILE_TRAIL_STYLES } from './shared/ProjectileTrails.js';
 
 // α shot sprite path points at the white particle art that will be tinted by the active palette.
 const ALPHA_SHOT_SPRITE_PATH = './assets/sprites/towers/alpha/projectiles/alphaProjectile.png';
@@ -26,14 +27,7 @@ const ALPHA_COLOR_OFFSETS = [0.18, 0.82];
 
 // Shared trail defaults use fixed-size world-space histories and vector layers so
 // shots stay sharp under the playfield camera without blur filters or raster caches.
-const DEFAULT_PROJECTILE_TRAIL_STYLE = {
-  length: 8,
-  width: 5.5,
-  sampleDistance: 5,
-  outerAlpha: 0.12,
-  innerAlpha: 0.3,
-  coreAlpha: 0.7,
-};
+const DEFAULT_PROJECTILE_TRAIL_STYLE = PROJECTILE_TRAIL_STYLES.alpha;
 
 // Refresh the cached sprite variants when the active palette changes.
 export function refreshAlphaShotSpritePaletteCache() {

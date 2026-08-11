@@ -8,6 +8,7 @@ import {
 } from './alphaTower.js';
 import { samplePaletteGradient } from '../../../assets/colorSchemeUtils.js';
 import { createShotSpriteCache } from './shared/TowerRenderHelpers.js';
+import { PROJECTILE_TRAIL_STYLES } from './shared/ProjectileTrails.js';
 
 // β shot sprite path points at the white particle art that will be tinted by the active palette.
 // Note: Beta projectile sprite is oriented with "forward" pointing upward (see docs/TOWER_SPRITE_ORIENTATION.md)
@@ -51,7 +52,7 @@ const BETA_PARTICLE_CONFIG = {
   colors: BETA_PARTICLE_COLORS,
   colorResolver: resolveBetaParticleColors,
   // Trail color follows each palette-derived projectile unless individually overridden.
-  trailStyle: { length: 8, width: 5.5, sampleDistance: 5, outerAlpha: 0.11, innerAlpha: 0.28, coreAlpha: 0.68 },
+  trailStyle: PROJECTILE_TRAIL_STYLES.beta,
   behavior: 'triangle',
   homing: true,
   particleCountRange: { min: 5, max: 10 },
