@@ -1,4 +1,4 @@
-// Per-tower algebraic upgrade variables, purchased with Aleph Glyphs (Well of
+// Per-tower algebraic upgrade variables, purchased with Aleph Glyphs (Tower of
 // Inspiration currency). These are plain stat-modifier levels distinct from the
 // authored equation "variables" in assets/towerEquations/*.js (e.g. Iota's
 // aleph0-3 ranks) and distinct from the retired Spire systems documented in

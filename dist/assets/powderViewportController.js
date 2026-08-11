@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Encapsulates viewport transforms, wall spacing, and interaction wiring for the Well of Inspiration.
+ * Encapsulates viewport transforms, wall spacing, and interaction wiring for the Tower of Inspiration.
  * Dependencies are injected so the helpers remain decoupled from the main orchestrator and simulations.
  *
  * @param {Object} options - Factory options for dependency injection
@@ -279,7 +279,7 @@ export function createPowderViewportController({
       return scale;
     };
 
-    // Allow camera gestures only when camera mode is explicitly enabled for the Well.
+    // Allow camera gestures only when camera mode is explicitly enabled for the Tower.
     const isCameraModeActive = () => {
       return Boolean(powderState?.alephCameraMode);
     };

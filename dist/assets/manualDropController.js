@@ -125,7 +125,7 @@ export function createManualDropController({
           }
 
           // Prevent bubbling into parent cards that also grant click rewards so a single tap
-          // doesn't trigger multiple mote or drop spawns (e.g., Well double drops).
+          // doesn't trigger multiple mote or drop spawns (e.g., Tower double drops).
           event?.stopPropagation?.();
 
           const activeTab = getActiveTabId();

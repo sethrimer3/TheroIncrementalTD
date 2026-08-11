@@ -743,6 +743,9 @@ export class AudioManager {
    */
   setMusicVolume(volume) {
     this.musicVolume = this._clampVolume(volume, this.musicVolume);
+    // A tab transition fade owns the element volume on every animation frame; end it
+    // before applying a manual slider change so an old fade target cannot restore stale volume.
+    this._cancelMusicFade({ finalize: false });
     this.musicElements.forEach((entry) => {
       if (!entry || !entry.audio) {
         return;

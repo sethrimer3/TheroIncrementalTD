@@ -10,7 +10,7 @@ const GOLD_ALEPH_SPRITE_PATH = 'assets/sprites/spires/alephSpire/Gold_Aleph.webp
 const GOLD_NUMBER_SPRITE_PATH_PREFIX = 'assets/sprites/goldNumbers/Gold_';
 
 /**
- * Factory that bundles DOM helpers used by the Well of Inspiration overlay.
+ * Factory that bundles DOM helpers used by the Tower of Inspiration overlay.
  * @param {Object} options - Dependency injection container for DOM bindings and utilities.
  * @returns {Object} Powder overlay helper functions consumed by main.js.
  */

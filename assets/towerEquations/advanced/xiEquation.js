@@ -13,6 +13,7 @@ export const xi = {
             key: 'nu',
             symbol: 'ν',
             masterEquationSymbol: 'Nu',
+            equationSymbol: 'Nu',
             name: 'Nu Power',
             description: 'Base damage per chain sourced from ν tower.',
             reference: 'nu',
@@ -44,7 +45,7 @@ export const xi = {
             key: 'aleph1',
             symbol: 'spd',
             equationSymbol: String.raw `\text{spd}`,
-            masterEquationSymbol: 'Spd',
+            masterEquationSymbol: 'spd',
             name: 'Aleph₁ Speed',
             description: 'Increases attack speed for faster chain initiation.',
             baseValue: 0,
@@ -71,7 +72,7 @@ export const xi = {
             key: 'aleph2',
             symbol: 'rng',
             equationSymbol: String.raw `\text{rng}`,
-            masterEquationSymbol: 'Rng',
+            masterEquationSymbol: 'rng',
             name: 'Aleph₂ Range',
             description: 'Extends initial targeting range in meters.',
             baseValue: 0,
@@ -98,7 +99,7 @@ export const xi = {
             key: 'aleph3',
             symbol: 'chnRng',
             equationSymbol: String.raw `\text{chnRng}`,
-            masterEquationSymbol: 'Chn',
+            masterEquationSymbol: 'chnRng',
             name: 'Aleph₃ Chain Range',
             description: 'Chain range for jumping between enemies in meters.',
             baseValue: 0,
@@ -125,7 +126,7 @@ export const xi = {
             key: 'aleph4',
             symbol: 'maxChn',
             equationSymbol: String.raw `\text{maxChn}`,
-            masterEquationSymbol: 'Max',
+            masterEquationSymbol: 'maxChn',
             name: 'Aleph₄ Max Chains',
             description: 'Maximum number of chain jumps per attack.',
             baseValue: 0,
@@ -152,7 +153,7 @@ export const xi = {
             key: 'aleph5',
             symbol: 'numChnExp',
             equationSymbol: String.raw `\text{numChnExp}`,
-            masterEquationSymbol: 'Exp',
+            masterEquationSymbol: 'numChnExp',
             name: 'Aleph₅ Chain Exponent',
             description: 'Exponential scaling factor for damage per chain.',
             baseValue: 0,
@@ -186,6 +187,6 @@ export const xi = {
     },
     formatBaseEquationValues({ values, result, formatComponent }) {
         const nuValue = Math.max(0, isFiniteNumber(values.nu) ? values.nu : 0);
-        return String.raw`\( ${formatComponent(result)} = ${formatComponent(nuValue)} \times (\text{chain}^{\text{exp}}) \)`;
+        return String.raw `\( ${formatComponent(result)} = ${formatComponent(nuValue)} \times (\text{chain}^{\text{exp}}) \)`;
     },
 };

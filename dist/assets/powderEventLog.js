@@ -1,4 +1,4 @@
-// Maintain the Well of Inspiration's recent active-action ledger.
+// Maintain the Tower of Inspiration's recent active-action ledger.
 
 const POWDER_LOG_LIMIT = 6;
 const powderLog = [];
@@ -12,12 +12,12 @@ const dependencies = {
   powderElements: null,
 };
 
-/** Inject the live Well state and formatting helpers used by ledger entries. */
+/** Inject the live Tower state and formatting helpers used by ledger entries. */
 export function configurePowderEventLog(config = {}) {
   Object.assign(dependencies, config);
 }
 
-/** Rebuild the visible Well event list from the most recent entries. */
+/** Rebuild the visible Tower event list from the most recent entries. */
 export function updatePowderLogDisplay() {
   const { logList, logEmpty } = dependencies.powderElements || {};
   if (!logList || !logEmpty) {
@@ -42,7 +42,7 @@ export function updatePowderLogDisplay() {
   logList.append(fragment);
 }
 
-/** Append a formatted entry for an active Well interaction. */
+/** Append a formatted entry for an active Tower interaction. */
 export function recordPowderEvent(type, context = {}) {
   const powderState = dependencies.powderState || {};
   const powderBonuses = dependencies.getCurrentPowderBonuses();
@@ -83,7 +83,7 @@ export function recordPowderEvent(type, context = {}) {
       break;
     }
     case 'mode-switch':
-      entry = 'Well of Inspiration simulation engaged.';
+      entry = 'Tower of Inspiration simulation engaged.';
       break;
     default:
       return;

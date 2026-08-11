@@ -19,7 +19,7 @@ const ACHIEVEMENT_CATEGORIES = [
   { id: 'campaign-story', name: 'Campaign: Story', icon: 'assets/sprites/menu/campaignButton_story.webp', iconType: 'image', type: 'campaign', campaign: 'Story' },
   { id: 'campaign-challenges', name: 'Campaign: Challenges', icon: 'assets/sprites/menu/campaignButton_trials.webp', iconType: 'image', type: 'campaign', campaign: 'Challenges' },
   { id: 'campaign-ladder', name: 'Campaign: Ladder', icon: 'assets/sprites/menu/campaignButton_ladder.webp', iconType: 'image', type: 'campaign', campaign: 'Ladder' },
-  { id: 'spire-powder', name: 'Well of Inspiration', icon: 'ℵ', type: 'spire', spireId: 'powder' },
+  { id: 'spire-powder', name: 'Tower of Inspiration', icon: 'ℵ', type: 'spire', spireId: 'powder' },
   { id: 'secret', name: 'Secret Achievements', icon: '?', type: 'secret' },
 ];
 
@@ -538,7 +538,7 @@ export async function generateLevelAchievements() {
     }
 
     // Generate spire glyph achievements
-    const spires = [{ id: 'powder', name: 'Well of Inspiration', icon: 'ℵ' }];
+    const spires = [{ id: 'powder', name: 'Tower of Inspiration', icon: 'ℵ' }];
 
     spires.forEach(spire => {
       const spireAchievements = generateSpireAchievements(spire.id, spire.name, spire.icon);

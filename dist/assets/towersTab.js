@@ -1408,7 +1408,7 @@ function getVariableCurrencyKey(_variable) {
 }
 
 function getCurrencyMeta(_currencyKey = 'aleph') {
-  return { singular: 'Well glyph', plural: 'Well glyphs', short: 'Well Glyphs', symbol: 'ℵ' };
+  return { singular: 'Tower glyph', plural: 'Tower glyphs', short: 'Tower Glyphs', symbol: 'ℵ' };
 }
 
 function getAvailableCurrency(_currencyKey = 'aleph') {

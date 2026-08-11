@@ -1,6 +1,6 @@
 'use strict';
 
-/** Flush combat-earned mote drops that were queued before the Well simulation initialized. */
+/** Flush combat-earned mote drops that were queued before the Tower simulation initialized. */
 export function flushPendingMoteDrops({ powderState, powderSimulation, schedulePowderBasinSave }) {
   if (!powderSimulation || typeof powderSimulation.queueDrop !== 'function') {
     return;

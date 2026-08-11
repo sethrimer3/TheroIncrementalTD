@@ -126,7 +126,7 @@ import { createPowderPersistence } from './powderPersistence.js';
 import { createPowderDisplaySystem } from './powderDisplay.js';
 import { createPowderViewportController } from './powderViewportController.js';
 import { createPowderResizeObserver } from './powderResizeObserver.js';
-// DOM helpers extracted from main.js to hydrate the Well of Inspiration.
+// DOM helpers extracted from main.js to hydrate the Tower of Inspiration.
 import { createPowderUiDomHelpers } from './powderUiDomHelpers.js';
 // Aleph tier-transition animation: wall-exit, golden glyph collection, wall-enter, palette scaling.
 import { createAlephTierTransitionController } from './alephTierTransitionController.js';
@@ -147,7 +147,7 @@ import { refreshBetaShotSpritePaletteCache } from '../scripts/features/towers/be
 import { refreshGammaShotSpritePaletteCache } from '../scripts/features/towers/gammaTower.js';
 // Delta tower sprite tint cache builder for palette-synced ship sprites.
 import { refreshDeltaShipSpritePaletteCache } from '../scripts/features/towers/deltaTower.js';
-// Well of Inspiration palette and simulation helpers (internally Aleph for save compatibility).
+// Tower of Inspiration palette and simulation helpers (internally Aleph for save compatibility).
 import {
   DEFAULT_MOTE_PALETTE,
   POWDER_CELL_SIZE_PX,
@@ -169,6 +169,7 @@ import {
   notifyAchievementsTabVisibilityChange,
 } from './achievementsTab.js';
 import { initializeBoostsSection } from './boostsSection.js';
+import { bindDefenseLeaderboardNotice } from './defenseLeaderboardNotice.js';
 import {
   loadMonetizationState,
 } from './state/monetizationState.js';
@@ -873,7 +874,7 @@ import { createSpireCameraController } from './spireCameraController.js';
     updatePlayfieldDevLayerTogglesVisibility,
   });
 
-  // Keep the active Well ledger isolated from persistence and reward systems.
+  // Keep the active Tower ledger isolated from persistence and reward systems.
   configurePowderEventLog({
     formatGameNumber,
     formatDecimal,
@@ -913,7 +914,7 @@ import { createSpireCameraController } from './spireCameraController.js';
   const setPowderCameraMode = cameraCtrl.setPowderCameraMode;
   const refreshPowderWallDecorations = cameraCtrl.refreshPowderWallDecorations;
 
-  // Hook the Well of Inspiration settings toggle into the camera control handler.
+  // Hook the Tower of Inspiration settings toggle into the camera control handler.
   setPowderCameraModeHandler((enabled) => {
     setPowderCameraMode(enabled);
   });
@@ -1155,7 +1156,7 @@ import { createSpireCameraController } from './spireCameraController.js';
           onViewTransformChange: handlePowderViewTransformChange,
         });
       }
-      if (!sandSimulation) throw new Error('Well of Inspiration simulation unavailable.');
+      if (!sandSimulation) throw new Error('Tower of Inspiration simulation unavailable.');
       powderSimulation = sandSimulation;
       powderSimulation.applyProfile(powderSimulation.getDefaultProfile() || undefined);
       syncAlephTierVisualProfile(resolveAlephTierProgress(powderState.wallGlyphsLit || 0));
@@ -1837,20 +1838,22 @@ import { createSpireCameraController } from './spireCameraController.js';
       spireId: 'playfield-settings',
     });
     
-    // Activate the Well of Inspiration options dropdown.
+    // Activate the Tower of Inspiration options dropdown.
     bindSpireOptionsDropdown({
       toggleId: 'powder-spire-options-toggle-button',
       menuId: 'powder-options-menu',
       spireId: 'powder',
       // Sync the footer spire button with the corner cog.
       extraToggleIds: ['powder-options-toggle-button'],
-      // Close the Well of Inspiration popover when clicking outside.
+      // Close the Tower of Inspiration popover when clicking outside.
       closeOnOutside: true,
     });
     initializePowderSpirePreferences();
     bindPowderSpireOptions();
     initializeColorScheme();
     bindAudioControls();
+    // Wire the Defense leaderboard placeholder after its static DOM is available.
+    bindDefenseLeaderboardNotice();
 
     const towerPanel = document.getElementById('panel-tower');
     const towersPanel = document.getElementById('panel-towers');

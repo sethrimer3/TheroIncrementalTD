@@ -1288,14 +1288,17 @@ export class PowderSimulation {
           const crestTint = mixRgbColors(
             waveBase,
             { r: 255, g: 243, b: 214 },
-            Math.min(1, 0.18 + easedWaveIntensity * 0.42),
+            Math.min(1, easedWaveIntensity * (0.18 + easedWaveIntensity * 0.42)),
           );
           const brightened = mixRgbColors(
             crestTint,
             { r: 255, g: 255, b: 255 },
             Math.min(
               this.maxTouchdownWaveBrightness,
-              this.baseTouchdownWaveBrightness + easedWaveIntensity * this.touchdownWaveBrightnessScale,
+              easedWaveIntensity * (
+                this.baseTouchdownWaveBrightness
+                + easedWaveIntensity * this.touchdownWaveBrightnessScale
+              ),
             ),
           );
           fillColor = colorToRgbaString(brightened, 1);
@@ -1614,10 +1617,13 @@ export class PowderSimulation {
 
   triggerTouchdownWave(grain, colliderSize) {
     const size = Number.isFinite(colliderSize) ? Math.max(1, colliderSize) : 1;
+    // Each impact travels 55-100% of the default reach so overlapping pulses feel naturally irregular.
+    const reachScale = 0.55 + Math.random() * 0.45;
     this.touchdownWaves.push({
       x: grain.x + size * 0.5,
       y: grain.y + size * 0.5,
       ageMs: 0,
+      lifetimeMs: this.getTouchdownWaveLifetimeMs() * reachScale,
     });
     if (this.touchdownWaves.length > this.maxTouchdownWaves) {
       this.touchdownWaves.splice(0, this.touchdownWaves.length - this.maxTouchdownWaves);
@@ -1629,11 +1635,13 @@ export class PowderSimulation {
       return;
     }
     const frameDelta = Number.isFinite(delta) && delta > 0 ? delta : 16;
-    const lifetime = this.getTouchdownWaveLifetimeMs();
     const activeWaves = [];
     for (const wave of this.touchdownWaves) {
       wave.ageMs += frameDelta;
-      if (wave.ageMs < lifetime) {
+      const waveLifetime = Number.isFinite(wave.lifetimeMs)
+        ? Math.max(200, wave.lifetimeMs)
+        : this.getTouchdownWaveLifetimeMs();
+      if (wave.ageMs < waveLifetime) {
         activeWaves.push(wave);
       }
     }
@@ -1644,7 +1652,6 @@ export class PowderSimulation {
     if (!this.touchdownWaves.length) {
       return 0;
     }
-    const lifetime = this.getTouchdownWaveLifetimeMs();
     const speedCellsPerMs = this.getTouchdownWaveSpeedCellsPerMs();
     const bandWidth = Math.max(0.35, this.touchdownWaveBandCells);
     // Keep gaussian blending but clip influence to local neighborhoods so base brightness does not tint the whole pile.
@@ -1655,7 +1662,10 @@ export class PowderSimulation {
     const tailStrength = Math.max(0, this.touchdownWaveTailStrength);
     let intensity = 0;
     for (const wave of this.touchdownWaves) {
-      const ageRatio = clampUnitInterval(wave.ageMs / lifetime);
+      const waveLifetime = Number.isFinite(wave.lifetimeMs)
+        ? Math.max(200, wave.lifetimeMs)
+        : this.getTouchdownWaveLifetimeMs();
+      const ageRatio = clampUnitInterval(wave.ageMs / waveLifetime);
       const frontRadius = wave.ageMs * speedCellsPerMs;
       const distance = Math.hypot(x - wave.x, y - wave.y);
       const distanceFromFront = Math.abs(distance - frontRadius);
@@ -1690,7 +1700,8 @@ export class PowderSimulation {
       const downwardTailStrength = downwardDistance >= 0 && downwardDistance <= frontRadius + bandWidth * 2
         ? horizontalStrength * downwardFrontStrength
         : 0;
-      const fadeStrength = 1 - ageRatio;
+      // Nonlinear decay removes the light continuously as the front approaches its randomized reach.
+      const fadeStrength = Math.pow(1 - ageRatio, 1.6);
       const blendedStrength = frontStrength * 0.58 + interiorStrength * 0.12 + downwardTailStrength * tailStrength;
       intensity = Math.max(intensity, blendedStrength * fadeStrength);
     }

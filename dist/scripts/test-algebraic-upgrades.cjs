@@ -1,5 +1,5 @@
 // Framework-free Node unit tests for the per-tower algebraic upgrade system
-// (assets/algebraicUpgrades.ts) and the surrounding Well of Inspiration
+// (assets/algebraicUpgrades.ts) and the surrounding Tower of Inspiration
 // mote/glyph economy it spends from. Mirrors the style of scripts/unit-test-core.cjs
 // (compiled .js output, not .ts sources) and scripts/test-retired-spires.cjs
 // (banned-key regression coverage).

@@ -2429,6 +2429,37 @@ body.playfield-fullscreen .playfield canvas {
   transform: translateY(-1px);
 }
 
+/* Present the temporary leaderboard message beneath the sword shortcut without blocking input. */
+.defense-leaderboard-notice {
+  position: absolute;
+  top: 62px;
+  right: 14px;
+  z-index: 4;
+  max-width: min(240px, calc(100% - 28px));
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 215, 100, 0.35);
+  border-radius: 10px;
+  background: rgba(10, 8, 6, 0.92);
+  color: rgba(255, 230, 150, 0.96);
+  font-size: 0.86rem;
+  letter-spacing: 0.04em;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+
+.defense-leaderboard-notice[hidden] {
+  display: none;
+}
+
+.defense-leaderboard-notice--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .level-grid {
   display: flex;
   flex-direction: column;
@@ -6900,8 +6931,8 @@ body.playfield-fullscreen .playfield canvas {
   justify-content: flex-end;
   align-items: center;
   padding: 32px 0;
-  background-color: rgba(16, 20, 28, 0.45);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  background-color: transparent;
+  box-shadow: none;
   z-index: 1;
   transition:
     width 0.6s ease,
@@ -6935,10 +6966,7 @@ body.playfield-fullscreen .playfield canvas {
 }
 
 .powder-wall::after {
-  background: linear-gradient(180deg, rgba(10, 12, 18, 0.72) 0%, rgba(12, 14, 20, 0.92) 100%);
-  opacity: 0.85;
-  mix-blend-mode: soft-light;
-  z-index: -1;
+  display: none;
 }
 
 .powder-wall-hitbox {
@@ -7136,6 +7164,8 @@ body.playfield-fullscreen .playfield canvas {
 }
 
 .powder-glyph-sprite-strip {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -7177,13 +7207,12 @@ body.playfield-fullscreen .playfield canvas {
   left: 12%;
   right: 12%;
   top: 50%;
-  height: 2px;
+  height: auto;
+  aspect-ratio: 768 / 44;
   transform: translateY(-50%);
-  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 20%, transparent), color-mix(in srgb, var(--accent-3) 20%, transparent));
-  border-radius: 999px;
-  box-shadow: 0 0 0 rgba(255, 255, 255, 0);
-  opacity: 0.35;
-  transition: background 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+  background: url('./sprites/TowerOfInspiration/VineSeperatorLine.png') center / contain no-repeat;
+  opacity: 1;
+  transition: opacity 1.5s ease;
 }
 
 /* Palette-aware glow lights reached glyphs with a golden outline. */
@@ -7196,9 +7225,9 @@ body.playfield-fullscreen .playfield canvas {
   filter: drop-shadow(var(--powder-glyph-glow));
 }
 
-/* Hide the cross-line once a glyph is earned to keep the symbol unobstructed. */
+/* Fade the vine separator away once a glyph is earned so the reveal feels continuous. */
 .powder-glyph--achieved::before {
-  display: none;
+  opacity: 0;
 }
 
 /* Target glyphs lean into the secondary palette hue while keeping the golden halo. */
@@ -7213,9 +7242,7 @@ body.playfield-fullscreen .playfield canvas {
 }
 
 .powder-glyph--target::before {
-  opacity: 0.95;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 95%, transparent), color-mix(in srgb, var(--accent-3) 95%, transparent));
-  box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent), 0 0 22px color-mix(in srgb, var(--accent-3) 40%, transparent);
+  opacity: 1;
 }
 
 .powder-simulation .powder-footnote {
@@ -8692,6 +8719,16 @@ body.playfield-fullscreen .playfield canvas {
   margin-left: 0.14ch;
   letter-spacing: 0.08em;
   transform-origin: left center;
+  align-self: center;
+}
+
+/* Script only authored _/^ groups; ordinary identifier letters stay inline. */
+.tower-upgrade-formula-part-tail--subscript {
+  transform: translateY(0.42em);
+}
+
+.tower-upgrade-formula-part-tail--superscript {
+  transform: translateY(-0.52em);
 }
 
 .tower-upgrade-formula-part--dynamic {
@@ -8735,6 +8772,8 @@ body.playfield-fullscreen .playfield canvas {
 .tower-upgrade-variables {
   display: grid;
   gap: 16px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .tower-upgrade-variables[data-tower-id='mind-gate'] {
@@ -8745,6 +8784,9 @@ body.playfield-fullscreen .playfield canvas {
 .tower-upgrade-variable { 
   display: grid;
   gap: 12px;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
   padding: 18px 22px;
   border-radius: 18px;
   background: rgba(16, 16, 24, 0.68);
@@ -8763,6 +8805,10 @@ body.playfield-fullscreen .playfield canvas {
 .tower-upgrade-variable-equations {
   display: grid;
   gap: 6px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
   padding: 10px 16px;
   border-radius: 14px;
   border-left: 3px solid rgba(255, 215, 0, 0.28);
@@ -8771,6 +8817,9 @@ body.playfield-fullscreen .playfield canvas {
   color: rgba(255, 255, 255, 0.82);
   opacity: 0;
   transform: translateY(8px);
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
   transition: opacity 240ms ease, transform 240ms ease;
 }
 
@@ -8787,6 +8836,8 @@ body.playfield-fullscreen .playfield canvas {
 
 .tower-upgrade-variable-equation-line {
   margin: 0;
+  min-width: 0;
+  max-width: 100%;
   font-size: 0.92rem;
   letter-spacing: 0.04em;
   text-align: left;
@@ -8832,6 +8883,9 @@ body.show-glyph-equations .tower-upgrade-variable-equations {
 /* Ensure MathJax breakdown lines stay readable against the dark lattice card. */
 .tower-upgrade-variable-equations mjx-container {
   display: flex;
+  width: max-content;
+  min-width: 100%;
+  max-width: none;
   justify-content: flex-start;
   color: inherit;
   text-shadow: 0 0 8px rgba(255, 246, 180, 0.35);
@@ -10011,6 +10065,11 @@ body.show-glyph-equations .tower-upgrade-variable-equations {
   text-shadow: 0 0 6px rgba(255, 255, 255, 0.25);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.28);
   pointer-events: none;
+}
+
+/* Remove empty resource badges completely so zero values leave no border or footprint. */
+.tab-icon-badge[hidden] {
+  display: none;
 }
 
 /* Accent the glyph badge with the same amber glow used in the tower panel. */

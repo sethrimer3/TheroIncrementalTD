@@ -178,6 +178,11 @@ function importMasterEquationUtilsModule() {
   return importAsEsm('assets/towerEquations/masterEquationUtils.js');
 }
 
+// Import the dependency-free tokenizer used by interactive tower equations.
+function importMathTokensModule() {
+  return importAsEsm('scripts/core/mathTokens.js');
+}
+
 // Import the compiled Mind Gate blueprint with a recording formatting stub so
 // its authored equations and callback timing can be characterized in Node.
 async function importMindGateEquationModule() {
@@ -896,7 +901,7 @@ async function run() {
     });
   });
 
-  await test('createSpireResourceState: accepts the current Well override', () => {
+  await test('createSpireResourceState: accepts the current Tower override', () => {
     const state = spireResourceStateModule.createSpireResourceState({
       wellOfInspiration: { storySeen: true },
       achievements: { storySeen: true },
@@ -933,8 +938,8 @@ async function run() {
 
   const saveCompatibility = await importAsEsm('assets/saveCompatibility.js');
 
-  await test('migrateWellOfInspirationSave: old retired branches are ignored without blocking startup data', () => {
-    const migrated = saveCompatibility.migrateWellOfInspirationSave({
+  await test('migrateTowerOfInspirationSave: old retired branches are ignored without blocking startup data', () => {
+    const migrated = saveCompatibility.migrateTowerOfInspirationSave({
       powder: { storySeen: true },
       fluid: { grainCount: 999 },
       lamed: { unlocked: true },
@@ -947,8 +952,8 @@ async function run() {
     });
   });
 
-  await test('migrateWellOfInspirationSave: preserves a valid legacy simulation snapshot', () => {
-    const migrated = saveCompatibility.migrateWellOfInspirationSave({
+  await test('migrateTowerOfInspirationSave: preserves a valid legacy simulation snapshot', () => {
+    const migrated = saveCompatibility.migrateTowerOfInspirationSave({
       alephSpire: { storySeen: true },
       loadedSimulationState: { grains: [] },
     });
@@ -2216,7 +2221,7 @@ async function run() {
         return `component:${value}`;
       },
     });
-    assert.equal(output, 'component:5 = component:0 × (\\text{chain}^{\\text{exp}})');
+    assert.equal(output, String.raw`\( component:5 = component:0 \times (\text{chain}^{\text{exp}}) \)`);
     assert.deepEqual(calls, [5, 0]);
   });
 
@@ -2677,6 +2682,44 @@ async function run() {
     assert.equal(Object.hasOwn(module.blueprintContext, 'after'), false);
     assert.equal(source.before, 'assigned');
     assert.equal(source.after, 'not-assigned');
+  });
+
+  // --- scripts/core/mathTokens.js ----------------------------------------
+  const mathTokens = await importMathTokensModule();
+
+  await test('math tokens: identifiers are matched whole and short variables respect boundaries', () => {
+    const tokens = mathTokens.tokenizeEquationParts(
+      'ξ = Nu × spd × rng × chnRng × maxChn × numChnExp × slice × stored',
+      [
+        { key: 'speed', symbol: 'spd' },
+        { key: 'range', symbol: 'rng' },
+        { key: 'chainRange', symbol: 'chnRng' },
+        { key: 'maxChain', symbol: 'maxChn' },
+        { key: 'chainExponent', symbol: 'numChnExp' },
+        { key: 'particle', symbol: 'p' },
+        { key: 'rangeLetter', symbol: 'm' },
+      ],
+    );
+    assert.deepEqual(tokens.filter((token) => token.variableKey).map((token) => token.text), [
+      'spd', 'rng', 'chnRng', 'maxChn', 'numChnExp',
+    ]);
+    assert.equal(tokens.map((token) => token.text).join(''),
+      'ξ = Nu × spd × rng × chnRng × maxChn × numChnExp × slice × stored');
+  });
+
+  await test('math tokens: TeX text and authored scripts retain their semantic parts', () => {
+    const plain = (value) => value
+      .replace(/\\text\{([^}]*)\}/g, '$1')
+      .replace(/\\([a-zA-Z]+)/g, '$1')
+      .replace(/[{}]/g, '');
+    assert.deepEqual(mathTokens.parseEquationLabel(String.raw`\text{slice}`, plain),
+      { base: 'slice', subscript: '', superscript: '' });
+    assert.deepEqual(mathTokens.parseEquationLabel(String.raw`\text{R}_{\text{AoE}}`, plain),
+      { base: 'R', subscript: 'AoE', superscript: '' });
+    assert.deepEqual(mathTokens.parseEquationLabel(String.raw`\text{C}^{-1}`, plain),
+      { base: 'C', subscript: '', superscript: '-1' });
+    assert.deepEqual(mathTokens.parseEquationLabel(String.raw`N_{\text{eff}}`, plain),
+      { base: 'N', subscript: 'eff', superscript: '' });
   });
 
   // --- assets/towerEquations/masterEquationUtils.js ----------------------
@@ -3316,7 +3359,7 @@ async function run() {
     assert.deepEqual(snapshot.achievements, { storySeen: true });
   });
 
-  await test('spire serialization: falls back from a missing Well branch to compatibility `powder`', () => {
+  await test('spire serialization: falls back from a missing Tower branch to compatibility `powder`', () => {
     const harness = createSpirePersistenceHarness(spirePersistence, {
       spireResourceState: {
         wellOfInspiration: null,

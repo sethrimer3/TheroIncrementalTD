@@ -44,7 +44,7 @@ for (const label of retiredLabels) {
 const tabIds = [...nav.matchAll(/data-tab="([^"]+)"/g)].map((match) => match[1]);
 assert.deepEqual(tabIds, ['tower', 'towers', 'powder', 'achievements', 'options']);
 assert.equal((nav.match(/class="[^"]*tab-button--stacked/g) || []).length, 1);
-assert.match(nav, /data-tab="powder"[\s\S]*?aria-label="Well of Inspiration"/);
+assert.match(nav, /data-tab="powder"[\s\S]*?aria-label="Tower of Inspiration"/);
 assert.match(nav, /aria-controls="panel-powder"/);
 assert.match(index, /id="panel-powder"[\s\S]*?aria-labelledby="tab-powder"/);
 assert.match(index, /id="panel-achievements"[\s\S]*?aria-labelledby="tab-achievements"/);

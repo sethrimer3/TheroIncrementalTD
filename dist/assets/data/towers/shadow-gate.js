@@ -10,7 +10,7 @@ export const SHADOW_GATE_TOWER = Object.freeze({
     rate: 0,
     range: 0,
     diameterMeters: 2.4,
-    icon: 'assets/sprites/gates%26track/enemyGate/enemyGateSymbol.png',
+    icon: 'assets/sprites/gates&track/enemyGate/enemyGateSymbol.png',
     description: 'The enemy spawn rift—dark curses woven here weaken every foe that passes through its void.',
 });
 export default SHADOW_GATE_TOWER;

@@ -8,7 +8,7 @@
 
 // Narrative targets for each spire tab so the shared story overlay can surface their briefings.
 export const SPIRE_STORY_TARGETS = {
-  powder: { id: 'spire-powder', title: 'Well of Inspiration' },
+  powder: { id: 'spire-powder', title: 'Tower of Inspiration' },
   achievements: { id: 'achievements', title: 'Achievements' },
 };
 
@@ -34,7 +34,7 @@ export function createSpireStoryManager({
 }) {
   /**
    * Retrieve or initialize the persistent story branch for a spire so unlock flow and autosave share state.
-   * @param {string} spireId - Identifier for the surviving Well or achievements tab.
+   * @param {string} spireId - Identifier for the surviving Tower or achievements tab.
    * @returns {Object|null} Reference to the spire story state branch.
    */
   function getSpireStoryBranch(spireId) {
