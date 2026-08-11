@@ -219,6 +219,8 @@ const DEFAULT_TOWER_ICON_COLORS = Object.freeze({
 
 // Cache for loaded SVG content to avoid redundant fetches.
 const svgContentCache = new Map();
+// Give every injected SVG private definition ids so repeated cards cannot steal each other's gradients.
+let towerIconInstanceId = 0;
 
 // Resolve palette-aware colors for a tower icon so Codex palette swaps recolor every glyph chip consistently.
 function resolveTowerIconPalette(tower) {
@@ -297,6 +299,39 @@ function rgbToHex(rgb) {
   return `#${toHex(rgb.r)}${toHex(rgb.g)}${toHex(rgb.b)}`;
 }
 
+// Namespace gradients, particles, and other SVG definitions before inserting an icon into the document.
+function namespaceSvgDefinitionIds(svgElement) {
+  const instanceSuffix = `tower-icon-${towerIconInstanceId += 1}`;
+  const idMap = new Map();
+  svgElement.querySelectorAll('[id]').forEach((element) => {
+    const originalId = element.id;
+    const namespacedId = `${originalId}-${instanceSuffix}`;
+    idMap.set(originalId, namespacedId);
+    element.id = namespacedId;
+  });
+
+  const referenceAttributes = ['fill', 'stroke', 'filter', 'mask', 'clip-path', 'href', 'xlink:href'];
+  svgElement.querySelectorAll('*').forEach((element) => {
+    referenceAttributes.forEach((attributeName) => {
+      const value = element.getAttribute(attributeName);
+      if (!value) {
+        return;
+      }
+      const updatedValue = value.replace(/url\(#([^)]+)\)|^#(.+)$/g, (match, urlId, hrefId) => {
+        const referencedId = urlId || hrefId;
+        const namespacedId = idMap.get(referencedId);
+        if (!namespacedId) {
+          return match;
+        }
+        return urlId ? `url(#${namespacedId})` : `#${namespacedId}`;
+      });
+      if (updatedValue !== value) {
+        element.setAttribute(attributeName, updatedValue);
+      }
+    });
+  });
+}
+
 // Apply palette colors to an inline SVG element by modifying its internal elements.
 function applySvgPaletteColors(svgElement, palette) {
   if (!(svgElement instanceof SVGElement) || !palette) {
@@ -349,6 +384,12 @@ function applySvgPaletteColors(svgElement, palette) {
     }
   });
 
+  // Separate the inner gradient from the thick outer color ring with a crisp black keyline.
+  if (circles[1]) {
+    circles[1].setAttribute('stroke', '#000000');
+    circles[1].setAttribute('stroke-width', '1.5');
+  }
+
   // Update text (tower symbol) with symbol color
   const textElements = svgElement.querySelectorAll('text');
   textElements.forEach((text) => {
@@ -394,6 +435,8 @@ async function loadAndColorSvg(iconUrl, palette) {
       return null;
     }
 
+    // Isolate referenced definitions before the icon joins a page containing duplicate tower types.
+    namespaceSvgDefinitionIds(svgElement);
     // Apply palette colors
     applySvgPaletteColors(svgElement, palette);
     
