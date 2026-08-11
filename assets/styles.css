@@ -7015,12 +7015,13 @@ body.playfield-fullscreen .playfield canvas {
 
 .powder-wall-left {
   left: 0;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: none;
 }
 
 .powder-wall-right {
   right: 0;
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  /* The canvas no longer draws a matching edge highlight, so keep this seam borderless too. */
+  border-left: none;
 }
 
 

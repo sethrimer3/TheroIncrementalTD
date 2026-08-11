@@ -1209,10 +1209,10 @@ export class PowderSimulation {
     this.ctx.fillStyle = gradient;
     this.ctx.fillRect(-width, gradientTop, width * 3, gradientHeight);
 
-    // Carry the wall edge highlights upward alongside the extended gradient to avoid abrupt seams at the zoom ceiling.
+    // Carry the left and floor edge highlights upward alongside the extended gradient.
+    // The former right highlight could drift inward from the decorative wall under camera transforms.
     this.ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
     this.ctx.fillRect(0, gradientTop, 2, gradientHeight);
-    this.ctx.fillRect(width - 2, gradientTop, 2, gradientHeight);
     this.ctx.fillRect(0, height - 2, width, 2);
 
     const cellSizePx = this.cellSize;

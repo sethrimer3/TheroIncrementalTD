@@ -705,6 +705,10 @@ function updateDeltaSoldier(playfield, tower, soldier, delta, state) {
       const speedMagnitude = Math.hypot(soldier.vx, soldier.vy);
       soldier.vx = Math.cos(soldier.heading) * speedMagnitude;
       soldier.vy = Math.sin(soldier.heading) * speedMagnitude;
+      // Cue the impact once, exactly when the completed ram sharply redirects the ship.
+      if (playfield?.audio) {
+        playfield.audio.playSfx('deltaShipImpact');
+      }
     }
   }
 
@@ -751,12 +755,7 @@ function updateDeltaSoldier(playfield, tower, soldier, delta, state) {
         target.hp = Math.max(0, enemyHp - inflicted);
         const loss = Math.max(0, inflicted - (state.defense || 0));
         soldier.health = Math.max(0, soldier.health - loss);
-        
-        // Play glass clinking sound on impact
-        if (playfield?.audio && inflicted > 0) {
-          playfield.audio.playSfx('deltaShipImpact');
-        }
-        
+
         if (target.hp <= 0) {
           playfield.processEnemyDefeat(target);
           soldier.targetId = null;
