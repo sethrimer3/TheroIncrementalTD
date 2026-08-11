@@ -1,6 +1,11 @@
 'use strict';
 
 import { transformPointForOrientation } from './geometryHelpers.js';
+import {
+  catmullRom,
+  distanceBetween,
+  generateSmoothPathPoints,
+} from './playfield/systems/PathGeometrySystem.js';
 
 /**
  * Factory that manages the level-selection grid: building level cards, campaign
@@ -477,7 +482,7 @@ export function createLevelGridController({
     // Generate both orientations from the actual level path. CSS selects the
     // appropriate pair, so rotating a device does not require rebuilding cards.
     ['portrait', 'landscape'].forEach((orientation) => {
-      const pathData = previewPoints
+      const scaledPoints = previewPoints
         .map((point) => transformPointForOrientation({
           x: point?.x ?? 0.5,
           y: point?.y ?? 0.5,
@@ -485,7 +490,15 @@ export function createLevelGridController({
         .map((point) => ({
           x: padding + clampNormalizedCoordinate(point.x) * span,
           y: padding + clampNormalizedCoordinate(point.y) * span,
-        }))
+        }));
+      // Match the battlefield's Catmull–Rom curve rather than connecting the
+      // authored control points with visibly angular straight segments.
+      const smoothPoints = generateSmoothPathPoints.call(
+        { catmullRom, distanceBetween },
+        scaledPoints,
+        14,
+      );
+      const pathData = smoothPoints
         .map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`)
         .join(' ');
 

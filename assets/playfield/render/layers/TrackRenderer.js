@@ -4,6 +4,7 @@
 import { samplePaletteGradient } from '../../../colorSchemeUtils.js';
 import { colorToRgbaString, resolvePaletteColorStops } from '../../../../scripts/features/towers/powderTower.js';
 import { getTrackRenderMode, TRACK_RENDER_MODES, areTrackTracersEnabled } from '../../../preferences.js';
+import { resolveZoomRasterScale } from '../../utils/rendering.js';
 
 // Pre-calculated constants for performance optimization in tight render loops
 const TWO_PI = Math.PI * 2;
@@ -369,7 +370,7 @@ function drawGateBackgroundLayers(ctx, layers, baseDrawSize, currentTime, global
 }
 
 // Build a cache key for the static path layer to avoid re-rasterizing on zoom.
-function getPathLayerCacheKey(width, height, paletteStops, trackMode) {
+function getPathLayerCacheKey(width, height, paletteStops, trackMode, zoomRasterScale) {
   const levelId = this.levelConfig?.id || 'unknown-level';
   const pixelRatio = Math.max(1, this.pixelRatio || 1);
   const points = Array.isArray(this.pathPoints) ? this.pathPoints : [];
@@ -383,6 +384,7 @@ function getPathLayerCacheKey(width, height, paletteStops, trackMode) {
     levelId,
     `${width}x${height}`,
     `pr${pixelRatio}`,
+    `zoom${zoomRasterScale}`,
     trackMode,
     `points:${points.length}:${Math.round(firstPoint.x)}:${Math.round(firstPoint.y)}:${Math.round(lastPoint.x)}:${Math.round(lastPoint.y)}`,
     `tunnels:${tunnelCount}`,
@@ -400,11 +402,13 @@ function buildPathLayerCache(width, height) {
     return null;
   }
   const paletteStops = getCachedTrackPaletteStops.call(this);
-  const key = getPathLayerCacheKey.call(this, width, height, paletteStops, trackMode);
+  const basePixelRatio = Math.max(1, this.pixelRatio || 1);
+  const rasterScale = Math.min(4, basePixelRatio * resolveZoomRasterScale(this.viewScale));
+  const key = getPathLayerCacheKey.call(this, width, height, paletteStops, trackMode, rasterScale);
   if (this._pathLayerCache?.key === key) {
     return this._pathLayerCache;
   }
-  const pixelRatio = Math.max(1, this.pixelRatio || 1);
+  const pixelRatio = rasterScale;
   const canvas = document.createElement('canvas');
   canvas.width = Math.max(1, Math.floor(width * pixelRatio));
   canvas.height = Math.max(1, Math.floor(height * pixelRatio));
