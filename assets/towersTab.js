@@ -328,13 +328,16 @@ function applySvgPaletteColors(svgElement, palette) {
     }
   });
 
-  // Update circles (background and rings)
-  const circles = svgElement.querySelectorAll('circle');
+  // Recolor only the visible structural circles. Animated circles inside
+  // <defs> vary by tower and must not shift the outer/inner ring indexing.
+  const circles = Array.from(svgElement.children).filter(
+    (child) => child.localName === 'circle',
+  );
   circles.forEach((circle, index) => {
     if (circle.hasAttribute('fill') && !circle.getAttribute('fill').startsWith('url(')) {
-      // Outer circles get secondary color
+      // The outer disc supplies the standard thick palette-colored ring.
       if (index === 0) {
-        circle.setAttribute('fill', secondaryHex);
+        circle.setAttribute('fill', primaryHex);
       } else {
         // Inner circles get primary color
         circle.setAttribute('fill', primaryHex);
