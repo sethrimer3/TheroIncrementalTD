@@ -18,8 +18,8 @@ import {
 // Δ ship sprite paths point at the white art that will be tinted by the active palette.
 // Note: Delta ship sprites are oriented with "forward" pointing upward (see docs/TOWER_SPRITE_ORIENTATION.md)
 const DELTA_SHIP_SPRITE_PATHS = [
-  'assets/sprites/towers/delta/ship1.png',
-  'assets/sprites/towers/delta/ship2.png',
+  'assets/sprites/towers/delta/ships/ship1.png',
+  'assets/sprites/towers/delta/ships/ship2.png',
 ];
 
 // Cache 12 tinted variants per ship sprite so palette swaps only pay the recolor cost once.
@@ -130,10 +130,20 @@ function buildDeltaShipSpriteCache() {
       }
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(image, 0, 0);
-      ctx.globalCompositeOperation = 'source-in';
-      ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.globalCompositeOperation = 'source-over';
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const pixels = imageData.data;
+      for (let pixelIndex = 0; pixelIndex < pixels.length; pixelIndex += 4) {
+        // Map white through the active palette while black stays black; preserve antialiasing and alpha.
+        const luminance = (
+          pixels[pixelIndex] * 0.2126 +
+          pixels[pixelIndex + 1] * 0.7152 +
+          pixels[pixelIndex + 2] * 0.0722
+        ) / 255;
+        pixels[pixelIndex] = Math.round(color.r * luminance);
+        pixels[pixelIndex + 1] = Math.round(color.g * luminance);
+        pixels[pixelIndex + 2] = Math.round(color.b * luminance);
+      }
+      ctx.putImageData(imageData, 0, 0);
       deltaShipSpriteCaches[shipIndex].push(canvas);
     }
   });
@@ -146,7 +156,7 @@ export function refreshDeltaShipSpritePaletteCache() {
 
 // Resolve a cached, palette-tinted sprite for a Δ soldier if available.
 function resolveDeltaShipSpriteVariant(soldier) {
-  // Use the ship variant index to pick which ship sprite (ship1 or ship2).
+  // Use the per-soldier random variant index to pick a sprite from the Delta ships folder.
   const shipVariantIndex = Number.isFinite(soldier?.shipVariantIndex) 
     ? soldier.shipVariantIndex % DELTA_SHIP_SPRITE_PATHS.length
     : 0;
@@ -473,7 +483,7 @@ export function deployDeltaSoldier(playfield, tower, targetInfo = null) {
     swarmPhase: Math.random() * Math.PI * 2,
     swarmSpeedMultiplier: 0.85 + Math.random() * 0.35,
     swarmRadiusMultiplier: 0.8 + Math.random() * 0.6,
-    // Randomly pick which ship sprite variant (ship1 or ship2) this soldier uses.
+    // Randomly pick one sprite from the Delta ships folder for this soldier's lifetime.
     shipVariantIndex: Math.floor(Math.random() * DELTA_SHIP_SPRITE_PATHS.length),
     // Lock a palette sample index so each soldier keeps a stable tint.
     spriteVariantIndex: Math.floor(Math.random() * DELTA_SHIP_SPRITE_SAMPLE_COUNT),
@@ -897,8 +907,8 @@ export function drawDeltaSoldiers(playfield) {
       // Try to use the sprite if available, otherwise fall back to triangle.
       const sprite = resolveDeltaShipSpriteVariant(soldier);
       if (sprite) {
-        // Draw the cached sprite variant with soldier health-based opacity.
-        const spriteSize = size * 2.5;
+        // Render at half the former scale while leaving collision and combat balance unchanged.
+        const spriteSize = size * 1.25;
         const alpha = clamp(0.75 + healthRatio * 0.25, 0, 1);
         ctx.globalAlpha = alpha;
         ctx.drawImage(sprite, -spriteSize / 2, -spriteSize / 2, spriteSize, spriteSize);
