@@ -23,6 +23,7 @@ import { createTowerVariableDiscoveryManager } from './towerVariableDiscovery.js
 import { createTowerLoadoutController } from './towerLoadoutController.js';
 import { getTowerVisualConfig } from './colorSchemeUtils.js';
 import { T2_FUNC_CONFIG } from '../scripts/features/towers/t2Tower.js';
+import { CANONICAL_TOWER_IDS } from './data/towers/towerUnlockCost.js';
 
 // Callback to update status displays when glyphs change. Set via configureTowersTabCallbacks.
 let updateStatusDisplaysCallback = null;
@@ -686,6 +687,31 @@ function normalizeLoadoutSlots() {
 }
 
 /**
+ * Fill open loadout slots with the earliest unlocked towers in the canonical tier chain.
+ * Existing selections are preserved so automatic unlock handling never replaces a player's choice.
+ */
+export function fillEmptyLoadoutSlotsFromUnlocks() {
+  const slots = normalizeLoadoutSlots();
+  const selectedTowerIds = new Set(slots.filter((towerId) => typeof towerId === 'string'));
+  const availableTowerIds = CANONICAL_TOWER_IDS.filter(
+    (towerId) =>
+      towerTabState.unlockState.unlocked.has(towerId) &&
+      towerTabState.towerDefinitionMap.has(towerId) &&
+      !selectedTowerIds.has(towerId),
+  );
+
+  slots.forEach((towerId, slotIndex) => {
+    if (towerId || !availableTowerIds.length) {
+      return;
+    }
+    const nextTowerId = availableTowerIds.shift();
+    slots[slotIndex] = nextTowerId;
+    selectedTowerIds.add(nextTowerId);
+  });
+  return slots;
+}
+
+/**
  * Count the number of equipped towers ignoring placeholder slots.
  */
 function _getEquippedLoadoutCount() {
@@ -718,7 +744,7 @@ function assignTowerToSlot(slotIndex, towerId) {
 export function setTowerLoadoutLimit(limit) {
   if (Number.isFinite(limit) && limit > 0) {
     towerTabState.towerLoadoutLimit = Math.max(1, Math.floor(limit));
-    normalizeLoadoutSlots();
+    fillEmptyLoadoutSlotsFromUnlocks();
   }
 }
 
@@ -1083,6 +1109,7 @@ export function unlockTower(towerId, { silent = false } = {}) {
     return false;
   }
   towerTabState.unlockState.unlocked.add(towerId);
+  fillEmptyLoadoutSlotsFromUnlocks();
   discoverTowerVariables(towerId);
   if (typeof document !== 'undefined') {
     // Notify other systems (such as the tower tree map) that unlock visibility should refresh.
