@@ -30,7 +30,6 @@ import {
   ensureGameplayConfigLoaded,
   calculateStartingThero,
   getTowerLoadoutLimit,
-  overrideTowerLoadoutLimit,
   getBaseStartThero,
   registerResourceContainers,
   setBaseStartThero,
@@ -53,7 +52,6 @@ import {
   bindWaveDamageTallyToggle,
   applyTrackTracerPreference,
   bindTrackTracerToggle,
-  bindLoadoutSlotButton,
   applyGraphicsMode,
   initializeGraphicsMode,
   bindGraphicsModeToggle,
@@ -68,8 +66,6 @@ import {
   getPreferredGraphicsMode,
   bindTrackRenderModeButton,
   initializeTrackRenderMode,
-  initializeLoadoutSlotPreference,
-  setLoadoutSlotChangeHandler,
   bindFrameRateLimitSlider,
   initializeFrameRateLimitPreference,
   applyFrameRateLimitPreference,
@@ -1800,7 +1796,6 @@ import { createSpireCameraController } from './spireCameraController.js';
     bindTrackRenderModeButton();
     // Expose a tactile toggle for the luminous track tracer overlay.
     bindTrackTracerToggle();
-    bindLoadoutSlotButton();
     bindNotationToggle();
     bindGlyphEquationToggle();
     bindDamageNumberToggle();
@@ -1912,10 +1907,6 @@ import { createSpireCameraController } from './spireCameraController.js';
       note: document.getElementById('tower-loadout-note'),
       toggle: document.getElementById('tower-loadout-toggle'),
     });
-    setLoadoutSlotChangeHandler((slotCount) => {
-      overrideTowerLoadoutLimit(slotCount);
-      syncLoadoutToPlayfield();
-    });
 
     setHideUpgradeMatrixCallback(hideUpgradeMatrix);
     setRenderUpgradeMatrixCallback(renderUpgradeMatrix);
@@ -1995,8 +1986,6 @@ import { createSpireCameraController } from './spireCameraController.js';
     }
 
     setMergingLogicUnlocked(getMergeProgressState().mergingLogicUnlocked);
-
-    initializeLoadoutSlotPreference({ defaultSlots: getTowerLoadoutLimit() });
 
     enemyCodexElements.list = document.getElementById('enemy-codex-list');
     enemyCodexElements.empty = document.getElementById('enemy-codex-empty');

@@ -20,6 +20,7 @@ export function createTowerLoadoutController({
   syncLoadoutToPlayfield,
 } = {}) {
   const LOADOUT_WHEEL_HOLD_MS = 500; // Require an intentional hold before opening the wheel overlay.
+  const LOADOUT_CAROUSEL_ENABLED = false; // Temporarily disable in-defense tower swapping.
   const LOADOUT_SCROLL_STEP_PX = 28; // Drag distance required to advance the wheel to the next item.
   const LOADOUT_DRAG_CANCEL_DISTANCE = 6; // Mouse/pen threshold that cancels the hold timer so drags can begin immediately.
   const LOADOUT_DRAG_CANCEL_DISTANCE_TOUCH = 14; // Slightly looser touch threshold to tolerate finger jitter during holds.
@@ -141,7 +142,7 @@ export function createTowerLoadoutController({
   function bindLoadoutToggle() {
     const elements = safeGetLoadoutElements();
     const toggle = elements?.toggle;
-    if (!toggle) {
+    if (!toggle || !LOADOUT_CAROUSEL_ENABLED) {
       return;
     }
     if (loadoutUiState.toggleHandler) {
@@ -183,9 +184,9 @@ export function createTowerLoadoutController({
       ? loadoutState.selected.some((towerId) => towerId)
       : false;
     const slotLimit = Math.max(1, safeGetLoadoutLimit());
-    const introMessage = `Hold a loadout slot for half a second to browse towers. Prepare up to ${slotLimit} glyphs for this defense.`;
+    const introMessage = `Prepare all ${slotLimit} required glyph slots from the Towers tab before entering this defense.`;
     const equippedMessage =
-      'Drag glyph chips onto the plane to lattice them; drop a chip atop a matching tower to merge. Hold a slot to swap towers mid-defense.';
+      'Drag glyph chips onto the plane to lattice them; drop a chip atop a matching tower to merge.';
     note.textContent = hasEquippedTower ? equippedMessage : introMessage;
   }
 
@@ -683,15 +684,17 @@ export function createTowerLoadoutController({
       }
     };
 
-    wheelState.timerId = setTimeout(() => {
-      cancelHold();
-      cancelTowerDrag();
-      openLoadoutWheel(slotIndex, element);
-      // Record the pointer position so hold-and-drag scrolls the wheel in discrete steps.
-      wheelState.dragPointerId = event.pointerId;
-      wheelState.dragLastY = event.clientY;
-      wheelState.dragAccumulated = 0;
-    }, LOADOUT_WHEEL_HOLD_MS);
+    if (LOADOUT_CAROUSEL_ENABLED) {
+      wheelState.timerId = setTimeout(() => {
+        cancelHold();
+        cancelTowerDrag();
+        openLoadoutWheel(slotIndex, element);
+        // Record the pointer position so hold-and-drag scrolls the wheel in discrete steps.
+        wheelState.dragPointerId = event.pointerId;
+        wheelState.dragLastY = event.clientY;
+        wheelState.dragAccumulated = 0;
+      }, LOADOUT_WHEEL_HOLD_MS);
+    }
 
     element.addEventListener('pointermove', handleMove);
     element.addEventListener('pointerup', cancelHold, { once: true });

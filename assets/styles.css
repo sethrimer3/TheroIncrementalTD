@@ -1567,9 +1567,8 @@ body.playfield-fullscreen .playfield canvas {
   transition: transform var(--transition), opacity var(--transition);
   opacity: 1;
   z-index: 1;
-  padding-left: calc(
-    var(--tower-loadout-edge-offset) + var(--tower-loadout-toggle-size) + var(--tower-loadout-gap)
-  );
+  /* The retired hide/show toggle no longer reserves space before the first tower. */
+  padding-left: 0;
   padding-right: 8px;
 }
 
@@ -1613,11 +1612,13 @@ body.playfield-fullscreen .playfield canvas {
   gap: 4px;
   padding: 0;
   border-radius: 12px;
-  border: none;
+  box-sizing: border-box;
+  border: 1px solid rgba(212, 175, 55, 0.72);
   background: transparent;
   cursor: var(--cursor-grab);
   touch-action: none;
-  transition: transform var(--transition), opacity var(--transition);
+  box-shadow: 0 0 0 1px rgba(255, 228, 120, 0.08);
+  transition: transform var(--transition), opacity var(--transition), border-color var(--transition);
   min-height: 0;
   pointer-events: auto; /* Re-enable interaction on actual loadout items while leaving gaps transparent to input. */
   /* Prevent long-press text selection and callouts on loadout slots. */

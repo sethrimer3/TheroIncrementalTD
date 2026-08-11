@@ -8,6 +8,7 @@ import {
   getTowerDefinition,
   setMergingLogicUnlocked,
   initializeDiscoveredVariablesFromUnlocks,
+  syncTowerLoadoutLimitFromUnlocks,
 } from './towersTab.js';
 import { setEnemyCodexEntries } from './codex.js';
 import {
@@ -183,6 +184,7 @@ async function applyGameplayConfigInternal(config = {}) {
     }
   });
   unlockState.unlocked = unlocked;
+  TOWER_LOADOUT_LIMIT = syncTowerLoadoutLimitFromUnlocks();
   setMergingLogicUnlocked(unlocked.has('beta'));
   initializeDiscoveredVariablesFromUnlocks(unlocked);
 

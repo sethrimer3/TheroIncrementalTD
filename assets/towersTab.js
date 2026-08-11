@@ -791,6 +791,20 @@ export function setTowerLoadoutLimit(limit) {
   }
 }
 
+/**
+ * Derive mandatory loadout capacity from discovered placeable tower types.
+ * Formula: slots = clamp(discovered towers, 2, 4), so every player starts with
+ * two slots and permanently gains the third and fourth alongside those discoveries.
+ */
+export function syncTowerLoadoutLimitFromUnlocks() {
+  const discoveredPlaceableCount = CANONICAL_TOWER_IDS.filter(
+    (towerId) => towerTabState.unlockState.unlocked.has(towerId) && isTowerPlaceable(towerId),
+  ).length;
+  towerTabState.towerLoadoutLimit = Math.min(4, Math.max(2, discoveredPlaceableCount));
+  fillEmptyLoadoutSlotsFromUnlocks();
+  return towerTabState.towerLoadoutLimit;
+}
+
 export function getTowerLoadoutState() {
   return towerTabState.loadoutState;
 }
@@ -1152,7 +1166,7 @@ export function unlockTower(towerId, { silent = false } = {}) {
     return false;
   }
   towerTabState.unlockState.unlocked.add(towerId);
-  fillEmptyLoadoutSlotsFromUnlocks();
+  syncTowerLoadoutLimitFromUnlocks();
   discoverTowerVariables(towerId);
   if (typeof document !== 'undefined') {
     // Notify other systems (such as the tower tree map) that unlock visibility should refresh.
@@ -1379,7 +1393,12 @@ export function toggleTowerSelection(towerId, { anchorButton = null } = {}) {
   const selected = normalizeLoadoutSlots();
   const index = selected.indexOf(towerId);
   if (index >= 0) {
-    selected[index] = null;
+    // Loadout capacity is progression-owned and every available slot is mandatory.
+    if (towerTabState.loadoutElements.note) {
+      towerTabState.loadoutElements.note.textContent = 'Every unlocked loadout slot is required—equip another glyph to replace this one.';
+    }
+    updateTowerSelectionButtons();
+    return;
   } else {
     const emptyIndex = getNextEmptyLoadoutSlot();
     if (emptyIndex === -1) {
