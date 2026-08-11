@@ -1,5 +1,7 @@
 'use strict';
 
+import { transformPointForOrientation } from './geometryHelpers.js';
+
 /**
  * Factory that manages the level-selection grid: building level cards, campaign
  * diamonds, set expansion/collapse, lock states, and the active-level banner.
@@ -472,23 +474,32 @@ export function createLevelGridController({
 
     const padding = 12;
     const span = 100 - padding * 2;
-    const pathData = previewPoints
-      .map((point) => ({
-        x: padding + clampNormalizedCoordinate(point?.x ?? 0.5) * span,
-        y: padding + clampNormalizedCoordinate(point?.y ?? 0.5) * span,
-      }))
-      .map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`)
-      .join(' ');
+    // Generate both orientations from the actual level path. CSS selects the
+    // appropriate pair, so rotating a device does not require rebuilding cards.
+    ['portrait', 'landscape'].forEach((orientation) => {
+      const pathData = previewPoints
+        .map((point) => transformPointForOrientation({
+          x: point?.x ?? 0.5,
+          y: point?.y ?? 0.5,
+        }, orientation))
+        .map((point) => ({
+          x: padding + clampNormalizedCoordinate(point.x) * span,
+          y: padding + clampNormalizedCoordinate(point.y) * span,
+        }))
+        .map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`)
+        .join(' ');
 
-    const glow = document.createElementNS(SVG_NS, 'path');
-    glow.setAttribute('d', pathData);
-    glow.setAttribute('class', 'level-node-preview__glow');
-    preview.append(glow);
+      const orientationClass = `level-node-preview__path--${orientation}`;
+      const glow = document.createElementNS(SVG_NS, 'path');
+      glow.setAttribute('d', pathData);
+      glow.setAttribute('class', `level-node-preview__glow ${orientationClass}`);
+      preview.append(glow);
 
-    const stroke = document.createElementNS(SVG_NS, 'path');
-    stroke.setAttribute('d', pathData);
-    stroke.setAttribute('class', 'level-node-preview__stroke');
-    preview.append(stroke);
+      const stroke = document.createElementNS(SVG_NS, 'path');
+      stroke.setAttribute('d', pathData);
+      stroke.setAttribute('class', `level-node-preview__stroke ${orientationClass}`);
+      preview.append(stroke);
+    });
 
     return preview;
   }

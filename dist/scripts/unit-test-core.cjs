@@ -178,6 +178,11 @@ function importMasterEquationUtilsModule() {
   return importAsEsm('assets/towerEquations/masterEquationUtils.js');
 }
 
+// Import the canonical tower unlock-cost formula without loading the UI registry.
+function importTowerUnlockCostModule() {
+  return importAsEsm('assets/data/towers/towerUnlockCost.js');
+}
+
 // Import the dependency-free tokenizer used by interactive tower equations.
 function importMathTokensModule() {
   return importAsEsm('scripts/core/mathTokens.js');
@@ -2682,6 +2687,28 @@ async function run() {
     assert.equal(Object.hasOwn(module.blueprintContext, 'after'), false);
     assert.equal(source.before, 'assigned');
     assert.equal(source.after, 'not-assigned');
+  });
+
+  // --- assets/data/towers/towerUnlockCost.js -----------------------------
+  const towerUnlockCost = await importTowerUnlockCostModule();
+
+  await test('tower unlock costs: all 25 canonical tiers follow 100 × tier²', () => {
+    const expectedCosts = Array.from({ length: 25 }, (_, index) => 100 * (index + 1) ** 2);
+    const canonicalDefinitions = towerUnlockCost.CANONICAL_TOWER_IDS.map(
+      (towerId) => towers.find((tower) => tower.id === towerId),
+    );
+    assert.equal(towerUnlockCost.CANONICAL_TOWER_IDS.length, 25);
+    assert.equal(towerUnlockCost.CANONICAL_TOWER_IDS[24], 'infinity');
+    assert.deepEqual(canonicalDefinitions.map((tower) => tower?.tier),
+      Array.from({ length: 25 }, (_, index) => index + 1));
+    assert.deepEqual(
+      expectedCosts.map((_, index) => towerUnlockCost.calculateTowerUnlockCost(index + 1)),
+      expectedCosts,
+    );
+    assert.equal(towerUnlockCost.calculateTowerUnlockCost(25), 62500);
+    towerUnlockCost.CANONICAL_TOWER_IDS.forEach((towerId) => {
+      assert.equal(towerUnlockCost.isCanonicalTowerId(towerId), true);
+    });
   });
 
   // --- scripts/core/mathTokens.js ----------------------------------------

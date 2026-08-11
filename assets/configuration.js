@@ -1,4 +1,5 @@
 import towers from './data/towers/index.js';
+import { calculateTowerUnlockCost, isCanonicalTowerId } from './data/towers/towerUnlockCost.js';
 import {
   setTowerDefinitions,
   setTowerLoadoutLimit,
@@ -136,7 +137,14 @@ async function applyGameplayConfigInternal(config = {}) {
   resourceStateRef.energyRate = baseResourcesRef.energyRate;
   resourceStateRef.fluxRate = baseResourcesRef.fluxRate;
 
-  const towerDefinitions = towers.map((tower) => ({ ...tower }));
+  // All display, affordability, and deduction paths consume this same runtime
+  // definition registry, making the tier formula the canonical unlock cost.
+  const towerDefinitions = towers.map((tower) => ({
+    ...tower,
+    baseCost: isCanonicalTowerId(tower.id)
+      ? calculateTowerUnlockCost(tower.tier)
+      : tower.baseCost,
+  }));
   gameplayConfigData.towers = towerDefinitions;
   setTowerDefinitions(towerDefinitions);
 

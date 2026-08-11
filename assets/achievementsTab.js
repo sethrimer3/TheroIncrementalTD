@@ -34,6 +34,7 @@ let overlayState = null; // Tracks the currently animating achievement so it can
 let achievementMetadata = [];
 let achievementMetadataLoadPromise = null;
 let openDropdowns = new Set(); // Track which dropdowns are currently open
+const dropdownRevealTimers = new WeakMap(); // Prevent stale reveal cleanup after rapid tab switches.
 let goldenTextContainer = null; // Container for golden text animations
 let goldenTextQueue = []; // Queue of text lines waiting to be displayed
 let goldenTextAnimating = false; // Whether golden text is currently animating
@@ -588,6 +589,8 @@ function toggleDropdown(categoryId) {
   
   if (isOpen) {
     openDropdowns.delete(categoryId);
+    window.clearTimeout(dropdownRevealTimers.get(dropdownContent));
+    dropdownContent.classList.remove('achievement-category-content--entering');
     dropdownContent.hidden = true;
     dropdownContent.style.display = 'none';
     toggleButton.setAttribute('aria-expanded', 'false');
@@ -609,6 +612,8 @@ function toggleDropdown(categoryId) {
         const otherButton = document.querySelector(`[data-dropdown-toggle="${otherId}"]`);
         if (otherDropdown && otherButton) {
           openDropdowns.delete(otherId);
+          window.clearTimeout(dropdownRevealTimers.get(otherDropdown));
+          otherDropdown.classList.remove('achievement-category-content--entering');
           otherDropdown.hidden = true;
           otherDropdown.style.display = 'none';
           otherButton.setAttribute('aria-expanded', 'false');
@@ -630,6 +635,10 @@ function toggleDropdown(categoryId) {
     openDropdowns.add(categoryId);
     dropdownContent.hidden = false;
     dropdownContent.style.display = 'block';
+    // Replay the shared staggered reveal whenever a category is opened.
+    dropdownContent.classList.remove('achievement-category-content--entering');
+    void dropdownContent.offsetWidth;
+    dropdownContent.classList.add('achievement-category-content--entering');
     toggleButton.setAttribute('aria-expanded', 'true');
     toggleButton.classList.add('achievement-category-toggle--expanded');
     
@@ -643,6 +652,14 @@ function toggleDropdown(categoryId) {
         setAchievementSparkleEmitter(element.container, true);
       }
     });
+
+    // Clear the transient class after the longest tile delay and animation.
+    window.clearTimeout(dropdownRevealTimers.get(dropdownContent));
+    const revealTimer = window.setTimeout(() => {
+      dropdownContent.classList.remove('achievement-category-content--entering');
+      dropdownRevealTimers.delete(dropdownContent);
+    }, 620);
+    dropdownRevealTimers.set(dropdownContent, revealTimer);
   }
 }
 
@@ -752,6 +769,8 @@ function renderAchievementGrid() {
       const tile = document.createElement('button');
       tile.type = 'button';
       tile.className = 'achievement-tile';
+      // Bound the stagger so large categories finish revealing promptly.
+      tile.style.setProperty('--achievement-enter-index', String(Math.min(index, 8)));
       tile.dataset.achievementId = definition.id;
       tile.setAttribute('role', 'listitem');
       tile.setAttribute('aria-haspopup', 'dialog');
