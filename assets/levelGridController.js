@@ -1,11 +1,6 @@
 'use strict';
 
 import { transformPointForOrientation } from './geometryHelpers.js';
-import {
-  catmullRom,
-  distanceBetween,
-  generateSmoothPathPoints,
-} from './playfield/systems/PathGeometrySystem.js';
 
 /**
  * Factory that manages the level-selection grid: building level cards, campaign
@@ -15,6 +10,36 @@ import {
  */
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
+
+// Convert battlefield Catmull–Rom control points into native cubic SVG curves so card previews have no angular joins.
+function createSmoothPreviewPathData(points) {
+  if (!Array.isArray(points) || points.length < 2) {
+    return '';
+  }
+
+  const commands = [`M ${points[0].x.toFixed(2)} ${points[0].y.toFixed(2)}`];
+  for (let index = 0; index < points.length - 1; index += 1) {
+    const previous = index > 0 ? points[index - 1] : points[index];
+    const current = points[index];
+    const next = points[index + 1];
+    const afterNext = index + 2 < points.length ? points[index + 2] : next;
+    // A tension of 1/6 converts the uniform Catmull–Rom segment into an equivalent cubic Bézier curve.
+    const controlOne = {
+      x: current.x + (next.x - previous.x) / 6,
+      y: current.y + (next.y - previous.y) / 6,
+    };
+    const controlTwo = {
+      x: next.x - (afterNext.x - current.x) / 6,
+      y: next.y - (afterNext.y - current.y) / 6,
+    };
+    commands.push(
+      `C ${controlOne.x.toFixed(2)} ${controlOne.y.toFixed(2)} ` +
+      `${controlTwo.x.toFixed(2)} ${controlTwo.y.toFixed(2)} ` +
+      `${next.x.toFixed(2)} ${next.y.toFixed(2)}`,
+    );
+  }
+  return commands.join(' ');
+}
 
 export function createLevelGridController({
   // ── Data sources (mutable collections passed by reference) ──────────
@@ -491,16 +516,8 @@ export function createLevelGridController({
           x: padding + clampNormalizedCoordinate(point.x) * span,
           y: padding + clampNormalizedCoordinate(point.y) * span,
         }));
-      // Match the battlefield's Catmull–Rom curve rather than connecting the
-      // authored control points with visibly angular straight segments.
-      const smoothPoints = generateSmoothPathPoints.call(
-        { catmullRom, distanceBetween },
-        scaledPoints,
-        14,
-      );
-      const pathData = smoothPoints
-        .map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`)
-        .join(' ');
+      // Draw the battlefield's Catmull–Rom geometry as native curves instead of a jagged polyline approximation.
+      const pathData = createSmoothPreviewPathData(scaledPoints);
 
       const orientationClass = `level-node-preview__path--${orientation}`;
       const glow = document.createElementNS(SVG_NS, 'path');
