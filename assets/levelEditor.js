@@ -10,6 +10,7 @@ import {
   showWaveEditor,
   hideWaveEditor,
   loadWavesIntoEditor,
+  exportWavesFromEditor,
 } from './waveEditorUI.js';
 
 /**
@@ -66,6 +67,7 @@ export function createLevelEditorController({
     clear: null,
     reset: null,
     exportButton: null,
+    exportChangesButton: null,
     output: null,
     status: null,
     mapSpeedInput: null,
@@ -352,6 +354,9 @@ export function createLevelEditorController({
     }
     if (levelEditorElements.exportButton) {
       levelEditorElements.exportButton.disabled = levelEditorState.points.length < 2;
+    }
+    if (levelEditorElements.exportChangesButton) {
+      levelEditorElements.exportChangesButton.disabled = !levelEditorState.levelId || levelEditorState.points.length < 2;
     }
     updateLevelEditorOutput();
   }
@@ -657,6 +662,81 @@ export function createLevelEditorController({
       levelEditorElements.output.focus();
       levelEditorElements.output.select();
       setLevelEditorStatus('Copy failed—select the JSON manually.', { tone: 'error' });
+    }
+  }
+
+  // Persist the complete developer-editor snapshot through the local Vite server. The endpoint does
+  // not exist in production builds, so hosted players can never use the editor to write repository files.
+  async function handleLevelEditorExportChanges() {
+    const playfield = getPlayfield();
+    if (!levelEditorState.levelId || !playfield) {
+      setLevelEditorStatus('Enter a level before exporting changes.', { tone: 'warning' });
+      return;
+    }
+
+    const orientation = levelEditorSurface.orientation || playfield.layoutOrientation || 'portrait';
+    const toSourcePoint = (point) => transformPointFromOrientation(point, orientation);
+    const roundPoint = (point) => ({
+      x: Number(point.x.toFixed(4)),
+      y: Number(point.y.toFixed(4)),
+    });
+    const findSourceEntry = (entries, normalized) => (Array.isArray(entries) ? entries : []).find((entry) => (
+      entry && Math.abs(entry.x - normalized.x) < 0.0001 && Math.abs(entry.y - normalized.y) < 0.0001
+    ));
+    const path = levelEditorState.points.map((point) => {
+      const exported = roundPoint(point);
+      if (Number.isFinite(point.speedMultiplier) && point.speedMultiplier !== 1) {
+        exported.speedMultiplier = Number(point.speedMultiplier.toFixed(2));
+      }
+      return exported;
+    });
+    const crystals = (Array.isArray(playfield.developerCrystals) ? playfield.developerCrystals : []).map((crystal) => {
+      const sourcePoint = toSourcePoint(crystal.normalized);
+      const sourceCrystals = playfield.levelConfig?.theroCrystals || playfield.levelConfig?.crystals;
+      const exported = { ...findSourceEntry(sourceCrystals, crystal.normalized), ...roundPoint(sourcePoint) };
+      exported.integrity = Number.isFinite(crystal.maxIntegrity) ? crystal.maxIntegrity : crystal.integrity;
+      if (Number.isFinite(crystal.theroReward) && crystal.theroReward !== 0) exported.thero = crystal.theroReward;
+      if (Number.isFinite(crystal.theroMultiplier) && crystal.theroMultiplier !== 0) exported.theroMultiplier = crystal.theroMultiplier;
+      return exported;
+    });
+    const autoAnchors = (Array.isArray(playfield.towers) ? playfield.towers : [])
+      .filter((tower) => tower?.isDeveloperTower === true && tower.normalized)
+      .map((tower) => ({
+        ...findSourceEntry(playfield.levelConfig?.autoAnchors, tower.normalized),
+        ...roundPoint(toSourcePoint(tower.normalized)),
+        type: tower.type,
+      }));
+    const changes = {
+      path,
+      waves: exportWavesFromEditor(),
+      crystals,
+      autoAnchors,
+      mapSpeedMultiplier: Number.isFinite(levelEditorState.mapSpeedMultiplier)
+        ? Number(levelEditorState.mapSpeedMultiplier.toFixed(2))
+        : 1,
+    };
+
+    levelEditorElements.exportChangesButton.disabled = true;
+    setLevelEditorStatus('Writing level changes locallyâ€¦', { duration: 0 });
+    try {
+      const response = await fetch('/__thero-editor/export-level', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ levelId: levelEditorState.levelId, changes }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(result.error || `Local export failed (${response.status}).`);
+      }
+      setLevelEditorStatus(`Saved changes to ${result.file}.`, { tone: 'info', duration: 5000 });
+    } catch (error) {
+      console.warn('Level editor failed to export local changes', error);
+      setLevelEditorStatus(
+        'Local export unavailable. Run the editor with npm run dev.',
+        { tone: 'error', duration: 5000 },
+      );
+    } finally {
+      updateLevelEditorUI();
     }
   }
 
@@ -1120,6 +1200,7 @@ export function createLevelEditorController({
     levelEditorElements.clear = document.getElementById('level-editor-clear');
     levelEditorElements.reset = document.getElementById('level-editor-reset');
     levelEditorElements.exportButton = document.getElementById('level-editor-export');
+    levelEditorElements.exportChangesButton = document.getElementById('level-editor-export-changes');
     levelEditorElements.output = document.getElementById('level-editor-output');
     levelEditorElements.status = document.getElementById('level-editor-status');
     levelEditorElements.mapSpeedInput = document.getElementById('map-speed-multiplier-input');
@@ -1173,6 +1254,13 @@ export function createLevelEditorController({
         event.preventDefault();
         event.stopPropagation();
         handleLevelEditorExport();
+      });
+    }
+    if (levelEditorElements.exportChangesButton) {
+      levelEditorElements.exportChangesButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        handleLevelEditorExportChanges();
       });
     }
 
