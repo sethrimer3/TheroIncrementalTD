@@ -7353,6 +7353,12 @@ body.playfield-fullscreen .playfield canvas {
   touch-action: pan-y;
 }
 
+/* Keep the outer circle of every SVG tower sprite white on tower cards, independent of the active palette. */
+.tower-preview .tower-icon svg > circle:first-of-type {
+  stroke: #ffffff;
+  stroke-width: 2px;
+}
+
 .tower-preview {
   margin: 0;
   position: relative;
