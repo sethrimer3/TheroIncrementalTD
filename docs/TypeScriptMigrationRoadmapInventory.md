@@ -2,7 +2,7 @@
 
 This appendix is the mechanically checked coverage record for the long-range roadmap in [`../JavaToTypeScriptConversionPlan.md`](../JavaToTypeScriptConversionPlan.md). It records the live source classification and assigns every active authored JavaScript module to one implementation phase. The phase order after Phase 21 is tentative.
 
-<!-- migration-roadmap-counts: ts=67 generated=67 active_js=171 candidates=45 -->
+<!-- migration-roadmap-counts: ts=68 generated=68 active_js=171 candidates=45 -->
 <!-- migration-roadmap-authorization: phase=23 -->
 
 ## Verified inventory
@@ -17,14 +17,14 @@ This appendix is the mechanically checked coverage record for the long-range roa
 
 | Classification | Count | Treatment |
 |---|---:|---|
-| Authored TypeScript source | 67 | Converted; `.d.ts` files would be excluded, but none are present. |
-| Build-generated `.js` siblings of authored `.ts` | 67 | Runtime compatibility output; never count as backlog. |
+| Authored TypeScript source | 68 | Converted; `.d.ts` files would be excluded, but none are present. |
+| Build-generated `.js` siblings of authored `.ts` | 68 | Runtime compatibility output; never count as backlog. |
 | Active authored JavaScript | 171 | Reachable from `assets/main.js` through static local imports; all assigned below. |
 | Intentionally preserved legacy JavaScript | 0 | The previously documented 19-file Terrarium legacy tree was deleted by `64ebc5e`; no surviving file has evidence strong enough for this category. |
 | Retirement/deletion candidates or ambiguous authored JavaScript | 45 | Not reachable from the browser entry graph; excluded pending a separate retirement audit. |
 | Generated/vendor/dependency/distribution material | Not counted | `node_modules/`, `dist/`, `build/`, source maps, dependencies, assets, fixtures, and non-source artifacts. |
 
-The repository therefore has 238 active authored JS/TS modules: 67 TypeScript plus 171 active JavaScript. The raw authored-language tree has 283 modules when the 45 decision candidates are included. Active conversion is 28.2% by module count (`67 / 238`). The supplemental line snapshot is historical; line counts are informative, not scheduling weights.
+The repository therefore has 239 active authored JS/TS modules: 68 TypeScript plus 171 active JavaScript. The raw authored-language tree has 284 modules when the 45 decision candidates are included. Active conversion is 28.5% by module count (`68 / 239`). The supplemental line snapshot is historical; line counts are informative, not scheduling weights.
 
 ## Method and limits
 
