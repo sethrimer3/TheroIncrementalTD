@@ -279,6 +279,7 @@ import {
   syncDeveloperControlValues,
   updateDeveloperControlsVisibility,
 } from './developerControls.js';
+import { createBalanceEstimator } from './balanceEstimator.js';
 import {
   configureTabManager,
   getActiveTabId,
@@ -843,6 +844,13 @@ import { createSpireCameraController } from './spireCameraController.js';
   registerResourceHudRefreshCallback(updatePowderModeButton);
 
   // Provide the developer controls module with runtime state references once all powder helpers are wired.
+  const balanceEstimator = createBalanceEstimator({
+    towers: _towers,
+    getLevels: () => Array.from(levelConfigs.values()).filter((level) => !level.isStoryLevel),
+    getTheroMultiplier: () => getStartingTheroMultiplier(),
+  });
+  balanceEstimator.bind();
+
   configureDeveloperControls({
     isDeveloperModeActive: () => developerModeActive,
     isDeveloperInfiniteTheroEnabled,
@@ -868,6 +876,7 @@ import { createSpireCameraController } from './spireCameraController.js';
     updateDeveloperMapElementsVisibility,
     updatePowderRenderSizeControlsVisibility,
     updatePlayfieldDevLayerTogglesVisibility,
+    balanceEstimator,
   });
 
   // Keep the active Tower ledger isolated from persistence and reward systems.

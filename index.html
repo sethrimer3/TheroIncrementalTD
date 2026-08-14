@@ -2538,6 +2538,23 @@
                   />
                   <p class="developer-control-hint">Override surviving Tower glyphs earned and currency.</p>
                 </div>
+                <section class="developer-balance-estimator" id="developer-balance-estimator" hidden>
+                  <h3>Balance Estimator</h3>
+                  <p class="developer-control-hint">Planning model: each glyph adds 12% compounded damage and 4% compounded attack speed. “Kill HP” is damage delivered during the engagement window; special mechanics are excluded.</p>
+                  <div class="developer-balance-inputs">
+                    <label>Level<select id="balance-estimator-level"></select></label>
+                    <label>Glyphs / tower<input id="balance-estimator-glyphs" type="number" min="0" step="1" value="0" /></label>
+                    <label>Engagement (s)<input id="balance-estimator-engagement" type="number" min="0.1" step="0.5" value="8" /></label>
+                    <label>Thero multiplier<input id="balance-estimator-multiplier" type="number" min="0" step="0.01" value="1" /></label>
+                  </div>
+                  <div class="developer-balance-summary" id="balance-estimator-summary"></div>
+                  <div class="developer-balance-table-wrap">
+                    <table class="developer-balance-table">
+                      <thead><tr><th>Tower</th><th>Cost</th><th>Hit</th><th>Rate</th><th>DPS</th><th>Kill HP</th><th>Affordable</th></tr></thead>
+                      <tbody id="balance-estimator-output"></tbody>
+                    </table>
+                  </div>
+                </section>
               </div>
             </div>
           </section>
