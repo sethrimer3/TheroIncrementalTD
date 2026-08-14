@@ -30,7 +30,6 @@ import {
   ensureGameplayConfigLoaded,
   calculateStartingThero,
   getTowerLoadoutLimit,
-  overrideTowerLoadoutLimit,
   getBaseStartThero,
   registerResourceContainers,
   setBaseStartThero,
@@ -53,7 +52,6 @@ import {
   bindWaveDamageTallyToggle,
   applyTrackTracerPreference,
   bindTrackTracerToggle,
-  bindLoadoutSlotButton,
   applyGraphicsMode,
   initializeGraphicsMode,
   bindGraphicsModeToggle,
@@ -68,8 +66,6 @@ import {
   getPreferredGraphicsMode,
   bindTrackRenderModeButton,
   initializeTrackRenderMode,
-  initializeLoadoutSlotPreference,
-  setLoadoutSlotChangeHandler,
   bindFrameRateLimitSlider,
   initializeFrameRateLimitPreference,
   applyFrameRateLimitPreference,
@@ -167,6 +163,7 @@ import {
   bindAchievements,
   evaluateAchievements,
   notifyAchievementsTabVisibilityChange,
+  getEarnedAchievementCount,
 } from './achievementsTab.js';
 import { initializeBoostsSection } from './boostsSection.js';
 import { bindDefenseLeaderboardNotice } from './defenseLeaderboardNotice.js';
@@ -283,6 +280,7 @@ import {
   syncDeveloperControlValues,
   updateDeveloperControlsVisibility,
 } from './developerControls.js';
+import { createBalanceEstimator } from './balanceEstimator.js';
 import {
   configureTabManager,
   getActiveTabId,
@@ -315,6 +313,8 @@ import {
   getLevelProgressSnapshot,
   applyLevelProgressSnapshot,
   setDeveloperModeUnlockOverride,
+  setEarnedAchievementCountProvider,
+  multiplyTheroGain,
 } from './levels.js';
 import {
   isTutorialCompleted,
@@ -360,6 +360,7 @@ import { createSpireCameraController } from './spireCameraController.js';
   const _COMMUNITY_DISCORD_INVITE = 'https://discord.gg/UzqhfsZQ8n'; // Reserved for future placement.
 
   setTheroSymbol(THERO_SYMBOL);
+  setEarnedAchievementCountProvider(getEarnedAchievementCount);
 
   const { getLevelSummary, describeLevelLastResult } = createLevelSummaryHelpers({
     getCompletedInteractiveLevelCount,
@@ -840,6 +841,7 @@ import { createSpireCameraController } from './spireCameraController.js';
     updatePowderLogDisplay,
     getPowderSimulation: () => powderSimulation,
     spireResourceState,
+    multiplyTheroGain,
   });
 
   setPowderElements(powderElements);
@@ -847,6 +849,13 @@ import { createSpireCameraController } from './spireCameraController.js';
   registerResourceHudRefreshCallback(updatePowderModeButton);
 
   // Provide the developer controls module with runtime state references once all powder helpers are wired.
+  const balanceEstimator = createBalanceEstimator({
+    towers: _towers,
+    getLevels: () => Array.from(levelConfigs.values()).filter((level) => !level.isStoryLevel),
+    getTheroMultiplier: () => getStartingTheroMultiplier(),
+  });
+  balanceEstimator.bind();
+
   configureDeveloperControls({
     isDeveloperModeActive: () => developerModeActive,
     isDeveloperInfiniteTheroEnabled,
@@ -872,6 +881,7 @@ import { createSpireCameraController } from './spireCameraController.js';
     updateDeveloperMapElementsVisibility,
     updatePowderRenderSizeControlsVisibility,
     updatePlayfieldDevLayerTogglesVisibility,
+    balanceEstimator,
   });
 
   // Keep the active Tower ledger isolated from persistence and reward systems.
@@ -947,6 +957,7 @@ import { createSpireCameraController } from './spireCameraController.js';
     getPreviousInteractiveLevelId,
     unlockNextInteractiveLevel,
     unlockLevel,
+    multiplyTheroGain,
     formatWholeNumber,
     checkTutorialCompletion,
     isTutorialCompleted,
@@ -1394,6 +1405,7 @@ import { createSpireCameraController } from './spireCameraController.js';
     alephChainUpgrades: alephChainUpgradeState,
     theroSymbol: THERO_SYMBOL,
     calculateStartingThero,
+    multiplyTheroGain,
     updateStatusDisplays,
     notifyEnemyDefeated,
     notifyAutoAnchorUsed,
@@ -1501,7 +1513,7 @@ import { createSpireCameraController } from './spireCameraController.js';
 
       const scoreGain = resourceState.scoreRate * deltaSeconds;
       if (Number.isFinite(scoreGain) && scoreGain > 0) {
-        resourceState.score += scoreGain;
+        resourceState.score += multiplyTheroGain(scoreGain);
       }
 
       updateStatusDisplays();
@@ -1800,7 +1812,6 @@ import { createSpireCameraController } from './spireCameraController.js';
     bindTrackRenderModeButton();
     // Expose a tactile toggle for the luminous track tracer overlay.
     bindTrackTracerToggle();
-    bindLoadoutSlotButton();
     bindNotationToggle();
     bindGlyphEquationToggle();
     bindDamageNumberToggle();
@@ -1912,10 +1923,6 @@ import { createSpireCameraController } from './spireCameraController.js';
       note: document.getElementById('tower-loadout-note'),
       toggle: document.getElementById('tower-loadout-toggle'),
     });
-    setLoadoutSlotChangeHandler((slotCount) => {
-      overrideTowerLoadoutLimit(slotCount);
-      syncLoadoutToPlayfield();
-    });
 
     setHideUpgradeMatrixCallback(hideUpgradeMatrix);
     setRenderUpgradeMatrixCallback(renderUpgradeMatrix);
@@ -1995,8 +2002,6 @@ import { createSpireCameraController } from './spireCameraController.js';
     }
 
     setMergingLogicUnlocked(getMergeProgressState().mergingLogicUnlocked);
-
-    initializeLoadoutSlotPreference({ defaultSlots: getTowerLoadoutLimit() });
 
     enemyCodexElements.list = document.getElementById('enemy-codex-list');
     enemyCodexElements.empty = document.getElementById('enemy-codex-empty');

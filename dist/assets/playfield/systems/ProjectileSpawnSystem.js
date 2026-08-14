@@ -5,6 +5,7 @@ import { getOmegaWaveVisualConfig, getTowerTierValue } from '../../colorSchemeUt
 import { computeTowerVariableValue, calculateTowerEquationResult } from '../../towersTab.js';
 import { metersToPixels } from '../../gameUnits.js';
 import { assignRandomShell } from '../../enemies.js';
+import { PROJECTILE_TRAIL_STYLES } from '../../../scripts/features/towers/shared/ProjectileTrails.js';
 
 // Preserve β triangle speed constant from playfield.js
 const BETA_TRIANGLE_SPEED = 144;
@@ -192,6 +193,7 @@ export function spawnOmegaWave(tower) {
       phase,
       color: visuals.color,
       trailColor: visuals.trailColor,
+      trailStyle: PROJECTILE_TRAIL_STYLES.omegaWave,
       size: baseSize,
       glowColor: visuals.glowColor,
       glowBlur: visuals.glowBlur,

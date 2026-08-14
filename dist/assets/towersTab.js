@@ -23,6 +23,7 @@ import { createTowerVariableDiscoveryManager } from './towerVariableDiscovery.js
 import { createTowerLoadoutController } from './towerLoadoutController.js';
 import { getTowerVisualConfig } from './colorSchemeUtils.js';
 import { T2_FUNC_CONFIG } from '../scripts/features/towers/t2Tower.js';
+import { CANONICAL_TOWER_IDS } from './data/towers/towerUnlockCost.js';
 
 // Callback to update status displays when glyphs change. Set via configureTowersTabCallbacks.
 let updateStatusDisplaysCallback = null;
@@ -218,6 +219,8 @@ const DEFAULT_TOWER_ICON_COLORS = Object.freeze({
 
 // Cache for loaded SVG content to avoid redundant fetches.
 const svgContentCache = new Map();
+// Give every injected SVG private definition ids so repeated cards cannot steal each other's gradients.
+let towerIconInstanceId = 0;
 
 // Resolve palette-aware colors for a tower icon so Codex palette swaps recolor every glyph chip consistently.
 function resolveTowerIconPalette(tower) {
@@ -296,6 +299,39 @@ function rgbToHex(rgb) {
   return `#${toHex(rgb.r)}${toHex(rgb.g)}${toHex(rgb.b)}`;
 }
 
+// Namespace gradients, particles, and other SVG definitions before inserting an icon into the document.
+function namespaceSvgDefinitionIds(svgElement) {
+  const instanceSuffix = `tower-icon-${towerIconInstanceId += 1}`;
+  const idMap = new Map();
+  svgElement.querySelectorAll('[id]').forEach((element) => {
+    const originalId = element.id;
+    const namespacedId = `${originalId}-${instanceSuffix}`;
+    idMap.set(originalId, namespacedId);
+    element.id = namespacedId;
+  });
+
+  const referenceAttributes = ['fill', 'stroke', 'filter', 'mask', 'clip-path', 'href', 'xlink:href'];
+  svgElement.querySelectorAll('*').forEach((element) => {
+    referenceAttributes.forEach((attributeName) => {
+      const value = element.getAttribute(attributeName);
+      if (!value) {
+        return;
+      }
+      const updatedValue = value.replace(/url\(#([^)]+)\)|^#(.+)$/g, (match, urlId, hrefId) => {
+        const referencedId = urlId || hrefId;
+        const namespacedId = idMap.get(referencedId);
+        if (!namespacedId) {
+          return match;
+        }
+        return urlId ? `url(#${namespacedId})` : `#${namespacedId}`;
+      });
+      if (updatedValue !== value) {
+        element.setAttribute(attributeName, updatedValue);
+      }
+    });
+  });
+}
+
 // Apply palette colors to an inline SVG element by modifying its internal elements.
 function applySvgPaletteColors(svgElement, palette) {
   if (!(svgElement instanceof SVGElement) || !palette) {
@@ -348,6 +384,12 @@ function applySvgPaletteColors(svgElement, palette) {
     }
   });
 
+  // Separate the inner gradient from the thick outer color ring with a crisp black keyline.
+  if (circles[1]) {
+    circles[1].setAttribute('stroke', '#000000');
+    circles[1].setAttribute('stroke-width', '1.5');
+  }
+
   // Update text (tower symbol) with symbol color
   const textElements = svgElement.querySelectorAll('text');
   textElements.forEach((text) => {
@@ -393,6 +435,8 @@ async function loadAndColorSvg(iconUrl, palette) {
       return null;
     }
 
+    // Isolate referenced definitions before the icon joins a page containing duplicate tower types.
+    namespaceSvgDefinitionIds(svgElement);
     // Apply palette colors
     applySvgPaletteColors(svgElement, palette);
     
@@ -686,6 +730,31 @@ function normalizeLoadoutSlots() {
 }
 
 /**
+ * Fill open loadout slots with the earliest unlocked towers in the canonical tier chain.
+ * Existing selections are preserved so automatic unlock handling never replaces a player's choice.
+ */
+export function fillEmptyLoadoutSlotsFromUnlocks() {
+  const slots = normalizeLoadoutSlots();
+  const selectedTowerIds = new Set(slots.filter((towerId) => typeof towerId === 'string'));
+  const availableTowerIds = CANONICAL_TOWER_IDS.filter(
+    (towerId) =>
+      towerTabState.unlockState.unlocked.has(towerId) &&
+      towerTabState.towerDefinitionMap.has(towerId) &&
+      !selectedTowerIds.has(towerId),
+  );
+
+  slots.forEach((towerId, slotIndex) => {
+    if (towerId || !availableTowerIds.length) {
+      return;
+    }
+    const nextTowerId = availableTowerIds.shift();
+    slots[slotIndex] = nextTowerId;
+    selectedTowerIds.add(nextTowerId);
+  });
+  return slots;
+}
+
+/**
  * Count the number of equipped towers ignoring placeholder slots.
  */
 function _getEquippedLoadoutCount() {
@@ -718,8 +787,22 @@ function assignTowerToSlot(slotIndex, towerId) {
 export function setTowerLoadoutLimit(limit) {
   if (Number.isFinite(limit) && limit > 0) {
     towerTabState.towerLoadoutLimit = Math.max(1, Math.floor(limit));
-    normalizeLoadoutSlots();
+    fillEmptyLoadoutSlotsFromUnlocks();
   }
+}
+
+/**
+ * Derive mandatory loadout capacity from discovered placeable tower types.
+ * Formula: slots = clamp(discovered towers, 2, 4), so every player starts with
+ * two slots and permanently gains the third and fourth alongside those discoveries.
+ */
+export function syncTowerLoadoutLimitFromUnlocks() {
+  const discoveredPlaceableCount = CANONICAL_TOWER_IDS.filter(
+    (towerId) => towerTabState.unlockState.unlocked.has(towerId) && isTowerPlaceable(towerId),
+  ).length;
+  towerTabState.towerLoadoutLimit = Math.min(4, Math.max(2, discoveredPlaceableCount));
+  fillEmptyLoadoutSlotsFromUnlocks();
+  return towerTabState.towerLoadoutLimit;
 }
 
 export function getTowerLoadoutState() {
@@ -1083,6 +1166,7 @@ export function unlockTower(towerId, { silent = false } = {}) {
     return false;
   }
   towerTabState.unlockState.unlocked.add(towerId);
+  syncTowerLoadoutLimitFromUnlocks();
   discoverTowerVariables(towerId);
   if (typeof document !== 'undefined') {
     // Notify other systems (such as the tower tree map) that unlock visibility should refresh.
@@ -1309,7 +1393,12 @@ export function toggleTowerSelection(towerId, { anchorButton = null } = {}) {
   const selected = normalizeLoadoutSlots();
   const index = selected.indexOf(towerId);
   if (index >= 0) {
-    selected[index] = null;
+    // Loadout capacity is progression-owned and every available slot is mandatory.
+    if (towerTabState.loadoutElements.note) {
+      towerTabState.loadoutElements.note.textContent = 'Every unlocked loadout slot is required—equip another glyph to replace this one.';
+    }
+    updateTowerSelectionButtons();
+    return;
   } else {
     const emptyIndex = getNextEmptyLoadoutSlot();
     if (emptyIndex === -1) {

@@ -6,8 +6,17 @@ import {
   openTowerUpgradeOverlay,
 } from './towersTab.js';
 import { convertMathExpressionToPlainText } from '../scripts/core/mathText.js';
+import { isCanonicalTowerId } from './data/towers/towerUnlockCost.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
+
+// Keep the constellation aligned with the production tower-card roster. The
+// canonical chain covers every Greek tower through Infinity; only the two gate
+// cards sit outside that chain. Experimental T1/T2 and graph towers stay excluded.
+function isTowerTreeDefinition(definition) {
+  const towerId = definition?.id;
+  return towerId === 'mind-gate' || towerId === 'shadow-gate' || isCanonicalTowerId(towerId);
+}
 
 const PHYSICS_CONFIG = {
   /** Diameter of the orbit button in pixels (matches CSS width of 55px). */
@@ -1157,7 +1166,9 @@ function refreshTreeInternal() {
   }
   const unlockState = getTowerUnlockState();
   const unlocked = Array.from(unlockState.unlocked || []);
-  const definitions = getTowerDefinitions().filter((definition) => unlocked.includes(definition.id));
+  const definitions = getTowerDefinitions().filter(
+    (definition) => isTowerTreeDefinition(definition) && unlocked.includes(definition.id),
+  );
 
   clearTreeLayers();
   if (!definitions.length) {
@@ -1238,16 +1249,16 @@ function toggleTreeVisibility(forceOpen = null) {
   const buttonLabel = towerTreeState.toggleButton.querySelector('.tower-tree-map-label');
   if (buttonLabel) {
     // Communicate the current action clearly so players know how to return to cards.
-    buttonLabel.textContent = nextOpen ? 'Back to Tower Cards' : 'Tower Tree Map';
+    buttonLabel.textContent = nextOpen ? 'Back to Tower Cards' : 'Tower Tree';
   }
   if (towerTreeState.toggleButton) {
     // Keep the button tooltip and announcement aligned with the current view for accessibility.
     towerTreeState.toggleButton.title = nextOpen
       ? 'Return to the tower card menu'
-      : 'Open the Tower Tree Map';
+      : 'Open the Tower Tree';
     towerTreeState.toggleButton.setAttribute(
       'aria-label',
-      nextOpen ? 'Return to the tower card menu' : 'Open the Tower Tree Map',
+      nextOpen ? 'Return to the tower card menu' : 'Open the Tower Tree',
     );
   }
   if (nextOpen) {

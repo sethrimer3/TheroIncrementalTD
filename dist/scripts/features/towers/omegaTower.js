@@ -2,6 +2,11 @@
 import { computeTowerVariableValue } from '../../../assets/towersTab.js';
 import { metersToPixels } from '../../../assets/gameUnits.js';
 import { clamp } from './shared/TowerUtils.js';
+import {
+  PROJECTILE_TRAIL_STYLES,
+  drawProjectileTrail,
+  recordProjectileTrail,
+} from './shared/ProjectileTrails.js';
 
 // Golden particle colors for Omega tower
 const OMEGA_PARTICLE_COLORS = [
@@ -48,10 +53,7 @@ function smoothMoveTo(particle, targetX, targetY, delta, speed) {
  * Push the current position into the trail buffer with a max length.
  */
 function updateTrail(particle) {
-  particle.trail.push({ x: particle.x, y: particle.y, life: 1 });
-  if (particle.trail.length > 16) {
-    particle.trail.shift();
-  }
+  recordProjectileTrail(particle, particle.x, particle.y, particle.trailStyle);
 }
 
 /**
@@ -239,7 +241,7 @@ function createParticles(state, targets, towerPosition) {
       opacity: 0.9,
       color,
       mode: 'orbit',
-      trail: [],
+      trailStyle: PROJECTILE_TRAIL_STYLES.omegaParticle,
       sliceTimer: 0,
       wanderTarget: null,
     });
@@ -352,7 +354,7 @@ function updateIdleParticles(playfield, tower, state, delta) {
         opacity: 0.9,
         color: colors[idx % colors.length],
         mode: 'idle',
-        trail: [],
+        trailStyle: PROJECTILE_TRAIL_STYLES.omegaParticle,
         sliceTimer: 0,
         wanderTarget: null,
       };
@@ -598,21 +600,7 @@ export function drawOmegaParticles(playfield) {
       const { r, g, b } = particle.color;
       const alpha = clamp(particle.opacity, 0, 1);
 
-      // Comet-like trail
-      if (particle.trail && particle.trail.length > 1) {
-        ctx.beginPath();
-        particle.trail.forEach((point, idx) => {
-          const trailAlpha = alpha * (idx / particle.trail.length);
-          if (idx === 0) {
-            ctx.moveTo(point.x, point.y);
-          } else {
-            ctx.lineTo(point.x, point.y);
-          }
-          ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${trailAlpha * 0.6})`;
-          ctx.lineWidth = Math.max(1, size * 0.6 * (idx / particle.trail.length));
-        });
-        ctx.stroke();
-      }
+      drawProjectileTrail(ctx, particle, particle.color, particle.trailStyle);
 
       gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${alpha})`);
       gradient.addColorStop(0.6, `rgba(${r}, ${g}, ${b}, ${alpha * 0.4})`);

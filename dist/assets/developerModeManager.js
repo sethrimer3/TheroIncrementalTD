@@ -14,7 +14,6 @@ export function createDeveloperModeManager(options = {}) {
     setDeveloperModeActive,
     getTowerDefinitions,
     getTowerLoadoutState,
-    getTowerLoadoutLimit,
     unlockTower,
     initializeDiscoveredVariablesFromUnlocks,
     pruneLockedTowersFromLoadout,
@@ -139,7 +138,6 @@ export function createDeveloperModeManager(options = {}) {
     updateTabLockStates?.(true);
 
     const towers = typeof getTowerDefinitions === 'function' ? getTowerDefinitions() : [];
-    const loadoutState = typeof getTowerLoadoutState === 'function' ? getTowerLoadoutState() : null;
     towers.forEach((definition) => {
       if (definition?.id && typeof unlockTower === 'function') {
         unlockTower(definition.id, { silent: true });
@@ -149,9 +147,8 @@ export function createDeveloperModeManager(options = {}) {
       const unlockedIds = towers.map((definition) => definition?.id).filter((id) => typeof id === 'string');
       initializeDiscoveredVariablesFromUnlocks(unlockedIds);
     }
-    if (loadoutState && typeof getTowerLoadoutLimit === 'function') {
-      loadoutState.selected = towers.slice(0, getTowerLoadoutLimit()).map((definition) => definition?.id);
-    }
+    // unlockTower fills open slots from the canonical Alpha-to-Infinity chain; do not
+    // overwrite that result with the registry order, which begins with experimental towers.
     pruneLockedTowersFromLoadout?.();
 
     if (!developerModeWasActive) {

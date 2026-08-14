@@ -452,8 +452,7 @@ export function createCombatStateManager(config) {
    * @param {Function} deathContext.spawnDeathParticles - Callback to spawn visual effects
    */
   function handleEnemyDeath(enemy, deathContext) {
-    // Award energy reward
-    energy += enemy.reward || 0;
+    // EnemyLifecycleSystem owns the single canonical Thero award so rewards are not credited twice.
 
     // Notify death to external systems
     if (notifyEnemyDeath) {

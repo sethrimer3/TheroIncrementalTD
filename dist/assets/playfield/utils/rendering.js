@@ -3,6 +3,17 @@ import { samplePaletteGradient } from '../../colorSchemeUtils.js';
 // Pre-calculated constants for performance optimization in tight render loops
 const TWO_PI = Math.PI * 2;
 
+// Bounded cache scales keep zoomed raster layers sharp without rebuilding for
+// every fractional wheel or pinch update.
+const ZOOM_RASTER_BUCKETS = Object.freeze([1, 1.5, 2, 3]);
+
+/** Resolve the smallest cached raster scale that covers the current zoom. */
+export function resolveZoomRasterScale(viewScale) {
+  const requested = Number.isFinite(viewScale) ? Math.max(1, viewScale) : 1;
+  return ZOOM_RASTER_BUCKETS.find((bucket) => bucket >= requested)
+    ?? ZOOM_RASTER_BUCKETS[ZOOM_RASTER_BUCKETS.length - 1];
+}
+
 // Normalize projectile color data so beam rendering can rely on palette-aware RGB objects.
 export function normalizeProjectileColor(candidate, fallbackPosition = 1) {
   if (

@@ -226,11 +226,12 @@ export function processEnemyDefeat(enemy) {
   const baseGain =
     (this.levelConfig?.theroPerKill ?? this.levelConfig?.energyPerKill ?? 0) +
     (enemy.reward || 0);
+  const multipliedGain = this.dependencies.multiplyTheroGain(baseGain);
   const cap = this.getEnergyCap();
-  this.energy = Math.min(cap, this.energy + baseGain);
+  this.energy = Math.min(cap, this.energy + multipliedGain);
 
   if (this.messageEl) {
-    const gainLabel = formatCombatNumber(baseGain);
+    const gainLabel = formatCombatNumber(multipliedGain);
     this.messageEl.textContent = `${enemy.label || 'Glyph'} collapsed · +${gainLabel} ${this.theroSymbol}.`;
   }
   
@@ -275,7 +276,7 @@ export function handleVictory() {
   this.activeWave = null;
   const cap = this.getEnergyCap();
   const reward = this.levelConfig.rewardThero ?? this.levelConfig.rewardEnergy ?? 0;
-  this.energy = Math.min(cap, this.energy + reward);
+  this.energy = Math.min(cap, this.energy + this.dependencies.multiplyTheroGain(reward));
   this.currentWaveNumber = this.baseWaveCount || this.currentWaveNumber;
   this.maxWaveReached = Math.max(this.maxWaveReached, this.currentWaveNumber);
   if (this.startButton) {

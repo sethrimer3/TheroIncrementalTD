@@ -1,6 +1,7 @@
 // Developer control bindings for active game systems only.
 
 let developerContext = null;
+let balanceEstimator = null;
 
 const developerControlElements = {
   container: null,
@@ -146,6 +147,7 @@ function updateDeveloperControlsVisibility() {
   if (active) {
     syncDeveloperControlValues();
   }
+  balanceEstimator?.setVisible?.(active);
   const context = getContext();
   context.updateDeveloperMapElementsVisibility?.();
   context.updatePowderRenderSizeControlsVisibility?.(active);
@@ -214,6 +216,7 @@ function bindDeveloperControls() {
 
 export function configureDeveloperControls(context = {}) {
   developerContext = context;
+  balanceEstimator = context.balanceEstimator || null;
 }
 
 export {

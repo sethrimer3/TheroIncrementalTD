@@ -175,6 +175,9 @@ export function createParticleDamageProjectile(tower, enemy, effectPosition, res
   const travelTime = Math.max(0.08, travelDistance / baseTravelSpeed);
   const maxLifetime = Math.max(0.24, travelTime);
   this.projectiles.push({
+    // This object only synchronizes Alpha's damage with its visible burst projectile.
+    // Suppress the generic beam renderer so it does not add a second laser-like shot.
+    hidden: true,
     source: sourcePosition,
     targetId: enemy.id,
     target: targetPosition,

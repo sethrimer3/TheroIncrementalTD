@@ -21,7 +21,11 @@ import { ALPHA_BASE_RADIUS_FACTOR } from '../../../gameUnits.js';
 import { getTowerVisualConfig } from '../../../colorSchemeUtils.js';
 import { getTowerDefinition } from '../../../towersTab.js';
 import { colorToRgbaString } from '../../../../scripts/features/towers/powderTower.js';
-import { normalizeProjectileColor, drawConnectionMoteGlow } from '../../utils/rendering.js';
+import {
+  normalizeProjectileColor,
+  drawConnectionMoteGlow,
+  resolveZoomRasterScale,
+} from '../../utils/rendering.js';
 import { clampSafe as clamp } from '../../../../scripts/core/mathUtils.js';
 import { drawZetaPendulums as drawZetaPendulumsHelper } from '../../../../scripts/features/towers/zetaTower.js';
 import { drawEtaOrbits as drawEtaOrbitsHelper } from '../../../../scripts/features/towers/etaTower.js';
@@ -122,16 +126,17 @@ const GOLDEN_BLOOM_CACHE_MAX = 8; // Body radius varies little in one session; a
  * Return (or create and cache) an offscreen canvas with the golden bloom
  * gradient pre-rendered for the given tower body radius.
  */
-function getOrCreateGoldenBloomSprite(bodyRadius) {
-  const key = Math.round(bodyRadius);
+function getOrCreateGoldenBloomSprite(bodyRadius, rasterScale = 1) {
+  const key = `${Math.round(bodyRadius)}:${rasterScale}`;
   if (goldenBloomSpriteCache.has(key)) {
     return goldenBloomSpriteCache.get(key);
   }
   const outerRadius = bodyRadius * 1.9;
   const innerRadius = bodyRadius * 0.35;
-  const size = Math.ceil(outerRadius * 2) + 4; // 2 px padding each side
-  const cx = size * 0.5;
-  const cy = size * 0.5;
+  const logicalSize = Math.ceil(outerRadius * 2) + 4; // 2 px padding each side
+  const size = Math.ceil(logicalSize * rasterScale);
+  const cx = logicalSize * 0.5;
+  const cy = logicalSize * 0.5;
   const canvas =
     typeof OffscreenCanvas !== 'undefined'
       ? new OffscreenCanvas(size, size)
@@ -145,6 +150,7 @@ function getOrCreateGoldenBloomSprite(bodyRadius) {
   if (!offCtx) {
     return null;
   }
+  offCtx.setTransform(rasterScale, 0, 0, rasterScale, 0, 0);
   const gradient = offCtx.createRadialGradient(cx, cy, innerRadius, cx, cy, outerRadius);
   gradient.addColorStop(0, 'rgba(255, 212, 120, 0.22)');
   gradient.addColorStop(0.62, 'rgba(255, 188, 92, 0.11)');
@@ -158,8 +164,9 @@ function getOrCreateGoldenBloomSprite(bodyRadius) {
   if (goldenBloomSpriteCache.size >= GOLDEN_BLOOM_CACHE_MAX) {
     goldenBloomSpriteCache.delete(goldenBloomSpriteCache.keys().next().value);
   }
-  goldenBloomSpriteCache.set(key, canvas);
-  return canvas;
+  const sprite = { canvas, logicalSize };
+  goldenBloomSpriteCache.set(key, sprite);
+  return sprite;
 }
 
 // ─── Viewport culling helpers (duplicated to avoid circular imports) ──────────
@@ -209,17 +216,18 @@ function isInViewport(position, bounds, radius = 0) {
 const towerBodySpriteCache = new Map();
 const TOWER_BODY_CACHE_MAX = 24;
 
-function getOrCreateTowerBodySprite(bodyRadius, innerFill, outerStroke, shadowColor, shadowBlur) {
+function getOrCreateTowerBodySprite(bodyRadius, innerFill, outerStroke, shadowColor, shadowBlur, rasterScale = 1) {
   const roundedRadius = Math.round(bodyRadius);
   const roundedBlur = Math.round(shadowBlur);
-  const key = `${roundedRadius}:${innerFill}:${outerStroke}:${shadowColor}:${roundedBlur}`;
+  const key = `${roundedRadius}:${innerFill}:${outerStroke}:${shadowColor}:${roundedBlur}:${rasterScale}`;
   if (towerBodySpriteCache.has(key)) {
     return towerBodySpriteCache.get(key);
   }
   const padding = Math.ceil(shadowBlur * 2) + 6;
-  const size = Math.ceil(bodyRadius * 2) + padding * 2;
-  const cx = size * HALF;
-  const cy = size * HALF;
+  const logicalSize = Math.ceil(bodyRadius * 2) + padding * 2;
+  const size = Math.ceil(logicalSize * rasterScale);
+  const cx = logicalSize * HALF;
+  const cy = logicalSize * HALF;
   const canvas =
     typeof OffscreenCanvas !== 'undefined'
       ? new OffscreenCanvas(size, size)
@@ -233,6 +241,7 @@ function getOrCreateTowerBodySprite(bodyRadius, innerFill, outerStroke, shadowCo
   if (!offCtx) {
     return null;
   }
+  offCtx.setTransform(rasterScale, 0, 0, rasterScale, 0, 0);
   offCtx.shadowColor = shadowColor;
   offCtx.shadowBlur = shadowBlur;
   offCtx.beginPath();
@@ -245,8 +254,9 @@ function getOrCreateTowerBodySprite(bodyRadius, innerFill, outerStroke, shadowCo
   if (towerBodySpriteCache.size >= TOWER_BODY_CACHE_MAX) {
     towerBodySpriteCache.delete(towerBodySpriteCache.keys().next().value);
   }
-  towerBodySpriteCache.set(key, { canvas, halfSize: size * HALF });
-  return { canvas, halfSize: size * HALF };
+  const sprite = { canvas, halfSize: logicalSize * HALF, logicalSize };
+  towerBodySpriteCache.set(key, sprite);
+  return sprite;
 }
 
 function getTowerRingSprites() {
@@ -794,6 +804,10 @@ export function drawTowers() {
   // Pre-build font strings that repeat across all towers to avoid per-tower template allocation.
   const glyphFontSize = Math.round(bodyRadius * 1.4);
   const glyphFont = `${glyphFontSize}px "Cormorant Garamond", serif`;
+  const zoomRasterScale = Math.min(
+    4,
+    Math.max(1, this.pixelRatio || 1) * resolveZoomRasterScale(this.viewScale),
+  );
 
   this.towers.forEach((tower) => {
     if (!tower || !Number.isFinite(tower.x) || !Number.isFinite(tower.y)) {
@@ -848,10 +862,16 @@ export function drawTowers() {
     ctx.save();
     // Blit the pre-rendered golden bloom glow to avoid a per-tower per-frame
     // createRadialGradient() call; the appearance is static for a given body radius.
-    const bloomSprite = getOrCreateGoldenBloomSprite(bodyRadius);
+    const bloomSprite = getOrCreateGoldenBloomSprite(bodyRadius, zoomRasterScale);
     if (bloomSprite) {
-      const bloomHalfSize = bloomSprite.width * HALF;
-      ctx.drawImage(bloomSprite, tower.x - bloomHalfSize, tower.y - bloomHalfSize, bloomSprite.width, bloomSprite.height);
+      const bloomHalfSize = bloomSprite.logicalSize * HALF;
+      ctx.drawImage(
+        bloomSprite.canvas,
+        tower.x - bloomHalfSize,
+        tower.y - bloomHalfSize,
+        bloomSprite.logicalSize,
+        bloomSprite.logicalSize,
+      );
     } else {
       // Fallback: draw the gradient inline when offscreen canvas is unavailable.
       const goldenGlowGradient = ctx.createRadialGradient(
@@ -886,9 +906,22 @@ export function drawTowers() {
       ? (Number.isFinite(outerShadow.blur) ? outerShadow.blur : 18)
       : Math.max(12, bodyRadius * 1.05);
     if (!shadowsSuppressed) {
-      const bodySprite = getOrCreateTowerBodySprite(bodyRadius, innerFill, outerStroke, shadowColor, bodyShadowBlur);
+      const bodySprite = getOrCreateTowerBodySprite(
+        bodyRadius,
+        innerFill,
+        outerStroke,
+        shadowColor,
+        bodyShadowBlur,
+        zoomRasterScale,
+      );
       if (bodySprite) {
-        ctx.drawImage(bodySprite.canvas, tower.x - bodySprite.halfSize, tower.y - bodySprite.halfSize);
+        ctx.drawImage(
+          bodySprite.canvas,
+          tower.x - bodySprite.halfSize,
+          tower.y - bodySprite.halfSize,
+          bodySprite.logicalSize,
+          bodySprite.logicalSize,
+        );
       } else {
         this.applyCanvasShadow(ctx, shadowColor, bodyShadowBlur);
         ctx.beginPath();

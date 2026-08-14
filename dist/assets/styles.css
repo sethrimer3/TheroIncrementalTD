@@ -1567,9 +1567,8 @@ body.playfield-fullscreen .playfield canvas {
   transition: transform var(--transition), opacity var(--transition);
   opacity: 1;
   z-index: 1;
-  padding-left: calc(
-    var(--tower-loadout-edge-offset) + var(--tower-loadout-toggle-size) + var(--tower-loadout-gap)
-  );
+  /* The retired hide/show toggle no longer reserves space before the first tower. */
+  padding-left: 0;
   padding-right: 8px;
 }
 
@@ -1613,11 +1612,13 @@ body.playfield-fullscreen .playfield canvas {
   gap: 4px;
   padding: 0;
   border-radius: 12px;
-  border: none;
+  box-sizing: border-box;
+  border: 1px solid rgba(212, 175, 55, 0.72);
   background: transparent;
   cursor: var(--cursor-grab);
   touch-action: none;
-  transition: transform var(--transition), opacity var(--transition);
+  box-shadow: 0 0 0 1px rgba(255, 228, 120, 0.08);
+  transition: transform var(--transition), opacity var(--transition), border-color var(--transition);
   min-height: 0;
   pointer-events: auto; /* Re-enable interaction on actual loadout items while leaving gaps transparent to input. */
   /* Prevent long-press text selection and callouts on loadout slots. */
@@ -4010,6 +4011,8 @@ body.playfield-fullscreen .playfield canvas {
   justify-content: center;
   gap: 12px;
   overflow-x: auto;
+  /* Preserve the full pill border when hover/focus lifts a button by one pixel. */
+  padding-top: 2px;
   padding-bottom: 4px;
 }
 
@@ -7012,12 +7015,13 @@ body.playfield-fullscreen .playfield canvas {
 
 .powder-wall-left {
   left: 0;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: none;
 }
 
 .powder-wall-right {
   right: 0;
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  /* The canvas no longer draws a matching edge highlight, so keep this seam borderless too. */
+  border-left: none;
 }
 
 
@@ -7349,6 +7353,12 @@ body.playfield-fullscreen .playfield canvas {
   touch-action: pan-y;
 }
 
+/* Keep the outer circle of every SVG tower sprite white on tower cards, independent of the active palette. */
+.tower-preview .tower-icon svg > circle:first-of-type {
+  stroke: #ffffff;
+  stroke-width: 2px;
+}
+
 .tower-preview {
   margin: 0;
   position: relative;
@@ -7387,32 +7397,17 @@ body.playfield-fullscreen .playfield canvas {
   pointer-events: none;
 }
 
-.tower-preview::before,
-.tower-preview::after {
-  content: '';
-  position: absolute;
-  inset: 18px 22%;
-  border-radius: 999px;
-  background: linear-gradient(135deg, rgba(120, 185, 255, 0.18), rgba(255, 208, 150, 0.16));
-  filter: blur(0.4px);
-  opacity: 0.85;
-}
-
-.tower-preview::after {
-  inset: 28px 32%;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
-  opacity: 0.55;
-}
-
 .tower-preview img,
 .tower-preview .tower-icon {
   width: min(160px, 72%);
-  max-height: 140px;
+  height: auto;
+  aspect-ratio: 1;
+  box-sizing: border-box;
   object-fit: contain;
   z-index: 1;
-  /* Add thin golden outline to tower icons within cards. */
+  /* Follow the SVG's square black background and rounded corners exactly. */
   border: 1px solid rgba(255, 215, 0, 0.4);
-  border-radius: 8px;
+  border-radius: 21.875%;
   filter:
     drop-shadow(0 12px 24px rgba(0, 0, 0, 0.6))
     drop-shadow(0 0 18px var(--tower-icon-primary, rgba(255, 220, 160, 0.45)));
@@ -8776,6 +8771,18 @@ body.playfield-fullscreen .playfield canvas {
   transform-origin: left center;
   align-self: center;
 }
+
+/* Developer balance worksheet keeps progression assumptions visible beside the sandbox controls. */
+.developer-balance-estimator { grid-column: 1 / -1; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid color-mix(in srgb, currentColor 22%, transparent); }
+.developer-balance-estimator h3 { margin: 0 0 0.35rem; }
+.developer-balance-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 0.55rem; margin: 0.65rem 0; }
+.developer-balance-inputs label { display: grid; gap: 0.25rem; font-size: 0.82rem; }
+.developer-balance-inputs input, .developer-balance-inputs select { width: 100%; min-height: 2.5rem; }
+.developer-balance-summary { display: flex; flex-wrap: wrap; gap: 0.45rem 1rem; margin: 0.6rem 0; font-size: 0.82rem; }
+.developer-balance-table-wrap { overflow-x: auto; }
+.developer-balance-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 0.78rem; }
+.developer-balance-table th, .developer-balance-table td { padding: 0.38rem 0.48rem; border-bottom: 1px solid color-mix(in srgb, currentColor 14%, transparent); text-align: right; white-space: nowrap; }
+.developer-balance-table th:first-child { text-align: left; }
 
 /* Script only authored _/^ groups; ordinary identifier letters stay inline. */
 .tower-upgrade-formula-part-tail--subscript {

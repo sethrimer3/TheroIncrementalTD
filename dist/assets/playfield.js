@@ -184,6 +184,7 @@ const HUD_UPDATE_INTERVAL_SECONDS = 1 / 15;
 const defaultDependencies = {
   theroSymbol: 'þ',
   calculateStartingThero: () => 0,
+  multiplyTheroGain: (amount) => amount,
   updateStatusDisplays: () => {},
   notifyEnemyDefeated: () => {},
   notifyAutoAnchorUsed: () => {},
@@ -2550,6 +2551,15 @@ export class SimplePlayfield {
     if (this.combatStateManager) {
       this.combatStateManager.setEnergy(value);
     }
+  }
+
+  // Canonical positive-award entry point used by crystals and future Thero sources.
+  addThero(amount) {
+    const gain = this.dependencies.multiplyTheroGain(amount);
+    const cap = this.getEnergyCap();
+    this.energy = Math.min(cap, this.energy + gain);
+    this.updateHud();
+    return gain;
   }
   
   get lives() {

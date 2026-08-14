@@ -3,6 +3,7 @@ import { metersToPixels } from '../../../assets/gameUnits.js';
 import { samplePaletteGradient } from '../../../assets/colorSchemeUtils.js';
 import { clamp, normalizeParticleColor, easeInCubic, easeOutCubic } from './shared/TowerUtils.js';
 import { createShotSpriteCache } from './shared/TowerRenderHelpers.js';
+import { PROJECTILE_TRAIL_STYLES } from './shared/ProjectileTrails.js';
 
 // α shot sprite path points at the white particle art that will be tinted by the active palette.
 const ALPHA_SHOT_SPRITE_PATH = './assets/sprites/towers/alpha/projectiles/alphaProjectile.png';
@@ -23,6 +24,10 @@ const ALPHA_PARTICLE_COLORS = [
 
 // Offsets define where α samples the active palette gradient so bursts pick up both endpoints.
 const ALPHA_COLOR_OFFSETS = [0.18, 0.82];
+
+// Shared trail defaults use fixed-size world-space histories and vector layers so
+// shots stay sharp under the playfield camera without blur filters or raster caches.
+const DEFAULT_PROJECTILE_TRAIL_STYLE = PROJECTILE_TRAIL_STYLES.alpha;
 
 // Refresh the cached sprite variants when the active palette changes.
 export function refreshAlphaShotSpritePaletteCache() {
@@ -46,6 +51,7 @@ const ALPHA_PARTICLE_CONFIG = {
   idPrefix: 'alpha',
   colors: ALPHA_PARTICLE_COLORS,
   colorResolver: resolveAlphaParticleColors,
+  trailStyle: { ...DEFAULT_PROJECTILE_TRAIL_STYLE },
   behavior: 'oscillate',
   homing: true,
   particleCountRange: { min: 5, max: 10 },
@@ -155,6 +161,8 @@ function createParticleCloud(playfield, tower, burst) {
     const dashDelayCap = Number.isFinite(config.dashDelayRange)
       ? Math.max(0, config.dashDelayRange)
       : 0.08;
+    const trailStyle = config.trailStyle || null;
+    const trailCapacity = trailStyle ? Math.max(2, Math.min(10, Math.floor(trailStyle.length || 8))) : 0;
     particles.push({
       angle,
       initialAngle: angle,
@@ -178,11 +186,56 @@ function createParticleCloud(playfield, tower, burst) {
         x: burst.origin.x + Math.cos(angle) * baseRadius,
         y: burst.origin.y + Math.sin(angle) * baseRadius,
       },
+      // Preallocate compact coordinate buffers once per shot to avoid render-time garbage.
+      trailX: trailCapacity ? new Float32Array(trailCapacity) : null,
+      trailY: trailCapacity ? new Float32Array(trailCapacity) : null,
+      trailCount: 0,
+      trailStart: 0,
       // Store the config so drawParticle can find the right sprite cache.
       config,
     });
   }
   return particles;
+}
+
+// Reset history when a particle is not in a fired state so tower-orbit motion never
+// creates a misleading trail before the projectile launches.
+function clearParticleTrail(particle) {
+  particle.trailCount = 0;
+  particle.trailStart = 0;
+}
+
+// Record a world-space sample into a fixed ring buffer after meaningful movement.
+function recordParticleTrail(particle) {
+  const style = particle?.trailStyle || particle?.config?.trailStyle;
+  const x = particle?.position?.x;
+  const y = particle?.position?.y;
+  const capacity = particle?.trailX?.length || 0;
+  if (!style || !capacity || !Number.isFinite(x) || !Number.isFinite(y)) {
+    return;
+  }
+  if (particle.trailCount >= 2) {
+    const lastIndex = (particle.trailStart + particle.trailCount - 1) % capacity;
+    const anchorIndex = (particle.trailStart + particle.trailCount - 2) % capacity;
+    const dx = x - particle.trailX[anchorIndex];
+    const dy = y - particle.trailY[anchorIndex];
+    const threshold = Math.max(1, Number.isFinite(style.sampleDistance) ? style.sampleDistance : 5);
+    if (dx * dx + dy * dy < threshold * threshold) {
+      // Move the live tip while retaining the prior anchor, keeping the ribbon attached.
+      particle.trailX[lastIndex] = x;
+      particle.trailY[lastIndex] = y;
+      return;
+    }
+  }
+  let writeIndex = (particle.trailStart + particle.trailCount) % capacity;
+  if (particle.trailCount >= capacity) {
+    particle.trailStart = (particle.trailStart + 1) % capacity;
+    writeIndex = (particle.trailStart + particle.trailCount - 1) % capacity;
+  } else {
+    particle.trailCount += 1;
+  }
+  particle.trailX[writeIndex] = x;
+  particle.trailY[writeIndex] = y;
 }
 
 // Resolve an enemy's latest position so particles know where to converge or ricochet.
@@ -788,6 +841,13 @@ function updateBurst(playfield, burst, delta) {
       updateResolvePhase(burst, delta);
       break;
   }
+  burst.particles.forEach((particle) => {
+    if (particle.state === 'dash' || particle.state === 'pierce' || particle.state === 'impactStar' || particle.state === 'bounce') {
+      recordParticleTrail(particle);
+    } else if (particle.state === 'swirl' || particle.state === 'charge') {
+      clearParticleTrail(particle);
+    }
+  });
   return !burst.done;
 }
 
@@ -836,6 +896,59 @@ function drawParticle(ctx, particle) {
   ctx.beginPath();
   ctx.arc(x, y, size, 0, Math.PI * 2);
   ctx.fill();
+}
+
+// Draw one tapered vector ribbon layer from the oldest sample to the live projectile.
+function drawTrailRibbonLayer(ctx, particle, color, width, alpha) {
+  const count = particle.trailCount || 0;
+  const capacity = particle.trailX?.length || 0;
+  if (count < 2 || !capacity || width <= 0 || alpha <= 0) {
+    return;
+  }
+  ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${clamp(alpha * particle.opacity, 0, 1)})`;
+  ctx.beginPath();
+  for (let index = 0; index < count; index += 1) {
+    const pointIndex = (particle.trailStart + index) % capacity;
+    const previousIndex = (particle.trailStart + Math.max(0, index - 1)) % capacity;
+    const nextIndex = (particle.trailStart + Math.min(count - 1, index + 1)) % capacity;
+    const dx = particle.trailX[nextIndex] - particle.trailX[previousIndex];
+    const dy = particle.trailY[nextIndex] - particle.trailY[previousIndex];
+    const distance = Math.hypot(dx, dy) || 1;
+    const halfWidth = width * 0.5 * (index / (count - 1));
+    const x = particle.trailX[pointIndex] - (dy / distance) * halfWidth;
+    const y = particle.trailY[pointIndex] + (dx / distance) * halfWidth;
+    if (index === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  for (let index = count - 1; index >= 0; index -= 1) {
+    const pointIndex = (particle.trailStart + index) % capacity;
+    const previousIndex = (particle.trailStart + Math.max(0, index - 1)) % capacity;
+    const nextIndex = (particle.trailStart + Math.min(count - 1, index + 1)) % capacity;
+    const dx = particle.trailX[nextIndex] - particle.trailX[previousIndex];
+    const dy = particle.trailY[nextIndex] - particle.trailY[previousIndex];
+    const distance = Math.hypot(dx, dy) || 1;
+    const halfWidth = width * 0.5 * (index / (count - 1));
+    ctx.lineTo(
+      particle.trailX[pointIndex] + (dy / distance) * halfWidth,
+      particle.trailY[pointIndex] - (dx / distance) * halfWidth,
+    );
+  }
+  ctx.closePath();
+  ctx.fill();
+}
+
+// Compose a restrained glow from three inexpensive tapered ribbons; an individual
+// projectile can override trailStyle or its color without touching this renderer.
+function drawParticleTrail(ctx, particle) {
+  const style = particle?.trailStyle || particle?.config?.trailStyle;
+  const color = normalizeParticleColor(style?.color || particle?.trailColor || particle?.color);
+  if (!style || !color || (particle.trailCount || 0) < 2) {
+    return;
+  }
+  const width = Math.max(0, Number.isFinite(style.width) ? style.width : DEFAULT_PROJECTILE_TRAIL_STYLE.width);
+  drawTrailRibbonLayer(ctx, particle, color, width * 1.8, style.outerAlpha ?? DEFAULT_PROJECTILE_TRAIL_STYLE.outerAlpha);
+  drawTrailRibbonLayer(ctx, particle, color, width, style.innerAlpha ?? DEFAULT_PROJECTILE_TRAIL_STYLE.innerAlpha);
+  drawTrailRibbonLayer(ctx, particle, color, width * 0.32, style.coreAlpha ?? DEFAULT_PROJECTILE_TRAIL_STYLE.coreAlpha);
 }
 
 // Ensure the correct burst container is ready for the requesting tower type.
@@ -942,6 +1055,7 @@ export function drawTowerBursts(playfield, config) {
     if (!burst || !Array.isArray(burst.particles)) {
       return;
     }
+    burst.particles.forEach((particle) => drawParticleTrail(ctx, particle));
     burst.particles.forEach((particle) => drawParticle(ctx, particle));
   });
   ctx.restore();

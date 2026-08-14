@@ -16,6 +16,7 @@ export function createPowderDisplaySystem({
   THERO_SYMBOL,
   updatePowderLogDisplay,
   getPowderSimulation,
+  multiplyTheroGain = (amount) => amount,
 }) {
   let powderCurrency = 0;
   let powderBasinPulseTimer = null;
@@ -255,7 +256,7 @@ export function createPowderDisplaySystem({
     const resonance = Math.sqrt(chargedTheta * chargedZeta);
     const pulseBonus = resonance * 0.008;
 
-    resourceState.score += resourceState.score * pulseBonus;
+    resourceState.score += multiplyTheroGain(resourceState.score * pulseBonus);
     updateStatusDisplays();
 
     return pulseBonus;

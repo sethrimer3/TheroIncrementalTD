@@ -9,12 +9,17 @@ import { samplePaletteGradient } from '../../../assets/colorSchemeUtils.js';
 import { formatGameNumber } from '../../core/formatting.js';
 import { metersToPixels } from '../../../assets/gameUnits.js';
 import { clamp, lerp, normalizeParticleColor } from './shared/TowerUtils.js';
+import {
+  PROJECTILE_TRAIL_STYLES,
+  drawProjectileTrail,
+  recordProjectileTrail,
+} from './shared/ProjectileTrails.js';
 
 // Δ ship sprite paths point at the white art that will be tinted by the active palette.
 // Note: Delta ship sprites are oriented with "forward" pointing upward (see docs/TOWER_SPRITE_ORIENTATION.md)
 const DELTA_SHIP_SPRITE_PATHS = [
-  'assets/sprites/towers/delta/ship1.png',
-  'assets/sprites/towers/delta/ship2.png',
+  'assets/sprites/towers/delta/ships/ship1.png',
+  'assets/sprites/towers/delta/ships/ship2.png',
 ];
 
 // Cache 12 tinted variants per ship sprite so palette swaps only pay the recolor cost once.
@@ -37,14 +42,6 @@ const DELTA_FALLBACK_GRADIENT = [
   { r: 139, g: 247, b: 255 },
   { r: 255, g: 138, b: 216 },
 ];
-
-// Particle trail tuning keeps luminous footprints lingering just long enough to feel ethereal.
-const DELTA_TRAIL_CONFIG = {
-  lifespan: 0.9,
-  spawnInterval: 0.04,
-  minDistance: 3,
-  maxPoints: 45,
-};
 
 // Default angular velocity (radians per second) for Δ sentries orbiting a track anchor.
 const DELTA_ORBIT_DEFAULT_SPEED = Math.PI * 0.35;
@@ -133,10 +130,20 @@ function buildDeltaShipSpriteCache() {
       }
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(image, 0, 0);
-      ctx.globalCompositeOperation = 'source-in';
-      ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.globalCompositeOperation = 'source-over';
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const pixels = imageData.data;
+      for (let pixelIndex = 0; pixelIndex < pixels.length; pixelIndex += 4) {
+        // Map white through the active palette while black stays black; preserve antialiasing and alpha.
+        const luminance = (
+          pixels[pixelIndex] * 0.2126 +
+          pixels[pixelIndex + 1] * 0.7152 +
+          pixels[pixelIndex + 2] * 0.0722
+        ) / 255;
+        pixels[pixelIndex] = Math.round(color.r * luminance);
+        pixels[pixelIndex + 1] = Math.round(color.g * luminance);
+        pixels[pixelIndex + 2] = Math.round(color.b * luminance);
+      }
+      ctx.putImageData(imageData, 0, 0);
       deltaShipSpriteCaches[shipIndex].push(canvas);
     }
   });
@@ -149,7 +156,7 @@ export function refreshDeltaShipSpritePaletteCache() {
 
 // Resolve a cached, palette-tinted sprite for a Δ soldier if available.
 function resolveDeltaShipSpriteVariant(soldier) {
-  // Use the ship variant index to pick which ship sprite (ship1 or ship2).
+  // Use the per-soldier random variant index to pick a sprite from the Delta ships folder.
   const shipVariantIndex = Number.isFinite(soldier?.shipVariantIndex) 
     ? soldier.shipVariantIndex % DELTA_SHIP_SPRITE_PATHS.length
     : 0;
@@ -425,33 +432,6 @@ function resolveDeltaHoldPosition(playfield, tower, soldier, state) {
   };
 }
 
-// Record a fresh trail point when the soldier moves far enough to warrant another streak segment.
-function appendTrailPoint(soldier, x, y) {
-  if (!soldier.trailPoints) {
-    soldier.trailPoints = [];
-  }
-  soldier.trailPoints.push({ x, y, age: 0 });
-  if (soldier.trailPoints.length > DELTA_TRAIL_CONFIG.maxPoints) {
-    soldier.trailPoints.splice(0, soldier.trailPoints.length - DELTA_TRAIL_CONFIG.maxPoints);
-  }
-  soldier.lastTrailSample = { x, y };
-  soldier.trailAccumulator = 0;
-}
-
-// Gently age and prune stored trail points so the ribbon always feels fresh.
-function updateTrailAges(soldier, delta) {
-  if (!Array.isArray(soldier.trailPoints) || !soldier.trailPoints.length) {
-    return;
-  }
-  for (let index = soldier.trailPoints.length - 1; index >= 0; index -= 1) {
-    const point = soldier.trailPoints[index];
-    point.age += delta;
-    if (point.age >= DELTA_TRAIL_CONFIG.lifespan) {
-      soldier.trailPoints.splice(index, 1);
-    }
-  }
-}
-
 // Emit a new Δ soldier, assign its gradient color, and seed its particle trail buffers.
 export function deployDeltaSoldier(playfield, tower, targetInfo = null) {
   const state = ensureDeltaState(playfield, tower);
@@ -492,9 +472,7 @@ export function deployDeltaSoldier(playfield, tower, targetInfo = null) {
     targetId: targetInfo?.enemy?.id || null,
     collisionRadius,
     mode: tower.behaviorMode || 'pursuit',
-    trailPoints: [],
-    trailAccumulator: 0,
-    lastTrailSample: { x: spawnX, y: spawnY },
+    trailStyle: PROJECTILE_TRAIL_STYLES.deltaShip,
     color,
     gradientProgress,
     ramCooldown: 0,
@@ -505,7 +483,7 @@ export function deployDeltaSoldier(playfield, tower, targetInfo = null) {
     swarmPhase: Math.random() * Math.PI * 2,
     swarmSpeedMultiplier: 0.85 + Math.random() * 0.35,
     swarmRadiusMultiplier: 0.8 + Math.random() * 0.6,
-    // Randomly pick which ship sprite variant (ship1 or ship2) this soldier uses.
+    // Randomly pick one sprite from the Delta ships folder for this soldier's lifetime.
     shipVariantIndex: Math.floor(Math.random() * DELTA_SHIP_SPRITE_PATHS.length),
     // Lock a palette sample index so each soldier keeps a stable tint.
     spriteVariantIndex: Math.floor(Math.random() * DELTA_SHIP_SPRITE_SAMPLE_COUNT),
@@ -705,6 +683,10 @@ function updateDeltaSoldier(playfield, tower, soldier, delta, state) {
       const speedMagnitude = Math.hypot(soldier.vx, soldier.vy);
       soldier.vx = Math.cos(soldier.heading) * speedMagnitude;
       soldier.vy = Math.sin(soldier.heading) * speedMagnitude;
+      // Cue the impact once, exactly when the completed ram sharply redirects the ship.
+      if (playfield?.audio) {
+        playfield.audio.playSfx('deltaShipImpact');
+      }
     }
   }
 
@@ -715,26 +697,8 @@ function updateDeltaSoldier(playfield, tower, soldier, delta, state) {
     }
   }
 
-  const lastSample = soldier.lastTrailSample || { x: soldier.prevX, y: soldier.prevY };
-  const moved = Math.hypot(soldier.x - lastSample.x, soldier.y - lastSample.y);
-  soldier.trailAccumulator = (soldier.trailAccumulator || 0) + delta;
-  let appended = false;
-  if (
-    moved >= DELTA_TRAIL_CONFIG.minDistance &&
-    soldier.trailAccumulator >= DELTA_TRAIL_CONFIG.spawnInterval
-  ) {
-    appendTrailPoint(soldier, soldier.x, soldier.y);
-    appended = true;
-  }
-  if (!Array.isArray(soldier.trailPoints) || !soldier.trailPoints.length) {
-    appendTrailPoint(soldier, soldier.x, soldier.y);
-    appended = true;
-  }
-  if (!appended) {
-    const cap = DELTA_TRAIL_CONFIG.spawnInterval;
-    soldier.trailAccumulator = Math.min(soldier.trailAccumulator, cap);
-  }
-  updateTrailAges(soldier, delta);
+  // Record exhaust in world space after movement so the live ribbon tip stays on the ship.
+  recordProjectileTrail(soldier, soldier.x, soldier.y, soldier.trailStyle);
 
   if (target) {
     const targetPosition = cachedTargetPosition || playfield.getEnemyPosition(target);
@@ -751,12 +715,7 @@ function updateDeltaSoldier(playfield, tower, soldier, delta, state) {
         target.hp = Math.max(0, enemyHp - inflicted);
         const loss = Math.max(0, inflicted - (state.defense || 0));
         soldier.health = Math.max(0, soldier.health - loss);
-        
-        // Play glass clinking sound on impact
-        if (playfield?.audio && inflicted > 0) {
-          playfield.audio.playSfx('deltaShipImpact');
-        }
-        
+
         if (target.hp <= 0) {
           playfield.processEnemyDefeat(target);
           soldier.targetId = null;
@@ -939,32 +898,7 @@ export function drawDeltaSoldiers(playfield) {
       ctx.fillText(healthLabel, soldier.x, barY + barHeight / 2);
       ctx.restore();
 
-      if (Array.isArray(soldier.trailPoints) && soldier.trailPoints.length) {
-        ctx.save();
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.strokeStyle = toRgba(color, 0.25);
-        ctx.lineWidth = Math.max(1.2, size * 0.18);
-        ctx.beginPath();
-        soldier.trailPoints.forEach((point, index) => {
-          const alpha = clamp(1 - point.age / DELTA_TRAIL_CONFIG.lifespan, 0, 1);
-          const radius = Math.max(2, size * 0.25 * alpha);
-          ctx.save();
-          ctx.globalCompositeOperation = 'lighter';
-          ctx.fillStyle = toRgba(color, alpha * 0.45);
-          ctx.beginPath();
-          ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.restore();
-          if (index === 0) {
-            ctx.moveTo(point.x, point.y);
-          } else {
-            ctx.lineTo(point.x, point.y);
-          }
-        });
-        ctx.stroke();
-        ctx.restore();
-      }
+      drawProjectileTrail(ctx, soldier, color, soldier.trailStyle);
 
       ctx.save();
       ctx.translate(soldier.x, soldier.y);
@@ -973,8 +907,8 @@ export function drawDeltaSoldiers(playfield) {
       // Try to use the sprite if available, otherwise fall back to triangle.
       const sprite = resolveDeltaShipSpriteVariant(soldier);
       if (sprite) {
-        // Draw the cached sprite variant with soldier health-based opacity.
-        const spriteSize = size * 2.5;
+        // Render at half the former scale while leaving collision and combat balance unchanged.
+        const spriteSize = size * 1.25;
         const alpha = clamp(0.75 + healthRatio * 0.25, 0, 1);
         ctx.globalAlpha = alpha;
         ctx.drawImage(sprite, -spriteSize / 2, -spriteSize / 2, spriteSize, spriteSize);

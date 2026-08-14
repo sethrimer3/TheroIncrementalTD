@@ -116,16 +116,6 @@
                 aria-label="Interactive glyph defense lane"
               >
                 <!-- Playfield menu surfaces layout toggles when a level is active. -->
-                <!-- Fullscreen toggle sits beside the playfield menu for quick access. -->
-                <button
-                  class="playfield-menu-button playfield-fullscreen-button"
-                  type="button"
-                  id="playfield-fullscreen-button"
-                  aria-label="Enter full screen"
-                  title="Enter full screen"
-                >
-                  ⤢
-                </button>
                 <button
                   class="playfield-menu-button"
                   type="button"
@@ -246,16 +236,6 @@
                   </div>
                 </dl>
                 <div class="tower-loadout-shell" id="tower-loadout-shell" data-toggle-side="left">
-                  <button
-                    class="tower-loadout-toggle"
-                    id="tower-loadout-toggle"
-                    type="button"
-                    aria-expanded="true"
-                    aria-controls="tower-loadout-grid"
-                    aria-label="Hide tower loadout"
-                  >
-                    <span class="tower-loadout-toggle__icon" aria-hidden="true">▼</span>
-                  </button>
                   <div class="tower-loadout" id="tower-loadout" aria-label="Tower loadout" role="region">
                     <p class="tower-loadout-note screen-reader-only" id="tower-loadout-note">
                       Select four towers to bring into the defense. Drag the glyph chips onto the plane to
@@ -431,18 +411,6 @@
                   </div>
                   <button class="action-button ghost" type="button" id="playfield-track-type-button">
                     Track Type · Gradient
-                  </button>
-                  <button class="action-button ghost" type="button" id="tower-loadout-toggle-side-button">
-                    Tower Toggle · Left
-                  </button>
-                  <button
-                    class="action-button ghost"
-                    type="button"
-                    id="loadout-slot-button"
-                    aria-live="polite"
-                    aria-label="Cycle loadout slots"
-                  >
-                    Slots · 2
                   </button>
                   <button class="action-button ghost playfield-settings-close" type="button">Close</button>
                   <!-- Developer-only: render layer toggles for debugging (hidden when dev mode is off) -->
@@ -846,6 +814,9 @@
                   <button class="overlay-editor__button" type="button" id="level-editor-export" disabled>
                     Copy Path JSON
                   </button>
+                  <button class="overlay-editor__button overlay-editor__button--primary" type="button" id="level-editor-export-changes" disabled>
+                    Export Changes
+                  </button>
                 </div>
                 <!-- Developer map tools palette for selecting placement modes -->
                 <div class="overlay-editor__elements" id="developer-map-elements" hidden aria-hidden="true">
@@ -1064,11 +1035,11 @@
                 class="tower-panel-button tower-tree-map-button"
                 type="button"
                 id="tower-tree-map-toggle"
-                aria-label="Open Tree Map"
+                aria-label="Open Tower Tree"
                 aria-pressed="false"
                 aria-expanded="false"
                 aria-controls="tower-tree-map"
-                title="Open the Tower Tree Map"
+                title="Open the Tower Tree"
               >
                 <span class="tower-tree-map-icon" aria-hidden="true">
                   <svg viewBox="0 0 80 80" focusable="false" aria-hidden="true">
@@ -1093,7 +1064,7 @@
                     </g>
                   </svg>
                 </span>
-                <span class="tower-tree-map-label tower-panel-button-label">Tree</span>
+                <span class="tower-tree-map-label tower-panel-button-label">Tower Tree</span>
               </button>
             </div>
           </div>
@@ -2430,28 +2401,6 @@
                 aria-hidden="true"
                 hidden
               >
-                <div class="settings-toggle" id="invert-carousel-drag-toggle-row">
-                  <div class="settings-toggle-text">
-                    <span class="settings-toggle-title" id="invert-carousel-drag-title">Invert Tower Carousel</span>
-                    <span class="settings-toggle-description" id="invert-carousel-drag-description"
-                      >Reverse the drag direction for the tower selection carousel.</span
-                    >
-                  </div>
-                  <label class="settings-toggle-control" for="invert-carousel-drag-toggle">
-                    <input
-                      type="checkbox"
-                      id="invert-carousel-drag-toggle"
-                      class="settings-toggle-input"
-                      role="switch"
-                      aria-labelledby="invert-carousel-drag-title"
-                      aria-describedby="invert-carousel-drag-description"
-                      aria-checked="true"
-                      checked
-                    />
-                    <span class="settings-toggle-slider" aria-hidden="true"></span>
-                    <span class="settings-toggle-state" id="invert-carousel-drag-toggle-state">On</span>
-                  </label>
-                </div>
               </div>
             </article>
             <article class="card">
@@ -2589,6 +2538,23 @@
                   />
                   <p class="developer-control-hint">Override surviving Tower glyphs earned and currency.</p>
                 </div>
+                <section class="developer-balance-estimator" id="developer-balance-estimator" hidden>
+                  <h3>Balance Estimator</h3>
+                  <p class="developer-control-hint">Planning model: each glyph adds 12% compounded damage and 4% compounded attack speed. “Kill HP” is damage delivered during the engagement window; special mechanics are excluded.</p>
+                  <div class="developer-balance-inputs">
+                    <label>Level<select id="balance-estimator-level"></select></label>
+                    <label>Glyphs / tower<input id="balance-estimator-glyphs" type="number" min="0" step="1" value="0" /></label>
+                    <label>Engagement (s)<input id="balance-estimator-engagement" type="number" min="0.1" step="0.5" value="8" /></label>
+                    <label>Thero multiplier<input id="balance-estimator-multiplier" type="number" min="0" step="0.01" value="1" /></label>
+                  </div>
+                  <div class="developer-balance-summary" id="balance-estimator-summary"></div>
+                  <div class="developer-balance-table-wrap">
+                    <table class="developer-balance-table">
+                      <thead><tr><th>Tower</th><th>Cost</th><th>Hit</th><th>Rate</th><th>DPS</th><th>Kill HP</th><th>Affordable</th></tr></thead>
+                      <tbody id="balance-estimator-output"></tbody>
+                    </table>
+                  </div>
+                </section>
               </div>
             </div>
           </section>
