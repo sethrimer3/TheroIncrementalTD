@@ -43,6 +43,7 @@ export function createLevelCombatController(deps) {
     getPreviousInteractiveLevelId,
     unlockNextInteractiveLevel,
     unlockLevel,
+    multiplyTheroGain,
     formatWholeNumber,
 
     // ── Tutorial / tab gating ────────────────────────────────────────
@@ -124,7 +125,7 @@ export function createLevelCombatController(deps) {
 
     if (!alreadyCompleted) {
       if (typeof stats.rewardScore === 'number') {
-        resourceState.score += stats.rewardScore;
+        resourceState.score += multiplyTheroGain(stats.rewardScore);
       }
       if (typeof stats.rewardFlux === 'number') {
         baseResources.fluxRate += stats.rewardFlux;

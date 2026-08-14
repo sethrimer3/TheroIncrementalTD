@@ -163,6 +163,7 @@ import {
   bindAchievements,
   evaluateAchievements,
   notifyAchievementsTabVisibilityChange,
+  getEarnedAchievementCount,
 } from './achievementsTab.js';
 import { initializeBoostsSection } from './boostsSection.js';
 import { bindDefenseLeaderboardNotice } from './defenseLeaderboardNotice.js';
@@ -312,6 +313,8 @@ import {
   getLevelProgressSnapshot,
   applyLevelProgressSnapshot,
   setDeveloperModeUnlockOverride,
+  setEarnedAchievementCountProvider,
+  multiplyTheroGain,
 } from './levels.js';
 import {
   isTutorialCompleted,
@@ -357,6 +360,7 @@ import { createSpireCameraController } from './spireCameraController.js';
   const _COMMUNITY_DISCORD_INVITE = 'https://discord.gg/UzqhfsZQ8n'; // Reserved for future placement.
 
   setTheroSymbol(THERO_SYMBOL);
+  setEarnedAchievementCountProvider(getEarnedAchievementCount);
 
   const { getLevelSummary, describeLevelLastResult } = createLevelSummaryHelpers({
     getCompletedInteractiveLevelCount,
@@ -837,6 +841,7 @@ import { createSpireCameraController } from './spireCameraController.js';
     updatePowderLogDisplay,
     getPowderSimulation: () => powderSimulation,
     spireResourceState,
+    multiplyTheroGain,
   });
 
   setPowderElements(powderElements);
@@ -952,6 +957,7 @@ import { createSpireCameraController } from './spireCameraController.js';
     getPreviousInteractiveLevelId,
     unlockNextInteractiveLevel,
     unlockLevel,
+    multiplyTheroGain,
     formatWholeNumber,
     checkTutorialCompletion,
     isTutorialCompleted,
@@ -1399,6 +1405,7 @@ import { createSpireCameraController } from './spireCameraController.js';
     alephChainUpgrades: alephChainUpgradeState,
     theroSymbol: THERO_SYMBOL,
     calculateStartingThero,
+    multiplyTheroGain,
     updateStatusDisplays,
     notifyEnemyDefeated,
     notifyAutoAnchorUsed,
@@ -1506,7 +1513,7 @@ import { createSpireCameraController } from './spireCameraController.js';
 
       const scoreGain = resourceState.scoreRate * deltaSeconds;
       if (Number.isFinite(scoreGain) && scoreGain > 0) {
-        resourceState.score += scoreGain;
+        resourceState.score += multiplyTheroGain(scoreGain);
       }
 
       updateStatusDisplays();

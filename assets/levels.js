@@ -33,6 +33,7 @@ function createDeveloperTestRangeWaves() {
 }
 
 let developerTheroMultiplierOverride = null;
+let earnedAchievementCountProvider = () => 0;
 // Flag to bypass level locks when developer mode is active so the UI always treats maps as available.
 let developerModeUnlockOverride = false;
 
@@ -192,10 +193,16 @@ export function getCompletedInteractiveLevelCount() {
   return count;
 }
 
-// Capture the baseline multiplier progression without any overrides.
+// Register the achievement ledger without coupling level progression to the achievements UI module.
+export function setEarnedAchievementCountProvider(provider) {
+  earnedAchievementCountProvider = typeof provider === 'function' ? provider : () => 0;
+}
+
+// Formula: global Thero multiplier = 1 + completed levels + earned achievements.
 export function getBaseStartingTheroMultiplier(levelsBeaten = getCompletedInteractiveLevelCount()) {
-  const normalized = Number.isFinite(levelsBeaten) ? Math.max(0, levelsBeaten) : 0;
-  return 2 ** normalized;
+  const completedLevels = Number.isFinite(levelsBeaten) ? Math.max(0, Math.floor(levelsBeaten)) : 0;
+  const earnedAchievements = Math.max(0, Math.floor(Number(earnedAchievementCountProvider()) || 0));
+  return 1 + completedLevels + earnedAchievements;
 }
 
 // Determine the multiplier applied to starting Thero based on completed levels and overrides.
@@ -204,6 +211,15 @@ export function getStartingTheroMultiplier(levelsBeaten = getCompletedInteractiv
     return developerTheroMultiplierOverride;
   }
   return getBaseStartingTheroMultiplier(levelsBeaten);
+}
+
+// Apply the canonical multiplier only to positive awards; costs, refunds, and restored balances stay exact.
+export function multiplyTheroGain(amount, levelsBeaten = getCompletedInteractiveLevelCount()) {
+  const normalized = Number(amount);
+  if (!Number.isFinite(normalized) || normalized <= 0) {
+    return Number.isFinite(normalized) ? normalized : 0;
+  }
+  return normalized * getStartingTheroMultiplier(levelsBeaten);
 }
 
 // Allow developer tooling to override the starting Thero multiplier directly.

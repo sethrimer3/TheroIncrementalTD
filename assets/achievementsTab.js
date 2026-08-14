@@ -1255,6 +1255,8 @@ function unlockAchievement(definition) {
 
   const element = achievementElements.get(definition.id);
   updateAchievementStatus(definition, element, state);
+  // Earning (not claiming) an achievement immediately increases the global Thero multiplier.
+  getContext().updateStatusDisplays?.();
 }
 
 // Claims an achievement and applies its rewards.
@@ -1303,6 +1305,11 @@ function claimAchievement(definition) {
 // Returns the count of achievements that have been claimed.
 export function getUnlockedAchievementCount() {
   return Array.from(achievementState.values()).filter((state) => state?.earned && state?.claimed).length;
+}
+
+// Count earned achievements for progression even while their presentation reward remains unclaimed.
+export function getEarnedAchievementCount() {
+  return Array.from(achievementState.values()).filter((state) => state?.earned).length;
 }
 
 // Returns true if there are any unclaimed achievements (earned but not claimed)
