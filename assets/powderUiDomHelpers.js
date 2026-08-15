@@ -128,6 +128,10 @@ export function createPowderUiDomHelpers(options = {}) {
     const maxAlephWallTier = Number.isFinite(info.maxAlephWallTier) && info.maxAlephWallTier > 0
       ? Math.max(minAlephWallTier, Math.floor(info.maxAlephWallTier))
       : 15;
+    // Clamp illuminated glyphs to the progression capacity supplied by the level system.
+    const glyphLimit = Number.isFinite(info.glyphLimit) && info.glyphLimit >= 0
+      ? Math.max(0, Math.floor(info.glyphLimit))
+      : Number.POSITIVE_INFINITY;
     // Keep Aleph milestones on a fixed 100-mote vertical cadence so wall-width changes never shift threshold spacing.
     const glyphSpacingRows = 100;
     const GLYPH_SPACING_NORMALIZED = glyphSpacingRows / Math.max(1, rows);
@@ -177,19 +181,20 @@ export function createPowderUiDomHelpers(options = {}) {
           const relativeRows = glyphNormalized * safeRows - scrollOffset;
           const topPx = basinHeight - relativeRows * cellSize;
           glyph.style.top = `${topPx.toFixed(1)}px`;
-          const achieved = highestNormalized >= glyphNormalized;
+          const achieved = index < glyphLimit && highestNormalized >= glyphNormalized;
           glyph.classList.toggle('powder-glyph--achieved', achieved);
         }
       });
     }
 
-    const glyphsLit =
+    const uncappedGlyphsLit =
       highestNormalized >= GLYPH_BASE_NORMALIZED
         ? Math.max(
             0,
             Math.floor((highestNormalized - GLYPH_BASE_NORMALIZED) / GLYPH_SPACING_NORMALIZED) + 1,
           )
         : 0;
+    const glyphsLit = Math.min(uncappedGlyphsLit, glyphLimit);
     const achievedIndex = glyphsLit > 0 ? glyphsLit - 1 : 0;
     const nextIndex = glyphsLit;
     const previousThreshold =
@@ -202,6 +207,7 @@ export function createPowderUiDomHelpers(options = {}) {
     const remainingToNext = Math.max(0, nextThreshold - highestNormalized);
     // Convert normalized remaining height into mote-height so Δh readouts are always in gameplay units.
     const remainingToNextMotes = remainingToNext * safeRows;
+    const limitReached = glyphsLit >= glyphLimit;
     const alephInTier = glyphsLit % tierAdvanceAlephCount;
     const tier = Math.max(
       minAlephWallTier,
@@ -214,8 +220,8 @@ export function createPowderUiDomHelpers(options = {}) {
         column.glyphs.forEach((glyph, index) => {
           const isTarget = index === nextIndex;
           const glyphNormalized = glyphHeightForIndex(index);
-          glyph.classList.toggle('powder-glyph--target', isTarget);
-          glyph.classList.toggle('powder-glyph--achieved', highestNormalized >= glyphNormalized);
+          glyph.classList.toggle('powder-glyph--target', isTarget && !limitReached);
+          glyph.classList.toggle('powder-glyph--achieved', index < glyphLimit && highestNormalized >= glyphNormalized);
         });
       });
     }
@@ -225,6 +231,8 @@ export function createPowderUiDomHelpers(options = {}) {
       nextIndex,
       highestRaw: highestNormalized,
       glyphsLit,
+      glyphLimit,
+      limitReached,
       progressFraction,
       remainingToNext,
       remainingToNextMotes,

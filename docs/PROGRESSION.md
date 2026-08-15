@@ -174,5 +174,6 @@ Future symbol variants will continue to draw from global mathematical alphabets 
 - Achievement seals record completed proofs but do not generate passive resources.
 - The Tower of Inspiration advances only through motes earned during active defenses and direct Tower interactions.
 - Powder height illuminates wall glyphs that become upgrade currency for tower research.
+- The Tower of Inspiration can illuminate 10 glyphs initially; each completed level raises that limit by 5 glyphs.
 - No offline rewards, automated level runs, passive banks, or background spire simulations remain.
 
