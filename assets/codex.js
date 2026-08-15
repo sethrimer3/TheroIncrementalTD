@@ -77,7 +77,7 @@ const TOWER_LABELS = {
   gamma: 'Gamma Spire',
   delta: 'Delta Spire',
   epsilon: 'Epsilon Spire',
-  zeta: 'Zeta Spire',
+  zeta: 'Zeta',
   eta: 'Eta Spire',
   theta: 'Theta Spire',
   iota: 'Iota Spire',

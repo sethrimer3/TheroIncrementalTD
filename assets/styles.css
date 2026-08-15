@@ -7526,8 +7526,9 @@ body.playfield-fullscreen .playfield canvas {
   font-style: italic;
 }
 
-/* Free ζ graph controls stay compact and touch-friendly inside the tower card. */
+/* Free ζ graph controls stay compact and touch-friendly inside the opened tower card. */
 .zeta-graph-controls { display: grid; gap: 7px; margin: 10px 0; padding: 10px; border: 1px solid rgba(138,247,255,.28); border-radius: 8px; background: rgba(8,18,30,.55); }
+.tower-upgrade-zeta-controls[hidden] { display: none; }
 .zeta-controls-title { margin: 0; color: #b8f8ff; font-family: "Cormorant Garamond", serif; text-align: center; }
 .zeta-graph-controls > label { display: grid; grid-template-columns: minmax(86px,1fr) minmax(100px,1.4fr) 30px; align-items: center; gap: 7px; font-size: .8rem; color: var(--muted); }
 .zeta-graph-controls input[type="range"] { width: 100%; accent-color: #8af7ff; touch-action: manipulation; }

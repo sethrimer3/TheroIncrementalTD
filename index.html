@@ -1255,7 +1255,7 @@
             <article class="card" data-tower-id="zeta" hidden aria-hidden="true">
               <header class="tower-header">
                 <span class="tower-tier">Tier VI</span>
-                <h3>ζ graphing calculator</h3>
+                <h3>Zeta</h3>
               </header>
               <div class="formula-block">
                 <p class="formula-line">\( r(\theta)=Rs|\sin(k\theta+\phi)| \)</p>
@@ -1265,21 +1265,6 @@
                   <li>Heads deal critical damage; fading graph trails deal base attack damage.</li>
                 </ul>
                 <p class="formula-line result" id="zeta-formula-display">Polar: 3 petals · Parametric: x sin(3t), y sin(2t + 90°)</p>
-              </div>
-              <div class="zeta-graph-controls" aria-label="Free Zeta graph parameters">
-                <p class="zeta-controls-title">Free graph parameters</p>
-                <label>Polar petals <input type="range" min="1" max="8" step="1" value="3" data-zeta-param="polarPetals"><output>3</output></label>
-                <label>Polar scale <input type="range" min="0.2" max="1" step="0.05" value="0.9" data-zeta-param="polarScale"><output>0.9</output></label>
-                <label>Polar phase° <input type="range" min="0" max="360" step="15" value="0" data-zeta-param="polarPhase"><output>0</output></label>
-                <label>x frequency <input type="range" min="1" max="8" step="1" value="3" data-zeta-param="parametricXFrequency"><output>3</output></label>
-                <label>y frequency <input type="range" min="1" max="8" step="1" value="2" data-zeta-param="parametricYFrequency"><output>2</output></label>
-                <label>y phase° <input type="range" min="0" max="360" step="15" value="90" data-zeta-param="parametricPhase"><output>90</output></label>
-                <div class="zeta-coefficient-grid">
-                  <label>x sin <input type="number" min="-2" max="2" step="0.25" value="1" data-zeta-param="parametricSinX"></label>
-                  <label>x cos <input type="number" min="-2" max="2" step="0.25" value="0" data-zeta-param="parametricCosX"></label>
-                  <label>y sin <input type="number" min="-2" max="2" step="0.25" value="1" data-zeta-param="parametricSinY"></label>
-                  <label>y cos <input type="number" min="-2" max="2" step="0.25" value="0" data-zeta-param="parametricCosY"></label>
-                </div>
               </div>
               <ul class="upgrade-list">
                 <li>Upgrade Critical Multiplier, Attack, and Speed.</li>
@@ -2701,6 +2686,22 @@
           </section>
         </div>
         <div class="tower-upgrade-variables" id="tower-upgrade-variables" role="list"></div>
+        <!-- Keep Zeta's free graph parameters behind its opened tower card. -->
+        <section class="zeta-graph-controls tower-upgrade-zeta-controls" id="tower-upgrade-zeta-controls" aria-label="Free Zeta graph parameters" hidden>
+          <p class="zeta-controls-title">Free graph parameters</p>
+          <label>Polar petals <input type="range" min="1" max="8" step="1" value="3" data-zeta-param="polarPetals"><output>3</output></label>
+          <label>Polar scale <input type="range" min="0.2" max="1" step="0.05" value="0.9" data-zeta-param="polarScale"><output>0.9</output></label>
+          <label>Polar phase° <input type="range" min="0" max="360" step="15" value="0" data-zeta-param="polarPhase"><output>0</output></label>
+          <label>x frequency <input type="range" min="1" max="8" step="1" value="3" data-zeta-param="parametricXFrequency"><output>3</output></label>
+          <label>y frequency <input type="range" min="1" max="8" step="1" value="2" data-zeta-param="parametricYFrequency"><output>2</output></label>
+          <label>y phase° <input type="range" min="0" max="360" step="15" value="90" data-zeta-param="parametricPhase"><output>90</output></label>
+          <div class="zeta-coefficient-grid">
+            <label>x sin <input type="number" min="-2" max="2" step="0.25" value="1" data-zeta-param="parametricSinX"></label>
+            <label>x cos <input type="number" min="-2" max="2" step="0.25" value="0" data-zeta-param="parametricCosX"></label>
+            <label>y sin <input type="number" min="-2" max="2" step="0.25" value="1" data-zeta-param="parametricSinY"></label>
+            <label>y cos <input type="number" min="-2" max="2" step="0.25" value="0" data-zeta-param="parametricCosY"></label>
+          </div>
+        </section>
         <p class="tower-upgrade-note" id="tower-upgrade-note"></p>
         <p class="overlay-instruction">Tap outside or press Esc to close.</p>
       </div>

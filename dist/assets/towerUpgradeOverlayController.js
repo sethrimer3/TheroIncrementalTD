@@ -1083,6 +1083,11 @@ export function createTowerUpgradeOverlayController({
       towerTabState.towerUpgradeElements.title.textContent = composeTowerDisplayLabel(definition);
     }
 
+    // Expose free graph controls only while the player has opened Zeta's tower card.
+    if (towerTabState.towerUpgradeElements.zetaGraphControls) {
+      towerTabState.towerUpgradeElements.zetaGraphControls.hidden = towerId !== 'zeta';
+    }
+
     if (towerTabState.towerUpgradeElements.tier) {
       const tierLabel = typeof definition.tierLabel === 'string' ? definition.tierLabel : `Tier ${definition.tier || 1}`;
       towerTabState.towerUpgradeElements.tier.textContent = tierLabel;
@@ -1422,6 +1427,7 @@ export function createTowerUpgradeOverlayController({
     elements.baseEquation = document.getElementById('tower-upgrade-base');
     elements.baseEquationValues = document.getElementById('tower-upgrade-base-values');
     elements.variables = document.getElementById('tower-upgrade-variables');
+    elements.zetaGraphControls = document.getElementById('tower-upgrade-zeta-controls');
     elements.note = document.getElementById('tower-upgrade-note');
     elements.icon = document.getElementById('tower-upgrade-icon');
 
