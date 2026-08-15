@@ -66,6 +66,7 @@ export function createLevelCombatController(deps) {
     updateTowerSelectionButtons,
     updateLayoutVisibility,
     notifyLevelVictory,
+    syncTowerLoadoutLimitForCampaignProgress,
     commitAutoSave,
 
     // ── Misc ─────────────────────────────────────────────────────────
@@ -119,6 +120,8 @@ export function createLevelCombatController(deps) {
       lastResult: { outcome: 'victory', stats, timestamp: Date.now() },
     };
     levelState.set(levelId, updated);
+    // Recalculate the milestone-owned loadout as soon as a campaign level is sealed.
+    syncTowerLoadoutLimitForCampaignProgress?.();
     resourceState.running = false;
 
     notifyLevelVictory(levelId);
@@ -273,6 +276,8 @@ export function createLevelCombatController(deps) {
                 entered: true,
                 storySeen: true,
               });
+              // Story seals are the Prologue and World loadout-slot milestones.
+              syncTowerLoadoutLimitForCampaignProgress?.();
               unlockNextInteractiveLevel(level.id);
               updateLevelCards();
               

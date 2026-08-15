@@ -154,7 +154,7 @@ const towerTabState = {
   towerDefinitionMap: new Map(),
   towerOrderIndex: new Map(),
   towerPreviousTierMap: new Map(),
-  towerLoadoutLimit: 4,
+  towerLoadoutLimit: 1,
   loadoutState: { selected: ['alpha'] },
   unlockState: { unlocked: new Set(['alpha', 't1', 't2']) },
   mergeProgress: { mergingLogicUnlocked: false },
@@ -792,15 +792,10 @@ export function setTowerLoadoutLimit(limit) {
 }
 
 /**
- * Derive mandatory loadout capacity from discovered placeable tower types.
- * Formula: slots = clamp(discovered towers, 2, 4), so every player starts with
- * two slots and permanently gains the third and fourth alongside those discoveries.
+ * Retain the public unlock hook without granting capacity from tower discoveries.
+ * Campaign story milestones exclusively control the one-to-five slot progression.
  */
 export function syncTowerLoadoutLimitFromUnlocks() {
-  const discoveredPlaceableCount = CANONICAL_TOWER_IDS.filter(
-    (towerId) => towerTabState.unlockState.unlocked.has(towerId) && isTowerPlaceable(towerId),
-  ).length;
-  towerTabState.towerLoadoutLimit = Math.min(4, Math.max(2, discoveredPlaceableCount));
   fillEmptyLoadoutSlotsFromUnlocks();
   return towerTabState.towerLoadoutLimit;
 }

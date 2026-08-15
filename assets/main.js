@@ -30,6 +30,7 @@ import {
   ensureGameplayConfigLoaded,
   calculateStartingThero,
   getTowerLoadoutLimit,
+  syncTowerLoadoutLimitForCampaignProgress,
   getBaseStartThero,
   registerResourceContainers,
   setBaseStartThero,
@@ -977,6 +978,7 @@ import { createSpireCameraController } from './spireCameraController.js';
     updateTowerSelectionButtons,
     updateLayoutVisibility,
     notifyLevelVictory,
+    syncTowerLoadoutLimitForCampaignProgress,
     commitAutoSave,
     closeLoadoutWheel,
     refreshTabMusic,
@@ -2063,6 +2065,8 @@ import { createSpireCameraController } from './spireCameraController.js';
     refreshTabMusic({ restart: true });
 
     loadPersistentState();
+    // Saved campaign milestones determine the player's available tower slots.
+    syncTowerLoadoutLimitForCampaignProgress();
     // Load tutorial state after persistent state is loaded
     loadTutorialState();
     // Check if tutorial should be completed based on level progress

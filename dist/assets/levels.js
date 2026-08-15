@@ -13,6 +13,13 @@ export const levelSetEntries = [];
 
 const LEVEL_PROGRESS_VERSION = 1;
 const PROLOGUE_STORY_ID = 'Prologue - Story';
+// Each sealed story milestone permanently opens one additional loadout slot.
+const TOWER_LOADOUT_SLOT_MILESTONE_LEVEL_IDS = [
+  PROLOGUE_STORY_ID,
+  '1 - Story',
+  '2 - Story',
+  '3 - Story',
+];
 const DEVELOPER_TEST_RANGE_ID = 'Developer - Test Range';
 const DEVELOPER_TEST_RANGE_BASE_HP = 10000;
 const DEVELOPER_TEST_RANGE_INTERVAL = 5;
@@ -285,6 +292,18 @@ export function isLevelCompleted(levelId) {
   }
   const state = levelState.get(levelId);
   return Boolean(state && state.completed);
+}
+
+/**
+ * Calculate the progression-owned tower loadout capacity.
+ * Formula: 1 starting slot + 1 for every sealed milestone through World 3, capped at 5.
+ */
+export function getTowerLoadoutLimitForCampaignProgress() {
+  const earnedSlots = TOWER_LOADOUT_SLOT_MILESTONE_LEVEL_IDS.reduce(
+    (count, levelId) => count + (isLevelCompleted(levelId) ? 1 : 0),
+    0,
+  );
+  return Math.min(5, 1 + earnedSlots);
 }
 
 // Mark the supplied level id as unlocked.

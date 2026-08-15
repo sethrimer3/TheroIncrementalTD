@@ -8,7 +8,6 @@ import {
   getTowerDefinition,
   setMergingLogicUnlocked,
   initializeDiscoveredVariablesFromUnlocks,
-  syncTowerLoadoutLimitFromUnlocks,
 } from './towersTab.js';
 import { setEnemyCodexEntries } from './codex.js';
 import {
@@ -17,6 +16,7 @@ import {
   initializeInteractiveLevelProgression,
   pruneLevelState,
   getStartingTheroMultiplier,
+  getTowerLoadoutLimitForCampaignProgress,
 } from './levels.js';
 import { generateLevelAchievements } from './achievementsTab.js';
 import {
@@ -28,7 +28,7 @@ import {
 const GAMEPLAY_CONFIG_RELATIVE_PATH = './data/gameplayConfig.json';
 const GAMEPLAY_CONFIG_URL = new URL(GAMEPLAY_CONFIG_RELATIVE_PATH, import.meta.url);
 
-export const FALLBACK_TOWER_LOADOUT_LIMIT = 2;
+export const FALLBACK_TOWER_LOADOUT_LIMIT = 1;
 export const FALLBACK_BASE_START_THERO = 50;
 export const FALLBACK_BASE_CORE_INTEGRITY = 100;
 export const FALLBACK_BASE_SCORE_RATE = 1;
@@ -184,7 +184,6 @@ async function applyGameplayConfigInternal(config = {}) {
     }
   });
   unlockState.unlocked = unlocked;
-  TOWER_LOADOUT_LIMIT = syncTowerLoadoutLimitFromUnlocks();
   setMergingLogicUnlocked(unlocked.has('beta'));
   initializeDiscoveredVariablesFromUnlocks(unlocked);
 
@@ -196,6 +195,7 @@ async function applyGameplayConfigInternal(config = {}) {
   setLevelConfigs(gameplayConfigData.levels);
   initializeInteractiveLevelProgression();
   pruneLevelState();
+  syncTowerLoadoutLimitForCampaignProgress();
 
   await generateLevelAchievements();
 
@@ -245,6 +245,13 @@ export function calculateStartingThero() {
 }
 
 export function getTowerLoadoutLimit() {
+  return TOWER_LOADOUT_LIMIT;
+}
+
+/** Apply the campaign milestone formula after a level save is restored or a world is sealed. */
+export function syncTowerLoadoutLimitForCampaignProgress() {
+  TOWER_LOADOUT_LIMIT = getTowerLoadoutLimitForCampaignProgress();
+  setTowerLoadoutLimit(TOWER_LOADOUT_LIMIT);
   return TOWER_LOADOUT_LIMIT;
 }
 
