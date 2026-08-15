@@ -104,6 +104,7 @@ import {
 import {
   updateZetaTower as updateZetaTowerHelper,
   applyZetaDamage as applyZetaDamageHelper,
+  updateZetaOldTower as updateZetaOldTowerHelper,
 } from '../scripts/features/towers/zetaTower.js';
 import {
   updateT1Tower as updateT1TowerHelper,
@@ -1875,6 +1876,16 @@ export class SimplePlayfield {
     return TowerManager.ensureZetaState.call(this, tower);
   }
 
+  /** Initialize the preserved pendulum Zeta state. */
+  ensureZetaOldState(tower) {
+    return TowerManager.ensureZetaOldState.call(this, tower);
+  }
+
+  /** Remove preserved pendulum Zeta caches. */
+  teardownZetaOldTower(tower) {
+    return TowerManager.teardownZetaOldTower.call(this, tower);
+  }
+
   /**
    * Clear cached η orbital data when the tower is removed or retuned.
    */
@@ -3001,6 +3012,10 @@ export class SimplePlayfield {
             this.updateZetaTower(tower, speedDelta);
             return;
           }
+          if (tower.type === 'zeta-old') {
+            this.updateZetaOldTower(tower, speedDelta);
+            return;
+          }
           if (tower.type === 't1') {
             // Keep the polar tracer animating while combat is paused.
             this.updateT1Tower(tower, speedDelta);
@@ -3154,6 +3169,11 @@ export class SimplePlayfield {
    */
   updateZetaTower(tower, delta) {
     updateZetaTowerHelper(this, tower, delta);
+  }
+
+  /** Advance the preserved pendulum Zeta implementation. */
+  updateZetaOldTower(tower, delta) {
+    updateZetaOldTowerHelper(this, tower, delta);
   }
 
   /**

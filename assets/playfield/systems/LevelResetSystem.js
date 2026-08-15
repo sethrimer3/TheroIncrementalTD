@@ -177,8 +177,10 @@ export function updateTowerPositions() {
       this.ensureOmegaState(tower);
     }
     if (tower.type === 'zeta') {
-      // Keep ζ pendulum geometry aligned with the tower's new coordinates.
+      // Re-evaluate the fixed graph radius after canvas size changes.
       this.ensureZetaState(tower);
+    } else if (tower.type === 'zeta-old') {
+      this.ensureZetaOldState(tower);
     } else if (tower.type === 'xi') {
       // Initialize ξ chaining mechanics.
       this.ensureXiState(tower);
@@ -201,13 +203,13 @@ export function updateTowerPositions() {
   if (this.hoverPlacement) {
     this.hoverPlacement.position = this.getCanvasPosition(this.hoverPlacement.normalized);
     const definition = getTowerDefinition(this.hoverPlacement.towerType);
-    if (this.hoverPlacement.towerType === 'zeta') {
-      // Simulate ζ's metrics so the placement preview reflects pendulum reach.
+    if (this.hoverPlacement.towerType === 'zeta' || this.hoverPlacement.towerType === 'zeta-old') {
+      // Simulate the selected ζ version so its graph or pendulum reach previews accurately.
       const baseRangeFactor = definition ? definition.range : 0.3;
       const baseRange = Math.min(this.renderWidth, this.renderHeight) * baseRangeFactor;
       const previewTower = {
-        id: 'zeta-preview',
-        type: 'zeta',
+        id: `${this.hoverPlacement.towerType}-preview`,
+        type: this.hoverPlacement.towerType,
         definition: definition || null,
         normalized: { ...this.hoverPlacement.normalized },
         x: this.hoverPlacement.position.x,
@@ -217,7 +219,11 @@ export function updateTowerPositions() {
         baseDamage: 0,
         baseRate: 0,
       };
-      this.ensureZetaState(previewTower);
+      if (this.hoverPlacement.towerType === 'zeta-old') {
+        this.ensureZetaOldState(previewTower);
+      } else {
+        this.ensureZetaState(previewTower);
+      }
       this.hoverPlacement.range = Number.isFinite(previewTower.range)
         ? previewTower.range
         : baseRange;

@@ -25,6 +25,9 @@ import {
   evaluateZetaMetrics as evaluateZetaMetricsHelper,
   teardownZetaTower as teardownZetaTowerHelper,
   ensureZetaState as ensureZetaStateHelper,
+  evaluateZetaOldMetrics as evaluateZetaOldMetricsHelper,
+  teardownZetaOldTower as teardownZetaOldTowerHelper,
+  ensureZetaOldState as ensureZetaOldStateHelper,
 } from '../../../scripts/features/towers/zetaTower.js';
 import {
   teardownEtaTower as teardownEtaTowerHelper,
@@ -111,6 +114,10 @@ import {
 
 function evaluateZetaMetrics(tower) {
   return evaluateZetaMetricsHelper(this, tower);
+}
+
+function evaluateZetaOldMetrics(tower) {
+  return evaluateZetaOldMetricsHelper(this, tower);
 }
 
 function teardownAlphaTower(tower) {
@@ -288,11 +295,15 @@ function applyTowerBehaviorDefaults(tower) {
     this.teardownIotaTower(tower);
   }
   if (tower.type === 'zeta') {
-    // Activate ζ pendulum state so orbit physics stay ready for combat or idle motion.
+    // Keep both modern ζ graph tracers ready during combat and idle animation.
     this.ensureZetaState(tower);
   } else if (tower.zetaState) {
-    // Clean up ζ caches if the lattice retunes into another form.
     this.teardownZetaTower(tower);
+  }
+  if (tower.type === 'zeta-old') {
+    this.ensureZetaOldState(tower);
+  } else if (tower.zetaOldState) {
+    this.teardownZetaOldTower(tower);
   }
   if (tower.type === 'eta') {
     // Maintain η orbital state so rings stay synchronized while idle.
@@ -480,12 +491,21 @@ function ensureT2State(tower) {
   return ensureT2StateHelper(this, tower);
 }
 
+function ensureZetaOldState(tower) {
+  return ensureZetaOldStateHelper(this, tower);
+}
+
+function teardownZetaOldTower(tower) {
+  teardownZetaOldTowerHelper(this, tower);
+}
+
 function teardownT2Tower(tower) {
   teardownT2TowerHelper(this, tower);
 }
 
 export {
   evaluateZetaMetrics,
+  evaluateZetaOldMetrics,
   teardownAlphaTower,
   ensureAlphaState,
   spawnAlphaAttackBurst,
@@ -508,6 +528,8 @@ export {
   ensureMuState,
   teardownZetaTower,
   ensureZetaState,
+  teardownZetaOldTower,
+  ensureZetaOldState,
   teardownEtaTower,
   ensureEtaState,
   mergeEtaTower,

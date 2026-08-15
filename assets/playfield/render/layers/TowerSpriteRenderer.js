@@ -27,7 +27,10 @@ import {
   resolveZoomRasterScale,
 } from '../../utils/rendering.js';
 import { clampSafe as clamp } from '../../../../scripts/core/mathUtils.js';
-import { drawZetaPendulums as drawZetaPendulumsHelper } from '../../../../scripts/features/towers/zetaTower.js';
+import {
+  drawZetaGraphs as drawZetaGraphsHelper,
+  drawZetaOldPendulums as drawZetaOldPendulumsHelper,
+} from '../../../../scripts/features/towers/zetaTower.js';
 import { drawEtaOrbits as drawEtaOrbitsHelper } from '../../../../scripts/features/towers/etaTower.js';
 import { drawDeltaSoldiers as drawDeltaSoldiersHelper } from '../../../../scripts/features/towers/deltaTower.js';
 import { drawOmicronUnits as drawOmicronUnitsHelper } from '../../../../scripts/features/towers/omicronTower.js';
@@ -96,7 +99,8 @@ let cachedTowerRingSprites = null;
 // Replaces 13 sequential if-checks per tower per frame with a single property lookup.
 const TOWER_TYPE_HANDLERS = {
   theta: (renderer, tower) => drawThetaContoursHelper(renderer, tower),
-  zeta: (renderer, tower) => drawZetaPendulumsHelper(renderer, tower),
+  zeta: (renderer, tower) => drawZetaGraphsHelper(renderer, tower),
+  'zeta-old': (renderer, tower) => drawZetaOldPendulumsHelper(renderer, tower),
   eta: (renderer, tower) => drawEtaOrbitsHelper(renderer, tower),
   kappa: (renderer, tower) => drawKappaTripwiresHelper(renderer, tower),
   lambda: (renderer, tower) => drawLambdaLasersHelper(renderer, tower),
@@ -1059,7 +1063,7 @@ export function drawTowers() {
 // ─── Per-Tower-Type Extension Delegates ──────────────────────────────────────
 
 export function drawZetaPendulums(tower) {
-  drawZetaPendulumsHelper(this, tower);
+  drawZetaOldPendulumsHelper(this, tower);
 }
 
 export function drawEtaOrbits(tower) {

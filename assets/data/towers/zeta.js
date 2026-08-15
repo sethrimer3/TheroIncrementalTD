@@ -8,6 +8,7 @@ export const ZETA_TOWER = Object.freeze({
     rate: 1.3,
     range: 0.3,
     icon: 'assets/images/tower-zeta.svg',
+    description: 'Plots two freely configurable attack curves like a graphing calculator.',
     nextTierId: 'eta',
 });
 export default ZETA_TOWER;

@@ -183,6 +183,10 @@ async function applyGameplayConfigInternal(config = {}) {
       unlocked.add(towerId);
     }
   });
+  // The preserved pendulum card follows modern ζ discovery without creating a second progression purchase.
+  if (unlocked.has('zeta') && getTowerDefinition('zeta-old')) {
+    unlocked.add('zeta-old');
+  }
   unlockState.unlocked = unlocked;
   setMergingLogicUnlocked(unlocked.has('beta'));
   initializeDiscoveredVariablesFromUnlocks(unlocked);

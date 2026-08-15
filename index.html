@@ -1255,20 +1255,37 @@
             <article class="card" data-tower-id="zeta" hidden aria-hidden="true">
               <header class="tower-header">
                 <span class="tower-tier">Tier VI</span>
-                <h3>ζ zeta</h3>
+                <h3>ζ graphing calculator</h3>
               </header>
               <div class="formula-block">
-                <p class="formula-line">\( \zeta = \sqrt{\varepsilon} \)</p>
+                <p class="formula-line">\( r(\theta)=Rs|\sin(k\theta+\phi)| \)</p>
+                <p class="formula-line">\( (x(t),y(t))=R(a\sin(ft)+b\cos(ft),c\sin(gt+\delta)+d\cos(gt+\delta)) \)</p>
                 <ul class="formula-definition">
-                  <li>ε → needle storm potential moderated into harmonic splash</li>
+                  <li>Two large projectiles trace one polar and one parametric curve.</li>
+                  <li>Heads deal critical damage; fading graph trails deal base attack damage.</li>
                 </ul>
-                <p class="formula-line result">Roots ε into controlled harmonic cascades.</p>
+                <p class="formula-line result" id="zeta-formula-display">Polar: 3 petals · Parametric: x sin(3t), y sin(2t + 90°)</p>
+              </div>
+              <div class="zeta-graph-controls" aria-label="Free Zeta graph parameters">
+                <p class="zeta-controls-title">Free graph parameters</p>
+                <label>Polar petals <input type="range" min="1" max="8" step="1" value="3" data-zeta-param="polarPetals"><output>3</output></label>
+                <label>Polar scale <input type="range" min="0.2" max="1" step="0.05" value="0.9" data-zeta-param="polarScale"><output>0.9</output></label>
+                <label>Polar phase° <input type="range" min="0" max="360" step="15" value="0" data-zeta-param="polarPhase"><output>0</output></label>
+                <label>x frequency <input type="range" min="1" max="8" step="1" value="3" data-zeta-param="parametricXFrequency"><output>3</output></label>
+                <label>y frequency <input type="range" min="1" max="8" step="1" value="2" data-zeta-param="parametricYFrequency"><output>2</output></label>
+                <label>y phase° <input type="range" min="0" max="360" step="15" value="90" data-zeta-param="parametricPhase"><output>90</output></label>
+                <div class="zeta-coefficient-grid">
+                  <label>x sin <input type="number" min="-2" max="2" step="0.25" value="1" data-zeta-param="parametricSinX"></label>
+                  <label>x cos <input type="number" min="-2" max="2" step="0.25" value="0" data-zeta-param="parametricCosX"></label>
+                  <label>y sin <input type="number" min="-2" max="2" step="0.25" value="1" data-zeta-param="parametricSinY"></label>
+                  <label>y cos <input type="number" min="-2" max="2" step="0.25" value="0" data-zeta-param="parametricCosY"></label>
+                </div>
               </div>
               <ul class="upgrade-list">
-                <li>Focus ε residue into denser splash pools</li>
-                <li>Delay the release to stack ε charges before bursting</li>
+                <li>Upgrade Critical Multiplier, Attack, and Speed.</li>
+                <li>Path parameters are free and update every placed ζ tower immediately.</li>
               </ul>
-              <footer class="card-footer">Turns ε's swell into rolling resonance detonations.</footer>
+              <footer class="card-footer">Experiment with rose curves and Lissajous figures like a graphing calculator.</footer>
               <button class="tower-equip-button" type="button" data-tower-toggle="zeta">
                 Equip ζ
               </button>
@@ -1753,6 +1770,17 @@
               <button class="tower-equip-button" type="button" data-tower-toggle="t2">
                 Equip T₂
               </button>
+            </article>
+
+            <article class="card" data-tower-id="zeta-old" hidden aria-hidden="true">
+              <header class="tower-header"><span class="tower-tier">Legacy</span><h3>Zeta (OLD)</h3></header>
+              <div class="formula-block">
+                <p class="formula-line">\( \zeta_{old}=\text{Atk}\times\text{Crt}\times\text{Spd}\times\text{Rng}\times\text{Tot} \)</p>
+                <p class="formula-line result">The original cascading pendulum tower, preserved unchanged.</p>
+              </div>
+              <ul class="upgrade-list"><li>Orbiting pendulum heads deal critical impacts.</li><li>Range and Total Pendulums remain available on this legacy version.</li></ul>
+              <footer class="card-footer">The original Zeta pendulum design.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="zeta-old">Equip Zeta (OLD)</button>
             </article>
 
             <!-- Tease one undiscovered lattice without exposing its identity or mechanics. -->

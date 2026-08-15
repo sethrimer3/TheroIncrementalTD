@@ -23,6 +23,7 @@ import { createTowerVariableDiscoveryManager } from './towerVariableDiscovery.js
 import { createTowerLoadoutController } from './towerLoadoutController.js';
 import { getTowerVisualConfig } from './colorSchemeUtils.js';
 import { T2_FUNC_CONFIG } from '../scripts/features/towers/t2Tower.js';
+import { ZETA_GRAPH_CONFIG } from '../scripts/features/towers/zetaTower.js';
 import { CANONICAL_TOWER_IDS } from './data/towers/towerUnlockCost.js';
 
 // Callback to update status displays when glyphs change. Set via configureTowersTabCallbacks.
@@ -1162,6 +1163,9 @@ export function unlockTower(towerId, { silent = false } = {}) {
     return false;
   }
   towerTabState.unlockState.unlocked.add(towerId);
+  if (towerId === 'zeta' && towerTabState.towerDefinitionMap.has('zeta-old')) {
+    towerTabState.unlockState.unlocked.add('zeta-old');
+  }
   syncTowerLoadoutLimitFromUnlocks();
   discoverTowerVariables(towerId);
   if (typeof document !== 'undefined') {
@@ -2310,6 +2314,38 @@ export function initializeT2Toggles() {
 
   // Ensure initial button state matches the default config.
   refreshT2ToggleButtons();
+  initializeZetaGraphControls();
+}
+
+/** Wire free graphing-calculator controls to every live modern ζ tower. */
+function initializeZetaGraphControls() {
+  const controls = document.querySelectorAll('[data-zeta-param]');
+  const phaseKeys = new Set(['polarPhase', 'parametricPhase']);
+  const refreshFormula = () => {
+    const display = document.getElementById('zeta-formula-display');
+    if (!display) return;
+    const phaseDegrees = Math.round(ZETA_GRAPH_CONFIG.parametricPhase * 180 / Math.PI);
+    display.textContent = `Polar: ${ZETA_GRAPH_CONFIG.polarPetals} petals · Parametric: x(${ZETA_GRAPH_CONFIG.parametricSinX} sin ${ZETA_GRAPH_CONFIG.parametricXFrequency}t + ${ZETA_GRAPH_CONFIG.parametricCosX} cos ${ZETA_GRAPH_CONFIG.parametricXFrequency}t), y(${ZETA_GRAPH_CONFIG.parametricSinY} sin(${ZETA_GRAPH_CONFIG.parametricYFrequency}t + ${phaseDegrees}°) + ${ZETA_GRAPH_CONFIG.parametricCosY} cos(${ZETA_GRAPH_CONFIG.parametricYFrequency}t + ${phaseDegrees}°))`;
+  };
+  controls.forEach((control) => {
+    const key = control.dataset.zetaParam;
+    if (!(key in ZETA_GRAPH_CONFIG)) return;
+    control.addEventListener('input', () => {
+      const numeric = Number(control.value);
+      if (!Number.isFinite(numeric)) return;
+      ZETA_GRAPH_CONFIG[key] = phaseKeys.has(key) ? numeric * Math.PI / 180 : numeric;
+      const output = control.parentElement?.querySelector('output');
+      if (output) output.value = control.value;
+      towerTabState.playfield?.towers?.forEach((tower) => {
+        if (tower?.type === 'zeta' && tower.zetaState) {
+          tower.zetaState.polar.trail.length = 0;
+          tower.zetaState.parametric.trail.length = 0;
+        }
+      });
+      refreshFormula();
+    });
+  });
+  refreshFormula();
 }
 
 // Initialize blueprint context with helper functions so tower blueprints can access them
