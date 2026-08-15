@@ -41,6 +41,7 @@ export function spawnSupplyProjectile(sourceTower, targetTower, options = {}) {
     speed: Number.isFinite(options.speed) ? options.speed : 260,
     progress: 0,
     payload,
+    trailStyle: PROJECTILE_TRAIL_STYLES.supply,
   };
   projectile.seeds = this.createSupplySeeds(sourcePosition, targetPosition, payload);
   if (payload.type === 'beta') {
@@ -79,6 +80,7 @@ export function spawnBetaTriangleProjectile(tower, enemy, effectPosition, resolv
     triangleOrientation: Number.isFinite(triangleOrientation)
       ? Math.sign(triangleOrientation) || 1
       : 1,
+    trailStyle: PROJECTILE_TRAIL_STYLES.beta,
   });
 }
 
@@ -145,6 +147,7 @@ export function spawnGammaStarProjectile(tower, enemy, effectPosition, resolvedD
     hitEnemies: new Set(), // Track all enemies hit for piercing
     enemyBursts: new Map(), // Track star burst state for each enemy hit
     maxLifetime,
+    trailStyle: PROJECTILE_TRAIL_STYLES.gamma,
   });
 }
 

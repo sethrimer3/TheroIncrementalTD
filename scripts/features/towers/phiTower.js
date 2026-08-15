@@ -20,6 +20,11 @@
  */
 
 import { samplePaletteGradient } from '../../../assets/colorSchemeUtils.js';
+import {
+  PROJECTILE_TRAIL_STYLES,
+  drawProjectileTrail,
+  recordProjectileTrail,
+} from './shared/ProjectileTrails.js';
 
 // Golden ratio and related constants
 const PHI = 1.61803398875;
@@ -96,6 +101,7 @@ function createSeed(rowIndex, theta0, ringRadius) {
     
     // Stateful flight variables
     inFlight: false,
+    trailStyle: PROJECTILE_TRAIL_STYLES.phi,
     flightTime: 0.0,
     remainingPierce: SEED_MAX_PIERCE,
     
@@ -259,6 +265,7 @@ function updateSeedFlight(playfield, tower, seed, delta) {
   
   seed.x = tower.x + radius * Math.cos(angle);
   seed.y = tower.y + radius * Math.sin(angle);
+  recordProjectileTrail(seed, seed.x, seed.y, seed.trailStyle);
   
   // Collision detection
   if (seed.remainingPierce > 0) {
@@ -404,6 +411,10 @@ export function drawPhiTower(playfield, tower) {
     for (const seed of row.seeds) {
       const alpha = seed.inFlight ? 0.9 : 0.7;
       const radius = seed.inFlight ? SEED_VISUAL_RADIUS * 1.2 : SEED_VISUAL_RADIUS;
+
+      if (seed.inFlight) {
+        drawProjectileTrail(ctx, seed, seed.color, seed.trailStyle);
+      }
       
       // Outer glow for in-flight seeds
       if (seed.inFlight && seed.flightTime >= T_OUT && seed.flightTime < T_OUT + T_SPIN) {

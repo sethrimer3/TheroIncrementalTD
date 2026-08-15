@@ -144,6 +144,7 @@ function updateProjectiles(delta) {
           x: projectile.source.x + (projectile.target.x - projectile.source.x) * clamped,
           y: projectile.source.y + (projectile.target.y - projectile.source.y) * clamped,
         };
+        recordProjectileTrail(projectile, projectile.currentPosition.x, projectile.currentPosition.y, projectile.trailStyle);
         this.updateSupplySeeds(projectile);
       }
       if (projectile.progress >= 1) {
@@ -220,6 +221,7 @@ function updateProjectiles(delta) {
     }
 
     if (projectile.patternType === 'gammaStar') {
+      recordProjectileTrail(projectile, projectile.position?.x, projectile.position?.y, projectile.trailStyle);
       const tower = this.getTowerById(projectile.towerId);
       if (!tower) {
         this.projectiles.splice(index, 1);
@@ -318,6 +320,7 @@ function updateProjectiles(delta) {
     }
 
     if (projectile.patternType === 'betaTriangle') {
+      recordProjectileTrail(projectile, projectile.position?.x, projectile.position?.y, projectile.trailStyle);
       const tower = this.getTowerById(projectile.towerId);
       if (!tower) {
         this.projectiles.splice(index, 1);
@@ -494,6 +497,7 @@ function updateProjectiles(delta) {
     }
 
     if (projectile.patternType === 'epsilonNeedle') {
+      recordProjectileTrail(projectile, projectile.position?.x, projectile.position?.y, projectile.trailStyle);
       // Extend the lifetime window when a needle embeds itself in a target.
       const recordedLifetime = Number.isFinite(projectile.maxLifetime) ? projectile.maxLifetime : 3.5;
       let allowedLifetime = recordedLifetime;
@@ -666,6 +670,8 @@ function updateProjectiles(delta) {
       const source = projectile.source || { x: 0, y: 0 };
       const currentX = source.x + (position.x - source.x) * progress;
       const currentY = source.y + (position.y - source.y) * progress;
+      projectile.currentPosition = { x: currentX, y: currentY };
+      recordProjectileTrail(projectile, currentX, currentY, projectile.trailStyle);
       // Check distance from projectile's interpolated position to enemy's current position
       const separation = Math.hypot(currentX - position.x, currentY - position.y);
 

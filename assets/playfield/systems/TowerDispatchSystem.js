@@ -14,6 +14,7 @@ import {
 import {
   resolveSigmaShotDamage as resolveSigmaShotDamageHelper,
 } from '../../../scripts/features/towers/sigmaTower.js';
+import { PROJECTILE_TRAIL_STYLES } from '../../../scripts/features/towers/shared/ProjectileTrails.js';
 
 /**
  * Main tower update loop — ticks cooldowns and dispatches per-type update handlers
@@ -360,6 +361,7 @@ export function emitTowerAttackVisuals(tower, targetInfo = {}) {
       damage: hasPendingHit ? resolvedDamage : 0,
       towerId: tower.id,
       hitRadius: this.getStandardShotHitRadius(),
+      trailStyle: PROJECTILE_TRAIL_STYLES.standard,
     });
   }
   if ((tower.type === 'beta' || tower.type === 'gamma' || tower.type === 'nu')) {

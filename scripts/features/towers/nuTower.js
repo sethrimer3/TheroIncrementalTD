@@ -32,6 +32,11 @@ import {
 import { canvasFractionToMeters, metersToPixels } from '../../../assets/gameUnits.js';
 import { samplePaletteGradient } from '../../../assets/colorSchemeUtils.js';
 import { distancePointToSegmentSquared } from './shared/TowerUtils.js';
+import {
+  PROJECTILE_TRAIL_STYLES,
+  drawProjectileTrail,
+  recordProjectileTrail,
+} from './shared/ProjectileTrails.js';
 
 // Constants
 const BASE_RANGE_METERS = 3;
@@ -86,6 +91,7 @@ const NU_PARTICLE_CONFIG = {
   idPrefix: 'nu',
   colors: NU_PARTICLE_COLORS,
   colorResolver: null, // Set dynamically based on kill count
+  trailStyle: PROJECTILE_TRAIL_STYLES.nu,
   behavior: 'pierceLaser',
   particleCountRange: { min: 5, max: 10 },
   dashDelayRange: 0.02,
@@ -261,6 +267,7 @@ export function spawnNuKillParticle(playfield, tower, position) {
     lifetime: 0,
     maxLifetime: 0.5, // Takes 0.5 seconds to reach tower
     absorbed: false,
+    trailStyle: PROJECTILE_TRAIL_STYLES.nu,
   };
   
   state.killParticles.push(particle);
@@ -283,6 +290,11 @@ function updateKillParticles(playfield, tower, state, delta) {
     }
     
     particle.lifetime += delta;
+    const progress = Math.min(1, particle.lifetime / particle.maxLifetime);
+    const easedProgress = 1 - Math.pow(1 - progress, 2);
+    particle.currentX = particle.x + (particle.targetX - particle.x) * easedProgress;
+    particle.currentY = particle.y + (particle.targetY - particle.y) * easedProgress;
+    recordProjectileTrail(particle, particle.currentX, particle.currentY, particle.trailStyle);
     
     // Check if particle reached tower
     if (particle.lifetime >= particle.maxLifetime) {
@@ -418,11 +430,18 @@ export function drawNuKillParticles(playfield, tower) {
     const progress = particle.lifetime / particle.maxLifetime;
     const easedProgress = 1 - Math.pow(1 - progress, 2); // Ease-in quadratic
     
-    const x = particle.x + (particle.targetX - particle.x) * easedProgress;
-    const y = particle.y + (particle.targetY - particle.y) * easedProgress;
+    const x = Number.isFinite(particle.currentX)
+      ? particle.currentX
+      : particle.x + (particle.targetX - particle.x) * easedProgress;
+    const y = Number.isFinite(particle.currentY)
+      ? particle.currentY
+      : particle.y + (particle.targetY - particle.y) * easedProgress;
     
     const alpha = 1 - progress * 0.3; // Slight fade as it approaches
     const size = 4 + progress * 2; // Grows slightly as it approaches
+
+    // Render the shared tapered ribbon before the returning kill mote.
+    drawProjectileTrail(ctx, particle, resolveNuParticleColors(state.kills)[0], particle.trailStyle);
     
     // Get current color based on kill count
     const colors = resolveNuParticleColors(state.kills);

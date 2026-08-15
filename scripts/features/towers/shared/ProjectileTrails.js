@@ -3,12 +3,19 @@ import { clamp, normalizeParticleColor } from './TowerUtils.js';
 // Central trail tuning table. Adjust these presets to change every supported
 // projectile/exhaust family without editing its movement or renderer code.
 export const PROJECTILE_TRAIL_STYLES = Object.freeze({
-  alpha: Object.freeze({ length: 8, width: 5.5, sampleDistance: 5, outerAlpha: 0.12, innerAlpha: 0.3, coreAlpha: 0.7 }),
-  beta: Object.freeze({ length: 8, width: 5.5, sampleDistance: 5, outerAlpha: 0.11, innerAlpha: 0.28, coreAlpha: 0.68 }),
-  gamma: Object.freeze({ length: 9, width: 4.8, sampleDistance: 5, outerAlpha: 0.12, innerAlpha: 0.3, coreAlpha: 0.72 }),
-  deltaShip: Object.freeze({ length: 10, width: 8, sampleDistance: 4, outerAlpha: 0.1, innerAlpha: 0.24, coreAlpha: 0.52 }),
-  omegaWave: Object.freeze({ length: 9, width: 4.2, sampleDistance: 3, outerAlpha: 0.12, innerAlpha: 0.32, coreAlpha: 0.76 }),
-  omegaParticle: Object.freeze({ length: 10, width: 5, sampleDistance: 3, outerAlpha: 0.1, innerAlpha: 0.3, coreAlpha: 0.72 }),
+  // Trail layer opacity is intentionally half-strength so projectile heads remain legible.
+  alpha: Object.freeze({ length: 8, width: 5.5, sampleDistance: 5, outerAlpha: 0.06, innerAlpha: 0.15, coreAlpha: 0.35 }),
+  beta: Object.freeze({ length: 8, width: 5.5, sampleDistance: 5, outerAlpha: 0.055, innerAlpha: 0.14, coreAlpha: 0.34 }),
+  gamma: Object.freeze({ length: 9, width: 4.8, sampleDistance: 5, outerAlpha: 0.06, innerAlpha: 0.15, coreAlpha: 0.36 }),
+  deltaShip: Object.freeze({ length: 10, width: 8, sampleDistance: 4, outerAlpha: 0.05, innerAlpha: 0.12, coreAlpha: 0.26 }),
+  omegaWave: Object.freeze({ length: 9, width: 4.2, sampleDistance: 3, outerAlpha: 0.06, innerAlpha: 0.16, coreAlpha: 0.38 }),
+  omegaParticle: Object.freeze({ length: 10, width: 5, sampleDistance: 3, outerAlpha: 0.05, innerAlpha: 0.15, coreAlpha: 0.36 }),
+  epsilon: Object.freeze({ length: 9, width: 3.4, sampleDistance: 4, outerAlpha: 0.05, innerAlpha: 0.13, coreAlpha: 0.34 }),
+  nu: Object.freeze({ length: 9, width: 4.8, sampleDistance: 4, outerAlpha: 0.055, innerAlpha: 0.14, coreAlpha: 0.35 }),
+  tau: Object.freeze({ length: 10, width: 5.5, sampleDistance: 4, outerAlpha: 0.05, innerAlpha: 0.14, coreAlpha: 0.36 }),
+  phi: Object.freeze({ length: 9, width: 4.2, sampleDistance: 4, outerAlpha: 0.05, innerAlpha: 0.13, coreAlpha: 0.34 }),
+  supply: Object.freeze({ length: 8, width: 3.6, sampleDistance: 4, outerAlpha: 0.045, innerAlpha: 0.12, coreAlpha: 0.3 }),
+  standard: Object.freeze({ length: 8, width: 3.8, sampleDistance: 5, outerAlpha: 0.045, innerAlpha: 0.12, coreAlpha: 0.3 }),
 });
 
 // Lazily allocate a bounded pair of typed coordinate buffers on the moving owner.
