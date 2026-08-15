@@ -610,6 +610,17 @@ export function createTowerUpgradeOverlayController({
     const currencyMeta = getCurrencyMeta(currencyKey);
     const availableGlyphs = getAvailableCurrency(currencyKey);
 
+    // Compact rows place the refund, allocation, and spend values directly above their controls.
+    const buildCompactControlColumn = (amount, element, modifier) => {
+      const column = document.createElement('span');
+      column.className = `tower-upgrade-variable-glyph-column tower-upgrade-variable-glyph-column--${modifier}`;
+      const amountLabel = document.createElement('span');
+      amountLabel.className = 'tower-upgrade-variable-glyph-amount';
+      amountLabel.textContent = formatWholeNumber(amount);
+      column.append(amountLabel, element);
+      return column;
+    };
+
     const decrement = document.createElement('button');
     decrement.type = 'button';
     decrement.className = 'tower-upgrade-variable-glyph-button tower-upgrade-variable-glyph-button--decrease';
@@ -617,12 +628,23 @@ export function createTowerUpgradeOverlayController({
     decrement.disabled = level <= 0;
     decrement.setAttribute('aria-label', `Withdraw glyphs from ${variable.symbol || variable.key}`);
     decrement.addEventListener('click', () => handleTowerVariableDowngrade(towerId, variable.key));
-    glyphControl.append(decrement);
+    const refund = level > 0
+      ? Math.max(1, calculateTowerVariableUpgradeCost(variable, level - 1))
+      : 0;
+    if (asAttachment) {
+      glyphControl.append(buildCompactControlColumn(refund, decrement, 'refund'));
+    } else {
+      glyphControl.append(decrement);
+    }
 
     const glyphCount = document.createElement('span');
     glyphCount.className = 'tower-upgrade-variable-glyph-count';
-    glyphCount.textContent = `${level} ${getVariableGlyphLabel(variable)}`;
-    glyphControl.append(glyphCount);
+    glyphCount.textContent = asAttachment ? getVariableGlyphLabel(variable) : `${level} ${getVariableGlyphLabel(variable)}`;
+    if (asAttachment) {
+      glyphControl.append(buildCompactControlColumn(level, glyphCount, 'allocated'));
+    } else {
+      glyphControl.append(glyphCount);
+    }
 
     const increment = document.createElement('button');
     increment.type = 'button';
@@ -632,18 +654,21 @@ export function createTowerUpgradeOverlayController({
     increment.disabled = availableGlyphs < cost || reachedMax;
     increment.setAttribute('aria-label', `Invest glyph into ${variable.symbol || variable.key}`);
     increment.addEventListener('click', () => handleTowerVariableUpgrade(towerId, variable.key));
-    glyphControl.append(increment);
+    if (asAttachment) {
+      glyphControl.append(buildCompactControlColumn(cost, increment, 'spend'));
+    } else {
+      glyphControl.append(increment);
+    }
 
     controls.append(glyphControl);
 
-    const costNote = document.createElement('span');
-    costNote.className = 'tower-upgrade-variable-cost';
-    const costLabel = cost === 1 ? currencyMeta.singular : currencyMeta.plural;
-    // Compact attachment rows use the shared tower-glyph symbol to keep the cost legible on mobile.
-    costNote.textContent = asAttachment
-      ? `COST: ${cost} ${currencyMeta.symbol}`
-      : `COST: ${cost} ${costLabel.toUpperCase()}`;
-    controls.append(costNote);
+    if (!asAttachment) {
+      const costNote = document.createElement('span');
+      costNote.className = 'tower-upgrade-variable-cost';
+      const costLabel = cost === 1 ? currencyMeta.singular : currencyMeta.plural;
+      costNote.textContent = `COST: ${cost} ${costLabel.toUpperCase()}`;
+      controls.append(costNote);
+    }
 
     if (maxLevel !== null) {
       const maxNote = document.createElement('span');
