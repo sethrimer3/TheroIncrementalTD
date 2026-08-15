@@ -35,6 +35,7 @@ import REGRESSION_TOWER from './regression.js';
 import DENSITY_COLLAPSE_TOWER from './density-collapse.js';
 import ORBITAL_COLLAPSE_TOWER from './orbital-collapse.js';
 import POLYNOMIAL_ENGINE_TOWER from './polynomial-engine.js';
+import ZETA_OLD_TOWER from './zeta-old.js';
 
 export type { TowerDefinition } from './types.js';
 
@@ -72,6 +73,7 @@ export {
   DENSITY_COLLAPSE_TOWER as densityCollapseTower,
   ORBITAL_COLLAPSE_TOWER as orbitalCollapseTower,
   POLYNOMIAL_ENGINE_TOWER as polynomialEngineTower,
+  ZETA_OLD_TOWER as zetaOldTower,
 };
 
 export const towers = [
@@ -113,6 +115,8 @@ export const towers = [
   DENSITY_COLLAPSE_TOWER,
   ORBITAL_COLLAPSE_TOWER,
   POLYNOMIAL_ENGINE_TOWER,
+  // Preserve the retired pendulum implementation as the final selectable card.
+  ZETA_OLD_TOWER,
 ] as const satisfies readonly TowerDefinition[];
 
 /** Union of every tower id currently registered, derived from the registry itself. */

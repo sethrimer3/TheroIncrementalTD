@@ -28,8 +28,8 @@ function computePendulumPalette(count) {
  * dynamic-context logic. This keeps battlefield stats in sync with the
  * upgrade overlay without duplicating the underlying formulas.
  */
-export function evaluateZetaMetrics(playfield, tower) {
-  if (!playfield || !tower || tower.type !== 'zeta') {
+export function evaluateZetaOldMetrics(playfield, tower) {
+  if (!playfield || !tower || tower.type !== 'zeta-old') {
     return null;
   }
 
@@ -72,40 +72,40 @@ export function evaluateZetaMetrics(playfield, tower) {
   });
 
   return withTowerDynamicContext(context, () => ({
-    attack: computeTowerVariableValue('zeta', 'atk'),
-    critical: computeTowerVariableValue('zeta', 'crt'),
-    speed: computeTowerVariableValue('zeta', 'spd'),
-    range: computeTowerVariableValue('zeta', 'rng'),
-    total: computeTowerVariableValue('zeta', 'tot'),
+    attack: computeTowerVariableValue('zeta-old', 'atk'),
+    critical: computeTowerVariableValue('zeta-old', 'crt'),
+    speed: computeTowerVariableValue('zeta-old', 'spd'),
+    range: computeTowerVariableValue('zeta-old', 'rng'),
+    total: computeTowerVariableValue('zeta-old', 'tot'),
   }));
 }
 
 /**
  * Clear cached ζ pendulum data when the tower is removed or retuned.
  */
-export function teardownZetaTower(playfield, tower) {
-  if (!playfield || !tower || !tower.zetaState) {
+export function teardownZetaOldTower(playfield, tower) {
+  if (!playfield || !tower || !tower.zetaOldState) {
     return;
   }
-  if (Array.isArray(tower.zetaState.pendulums)) {
-    tower.zetaState.pendulums.forEach((pendulum) => {
+  if (Array.isArray(tower.zetaOldState.pendulums)) {
+    tower.zetaOldState.pendulums.forEach((pendulum) => {
       if (pendulum?.trail) {
         pendulum.trail.length = 0;
       }
     });
   }
-  tower.zetaState = null;
+  tower.zetaOldState = null;
 }
 
 /**
  * Ensure ζ towers maintain their double-pendulum state and derived stats.
  */
-export function ensureZetaState(playfield, tower) {
-  if (!playfield || !tower || tower.type !== 'zeta') {
+export function ensureZetaOldState(playfield, tower) {
+  if (!playfield || !tower || tower.type !== 'zeta-old') {
     return null;
   }
 
-  const metrics = evaluateZetaMetrics(playfield, tower);
+  const metrics = evaluateZetaOldMetrics(playfield, tower);
   if (!metrics) {
     return null;
   }
@@ -129,10 +129,10 @@ export function ensureZetaState(playfield, tower) {
   tower.range = detectionRadius;
   tower.baseRange = detectionRadius;
 
-  let state = tower.zetaState;
+  let state = tower.zetaOldState;
   if (!state) {
     state = { pendulums: [], elapsed: 0 };
-    tower.zetaState = state;
+    tower.zetaOldState = state;
   }
 
   state.attack = attackValue;
@@ -221,11 +221,11 @@ export function applyZetaDamage(playfield, enemy, damage) {
 /**
  * Advance ζ pendulum physics, maintain trail history, and apply collision damage.
  */
-export function updateZetaTower(playfield, tower, delta) {
+export function updateZetaOldTower(playfield, tower, delta) {
   if (!playfield) {
     return;
   }
-  const state = ensureZetaState(playfield, tower);
+  const state = ensureZetaOldState(playfield, tower);
   if (!state) {
     return;
   }
@@ -339,11 +339,11 @@ export function updateZetaTower(playfield, tower, delta) {
 /**
  * Render ζ pendulum arms and trails so the battlefield reflects their orbit.
  */
-export function drawZetaPendulums(playfield, tower) {
-  if (!playfield?.ctx || !tower?.zetaState) {
+export function drawZetaOldPendulums(playfield, tower) {
+  if (!playfield?.ctx || !tower?.zetaOldState) {
     return;
   }
-  const state = tower.zetaState;
+  const state = tower.zetaOldState;
   const pendulums = Array.isArray(state.pendulums) ? state.pendulums : [];
   if (!pendulums.length) {
     return;
@@ -439,4 +439,218 @@ function resolvePendulumRgb(color) {
   }
   const fallback = samplePaletteGradient(0);
   return `${fallback.r}, ${fallback.g}, ${fallback.b}`;
+}
+
+// Free graph controls are shared by every ζ graph tower so card changes update the battlefield immediately.
+export const ZETA_GRAPH_CONFIG = {
+  polarPetals: 3,
+  polarScale: 0.9,
+  polarPhase: 0,
+  parametricXFrequency: 3,
+  parametricYFrequency: 2,
+  parametricPhase: Math.PI / 2,
+  parametricSinX: 1,
+  parametricCosX: 0,
+  parametricSinY: 1,
+  parametricCosY: 0,
+};
+
+const ZETA_GRAPH_RADIUS_METERS = 8;
+const ZETA_GRAPH_TRAIL_SECONDS = 2.75;
+const ZETA_GRAPH_MAX_POINTS = 110;
+const ZETA_GRAPH_HEAD_RADIUS = 15;
+const ZETA_GRAPH_TRAIL_WIDTH = 9;
+
+/** Evaluate the three retained ζ combat stats while respecting the live tower context. */
+export function evaluateZetaMetrics(playfield, tower) {
+  if (!playfield || !tower || tower.type !== 'zeta') {
+    return null;
+  }
+  const contextEntries = playfield.towers.filter(Boolean).map((entry) => ({
+    id: entry.id,
+    type: entry.type,
+    x: entry.x,
+    y: entry.y,
+    range: Number.isFinite(entry.range) ? entry.range : 0,
+    connections: entry.linkTargetId ? [entry.linkTargetId] : [],
+    sources: entry.linkSources instanceof Set ? Array.from(entry.linkSources) : [],
+  }));
+  const context = buildTowerDynamicContext({
+    contextTowerId: tower.id,
+    contextTower: contextEntries.find((entry) => entry.id === tower.id) || null,
+    contextTowers: contextEntries,
+  });
+  return withTowerDynamicContext(context, () => ({
+    attack: computeTowerVariableValue('zeta', 'atk'),
+    critical: computeTowerVariableValue('zeta', 'crt'),
+    speed: computeTowerVariableValue('zeta', 'spd'),
+  }));
+}
+
+/** Convert the configurable polar rose into a Cartesian graph offset. */
+export function evaluateZetaPolarPoint(theta, radius, config = ZETA_GRAPH_CONFIG) {
+  const petals = Math.max(1, Math.round(Number(config.polarPetals) || 1));
+  const scale = Math.max(0.2, Math.min(1, Number(config.polarScale) || 0.9));
+  const phase = Number.isFinite(config.polarPhase) ? config.polarPhase : 0;
+  const r = radius * scale * Math.abs(Math.sin(petals * theta + phase));
+  return { x: r * Math.cos(theta), y: r * Math.sin(theta) };
+}
+
+/**
+ * Evaluate a bounded Lissajous-style parametric graph.
+ * x(t)=R[a sin(ft)+b cos(ft)] and y(t)=R[c sin(gt+φ)+d cos(gt+φ)].
+ */
+export function evaluateZetaParametricPoint(t, radius, config = ZETA_GRAPH_CONFIG) {
+  const fx = Math.max(1, Math.min(8, Math.round(Number(config.parametricXFrequency) || 1)));
+  const fy = Math.max(1, Math.min(8, Math.round(Number(config.parametricYFrequency) || 1)));
+  const phase = Number.isFinite(config.parametricPhase) ? config.parametricPhase : 0;
+  const sinX = Number(config.parametricSinX) || 0;
+  const cosX = Number(config.parametricCosX) || 0;
+  const sinY = Number(config.parametricSinY) || 0;
+  const cosY = Number(config.parametricCosY) || 0;
+  const normalization = Math.max(1, Math.abs(sinX) + Math.abs(cosX), Math.abs(sinY) + Math.abs(cosY));
+  return {
+    x: radius * (sinX * Math.sin(fx * t) + cosX * Math.cos(fx * t)) / normalization,
+    y: radius * (sinY * Math.sin(fy * t + phase) + cosY * Math.cos(fy * t + phase)) / normalization,
+  };
+}
+
+function createGraphTracer(color) {
+  return { headX: 0, headY: 0, trail: [], hitMap: new Map(), color };
+}
+
+/** Create or refresh the dual-projectile graph state for the modern ζ tower. */
+export function ensureZetaState(playfield, tower) {
+  if (!playfield || !tower || tower.type !== 'zeta') {
+    return null;
+  }
+  const metrics = evaluateZetaMetrics(playfield, tower);
+  if (!metrics) {
+    return null;
+  }
+  const minDimension = Math.min(playfield.renderWidth || 0, playfield.renderHeight || 0) || 1;
+  const radius = Math.max(24, minDimension * (ZETA_GRAPH_RADIUS_METERS / 30));
+  let state = tower.zetaState;
+  if (!state) {
+    state = {
+      parameter: 0,
+      polar: createGraphTracer(samplePaletteGradient(0.25)),
+      parametric: createGraphTracer(samplePaletteGradient(0.75)),
+    };
+    tower.zetaState = state;
+  }
+  const critical = Math.max(1, Number(metrics.critical) || 1);
+  const attack = Math.max(0, Number(metrics.attack) || 0);
+  state.radius = radius;
+  state.speed = Math.max(0.05, Number(metrics.speed) || 0.25);
+  state.baseDamage = attack / critical;
+  state.criticalDamage = attack;
+  tower.damage = state.baseDamage;
+  tower.baseDamage = state.baseDamage;
+  tower.rate = state.speed;
+  tower.baseRate = state.speed;
+  tower.range = radius;
+  tower.baseRange = radius;
+  return state;
+}
+
+/** Clear both graph histories when ζ is removed or its parameters are reset. */
+export function teardownZetaTower(_playfield, tower) {
+  if (!tower?.zetaState) {
+    return;
+  }
+  tower.zetaState.polar?.trail?.splice(0);
+  tower.zetaState.parametric?.trail?.splice(0);
+  tower.zetaState = null;
+}
+
+function updateGraphTracer(playfield, tower, tracer, offset, step, damage, criticalDamage) {
+  tracer.headX = tower.x + offset.x;
+  tracer.headY = tower.y + offset.y;
+  const last = tracer.trail[tracer.trail.length - 1];
+  if (!last || Math.hypot(tracer.headX - last.x, tracer.headY - last.y) >= 2) {
+    tracer.trail.push({ x: tracer.headX, y: tracer.headY, age: 0 });
+  }
+  tracer.trail.forEach((point) => { point.age += step; });
+  while (tracer.trail.length > ZETA_GRAPH_MAX_POINTS || tracer.trail[0]?.age > ZETA_GRAPH_TRAIL_SECONDS) {
+    tracer.trail.shift();
+  }
+  if (!playfield.combatActive || !Array.isArray(playfield.enemies)) {
+    return;
+  }
+  playfield.enemies.forEach((enemy) => {
+    if (!enemy || enemy.hp <= 0) return;
+    const position = playfield.getEnemyPosition(enemy);
+    if (!position) return;
+    const contact = tracer.hitMap.get(enemy.id) || { head: false, trail: false };
+    const onHead = Math.hypot(position.x - tracer.headX, position.y - tracer.headY) <= ZETA_GRAPH_HEAD_RADIUS;
+    if (onHead && !contact.head) playfield.applyDamageToEnemy(enemy, criticalDamage, { sourceTower: tower });
+    contact.head = onHead;
+    let onTrail = false;
+    for (let index = tracer.trail.length - 1, checked = 0; index > 0 && checked < 60; index -= 1, checked += 1) {
+      if (playfield.distancePointToSegment(position, tracer.trail[index - 1], tracer.trail[index]) <= ZETA_GRAPH_TRAIL_WIDTH / 2) {
+        onTrail = true;
+        break;
+      }
+    }
+    if (onTrail && !contact.trail) playfield.applyDamageToEnemy(enemy, damage, { sourceTower: tower });
+    contact.trail = onTrail;
+    tracer.hitMap.set(enemy.id, contact);
+  });
+}
+
+/** Advance both large ζ graph projectiles along their player-authored curves. */
+export function updateZetaTower(playfield, tower, delta) {
+  const state = ensureZetaState(playfield, tower);
+  if (!state) return;
+  const step = Math.max(0, Number.isFinite(delta) ? delta : 0);
+  state.parameter = (state.parameter + step * state.speed * Math.PI * 2) % (Math.PI * 2);
+  updateGraphTracer(playfield, tower, state.polar, evaluateZetaPolarPoint(state.parameter, state.radius), step, state.baseDamage, state.criticalDamage);
+  updateGraphTracer(playfield, tower, state.parametric, evaluateZetaParametricPoint(state.parameter, state.radius), step, state.baseDamage, state.criticalDamage);
+}
+
+function drawGraphTracer(playfield, tracer) {
+  const ctx = playfield.ctx;
+  const rgb = resolvePendulumRgb(tracer.color);
+  ctx.lineCap = 'round';
+  for (let index = 1; index < tracer.trail.length; index += 1) {
+    const point = tracer.trail[index];
+    const previous = tracer.trail[index - 1];
+    const alpha = Math.max(0, 1 - point.age / ZETA_GRAPH_TRAIL_SECONDS);
+    ctx.strokeStyle = `rgba(${rgb}, ${alpha * 0.42})`;
+    ctx.lineWidth = ZETA_GRAPH_TRAIL_WIDTH;
+    ctx.beginPath();
+    ctx.moveTo(previous.x, previous.y);
+    ctx.lineTo(point.x, point.y);
+    ctx.stroke();
+  }
+  const gradient = ctx.createRadialGradient(tracer.headX, tracer.headY, 1, tracer.headX, tracer.headY, ZETA_GRAPH_HEAD_RADIUS);
+  gradient.addColorStop(0, `rgba(${rgb}, 1)`);
+  gradient.addColorStop(0.5, `rgba(${rgb}, 0.65)`);
+  gradient.addColorStop(1, `rgba(${rgb}, 0)`);
+  ctx.fillStyle = gradient;
+  ctx.beginPath();
+  ctx.arc(tracer.headX, tracer.headY, ZETA_GRAPH_HEAD_RADIUS, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+/** Draw the polar trail plus dotted sine/cosine component guides for the parametric tracer. */
+export function drawZetaGraphs(playfield, tower) {
+  if (!playfield?.ctx || !tower?.zetaState) return;
+  const { ctx } = playfield;
+  const { polar, parametric } = tower.zetaState;
+  ctx.save();
+  ctx.setLineDash([3, 5]);
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = `rgba(${resolvePendulumRgb(parametric.color)}, 0.48)`;
+  ctx.beginPath();
+  ctx.moveTo(tower.x, parametric.headY);
+  ctx.lineTo(parametric.headX, parametric.headY);
+  ctx.moveTo(parametric.headX, tower.y);
+  ctx.lineTo(parametric.headX, parametric.headY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  drawGraphTracer(playfield, polar);
+  drawGraphTracer(playfield, parametric);
+  ctx.restore();
 }

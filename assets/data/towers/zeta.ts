@@ -1,5 +1,5 @@
 /**
- * Zeta Tower definition extracted from the gameplay configuration.
+ * Zeta graphing tower definition: one polar and one parametric projectile.
  */
 import type { TowerDefinition } from './types.js';
 
@@ -13,6 +13,7 @@ export const ZETA_TOWER = Object.freeze({
   rate: 1.3,
   range: 0.3,
   icon: 'assets/images/tower-zeta.svg',
+  description: 'Plots two freely configurable attack curves like a graphing calculator.',
   nextTierId: 'eta',
 } as const satisfies TowerDefinition);
 

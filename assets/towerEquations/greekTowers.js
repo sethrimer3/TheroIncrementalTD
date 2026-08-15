@@ -302,7 +302,7 @@ export const epsilon = {
 // η tower channels synchronized orbital upgrades that determine laser cadence,
 // alignment thresholds, and range when planets line up.
 
-export const zeta = {
+export const zetaOld = {
   mathSymbol: String.raw`\zeta`,
   baseEquation: String.raw`\( \zeta = \text{Atk} \times \text{Crt} \times \text{Spd} \times \text{Rng} \times \text{Tot} \)`,
   variables: [
@@ -639,6 +639,32 @@ export const zeta = {
     const range = Number.isFinite(values.rng) ? values.rng : 0;
     const total = Number.isFinite(values.tot) ? values.tot : 0;
     return `${formatComponent(result)} = ${formatComponent(attack)} × ${formatComponent(critical)} × ${formatComponent(speed)} × ${formatComponent(range)} × ${formatComponent(total)}`;
+  },
+};
+
+// The graphing ζ retains only its attack, critical, and speed upgrade channels.
+const ZETA_GRAPH_VARIABLE_KEYS = new Set(['aleph1', 'aleph2', 'aleph5', 'aleph6', 'crt', 'atk', 'spd']);
+export const zeta = {
+  mathSymbol: String.raw`\zeta`,
+  baseEquation: String.raw`\( \zeta = \text{Atk} \times \text{Crt} \times \text{Spd} \)`,
+  variables: zetaOld.variables
+    .filter((variable) => ZETA_GRAPH_VARIABLE_KEYS.has(variable.key))
+    .map((variable) => {
+      if (variable.key === 'crt') return { ...variable, description: 'Multiplier applied when either large graph projectile touches an enemy.' };
+      if (variable.key === 'atk') return { ...variable, description: 'Damage traced through both the polar and parametric projectiles.' };
+      if (variable.key === 'spd') return { ...variable, description: 'Graphing speed shared by both projectile parameters.' };
+      if (variable.key === 'aleph2') return { ...variable, description: 'Accelerates both graph parameters around their curves.' };
+      if (variable.key === 'aleph5' || variable.key === 'aleph6') return { ...variable, description: 'Sharpens critical contact from both graph projectile heads.' };
+      return { ...variable, description: 'Amplifies ζ graph projectile attack.' };
+    }),
+  computeResult(values) {
+    const attack = Number.isFinite(values.atk) ? values.atk : 0;
+    const critical = Number.isFinite(values.crt) ? values.crt : 1;
+    const speed = Number.isFinite(values.spd) ? values.spd : 0;
+    return attack * critical * speed;
+  },
+  formatBaseEquationValues({ values, result, formatComponent }) {
+    return `${formatComponent(result)} = ${formatComponent(values.atk || 0)} × ${formatComponent(values.crt || 1)} × ${formatComponent(values.spd || 0)}`;
   },
 };
 
