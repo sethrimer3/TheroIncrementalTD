@@ -8883,9 +8883,16 @@ body.show-glyph-equations .tower-upgrade-variable-equations {
 
 .tower-upgrade-variable-glyph-control--attachment {
   display: grid;
-  grid-template-columns: repeat(3, minmax(28px, auto));
+  grid-template-columns: auto minmax(28px, auto) auto;
   align-items: end;
   gap: 10px;
+}
+
+.tower-upgrade-variable-glyph-control--attachment .tower-upgrade-variable-glyph-button {
+  width: auto;
+  min-width: 44px;
+  padding: 0 8px;
+  border-radius: 999px;
 }
 
 .tower-upgrade-variable-glyph-column {

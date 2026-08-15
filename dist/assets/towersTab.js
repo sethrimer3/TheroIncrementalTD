@@ -1528,10 +1528,10 @@ function _buildVariableGlyphControls(variable, towerId, level, options = {}) {
   const currencyMeta = getCurrencyMeta(currencyKey);
   const availableGlyphs = getAvailableCurrency(currencyKey);
 
-  // Compact rows place the refund, allocation, and spend values directly above their controls.
-  const buildCompactControlColumn = (amount, element, modifier) => {
+  // Compact rows keep only the total allocation above the variable glyph.
+  const buildCompactAllocation = (amount, element) => {
     const column = document.createElement('span');
-    column.className = `tower-upgrade-variable-glyph-column tower-upgrade-variable-glyph-column--${modifier}`;
+    column.className = 'tower-upgrade-variable-glyph-column tower-upgrade-variable-glyph-column--allocated';
     const amountLabel = document.createElement('span');
     amountLabel.className = 'tower-upgrade-variable-glyph-amount';
     amountLabel.textContent = formatWholeNumber(amount);
@@ -1550,7 +1550,8 @@ function _buildVariableGlyphControls(variable, towerId, level, options = {}) {
     ? Math.max(1, calculateTowerVariableUpgradeCost(variable, level - 1))
     : 0;
   if (asAttachment) {
-    glyphControl.append(buildCompactControlColumn(refund, decrement, 'refund'));
+    decrement.textContent = `− ${formatWholeNumber(refund)}`;
+    glyphControl.append(decrement);
   } else {
     glyphControl.append(decrement);
   }
@@ -1559,7 +1560,7 @@ function _buildVariableGlyphControls(variable, towerId, level, options = {}) {
   glyphCount.className = 'tower-upgrade-variable-glyph-count';
   glyphCount.textContent = asAttachment ? getVariableGlyphLabel(variable) : `${level} ${getVariableGlyphLabel(variable)}`;
   if (asAttachment) {
-    glyphControl.append(buildCompactControlColumn(level, glyphCount, 'allocated'));
+    glyphControl.append(buildCompactAllocation(level, glyphCount));
   } else {
     glyphControl.append(glyphCount);
   }
@@ -1573,7 +1574,8 @@ function _buildVariableGlyphControls(variable, towerId, level, options = {}) {
   increment.setAttribute('aria-label', `Invest glyph into ${variable.symbol || variable.key}`);
   increment.addEventListener('click', () => handleTowerVariableUpgrade(towerId, variable.key));
   if (asAttachment) {
-    glyphControl.append(buildCompactControlColumn(cost, increment, 'spend'));
+    increment.textContent = `+ ${formatWholeNumber(cost)}`;
+    glyphControl.append(increment);
   } else {
     glyphControl.append(increment);
   }
