@@ -207,6 +207,8 @@ export function triggerPhiBurst(playfield, tower) {
     for (const seed of row.seeds) {
       seed.inFlight = true;
       seed.flightTime = 0.0;
+      seed.trailCount = 0;
+      seed.trailStart = 0;
       hasSeeds = true;
     }
   }
@@ -234,6 +236,8 @@ function updateSeedFlight(playfield, tower, seed, delta) {
       seed.remainingPierce = SEED_MAX_PIERCE;
       seed.x = tower.x + seed.ringRadius * Math.cos(seed.theta0);
       seed.y = tower.y + seed.ringRadius * Math.sin(seed.theta0);
+      seed.trailCount = 0;
+      seed.trailStart = 0;
       return true; // Keep seed
     } else {
       // Consumed: remove from row

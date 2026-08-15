@@ -585,7 +585,7 @@ export function drawEtaOrbits(playfield, tower) {
           continue;
         }
         ctx.beginPath();
-        ctx.strokeStyle = `rgba(${or}, ${og}, ${ob}, ${fade * 0.45})`;
+        ctx.strokeStyle = `rgba(${or}, ${og}, ${ob}, ${fade * 0.225})`;
         ctx.lineWidth = Math.max(1, (ring.orbRadius || 8) * 0.35);
         ctx.moveTo(previous.x, previous.y);
         ctx.lineTo(point.x, point.y);

@@ -376,7 +376,7 @@ export function drawZetaPendulums(playfield, tower) {
         continue;
       }
       ctx.beginPath();
-      ctx.strokeStyle = `rgba(${rgbColor}, ${alpha * 0.55})`;
+      ctx.strokeStyle = `rgba(${rgbColor}, ${alpha * 0.275})`;
       ctx.lineWidth = trailWidth;
       ctx.moveTo(previous.x, previous.y);
       ctx.lineTo(point.x, point.y);

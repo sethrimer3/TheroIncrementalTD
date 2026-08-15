@@ -522,7 +522,7 @@ export function drawXiBalls(playfield, tower) {
         const alpha = Math.max(0, 1 - point.age / 0.5);
         const width = Math.max(1, BALL_RADIUS * 0.3 * alpha);
         
-        ctx.strokeStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha * 0.6})`;
+        ctx.strokeStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha * 0.3})`;
         ctx.lineWidth = width;
         ctx.lineCap = 'round';
         

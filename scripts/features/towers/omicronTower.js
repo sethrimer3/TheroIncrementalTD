@@ -871,7 +871,7 @@ export function drawOmicronUnits(playfield) {
           ctx.save();
           ctx.lineCap = 'round';
           ctx.lineJoin = 'round';
-          ctx.strokeStyle = `rgba(${unit.color.r}, ${unit.color.g}, ${unit.color.b}, 0.25)`;
+          ctx.strokeStyle = `rgba(${unit.color.r}, ${unit.color.g}, ${unit.color.b}, 0.125)`;
           ctx.lineWidth = Math.max(1.2, unit.size * 0.1);
           ctx.beginPath();
           unit.trailPoints.forEach((point, index) => {
@@ -879,7 +879,7 @@ export function drawOmicronUnits(playfield) {
             const radius = Math.max(2, unit.size * 0.15 * alpha);
             ctx.save();
             ctx.globalCompositeOperation = 'lighter';
-            ctx.fillStyle = `rgba(${unit.color.r}, ${unit.color.g}, ${unit.color.b}, ${alpha * 0.3})`;
+            ctx.fillStyle = `rgba(${unit.color.r}, ${unit.color.g}, ${unit.color.b}, ${alpha * 0.15})`;
             ctx.beginPath();
             ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
             ctx.fill();
