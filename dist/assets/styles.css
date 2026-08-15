@@ -3009,6 +3009,12 @@ body.playfield-fullscreen .playfield canvas {
   text-transform: uppercase;
 }
 
+/* Reserve the card's inner width for long, unbroken level names such as Consciousness. */
+.level-node--long-title .level-node-title {
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+}
+
 .level-best-wave {
   position: absolute;
   bottom: 14px;

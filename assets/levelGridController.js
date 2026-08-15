@@ -627,6 +627,8 @@ export function createLevelGridController({
     const card = document.createElement('button');
     card.type = 'button';
     card.className = 'level-node';
+    // Compact exceptionally long single-word labels so every title stays inside its card.
+    card.classList.toggle('level-node--long-title', !/\s/.test(level.title) && level.title.length > 11);
     card.classList.toggle('level-node--story', Boolean(level.isStoryLevel));
     card.dataset.level = level.id;
     card.setAttribute('aria-pressed', 'false');
