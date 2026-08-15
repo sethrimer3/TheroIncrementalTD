@@ -101,14 +101,6 @@ import {
   ensurePsiState as ensurePsiStateHelper,
   teardownPsiTower as teardownPsiTowerHelper,
 } from '../../../scripts/features/towers/psiTower.js';
-import {
-  ensureT1State as ensureT1StateHelper,
-  teardownT1Tower as teardownT1TowerHelper,
-} from '../../../scripts/features/towers/t1Tower.js';
-import {
-  ensureT2State as ensureT2StateHelper,
-  teardownT2Tower as teardownT2TowerHelper,
-} from '../../../scripts/features/towers/t2Tower.js';
 
 // Tower management routines extracted from SimplePlayfield.
 
@@ -347,16 +339,6 @@ function applyTowerBehaviorDefaults(tower) {
   } else if (tower.psiState) {
     this.teardownPsiTower(tower);
   }
-  if (tower.type === 't1') {
-    this.ensureT1State(tower);
-  } else if (tower.t1State) {
-    this.teardownT1Tower(tower);
-  }
-  if (tower.type === 't2') {
-    this.ensureT2State(tower);
-  } else if (tower.t2State) {
-    this.teardownT2Tower(tower);
-  }
 }
 
 function ensureDeltaState(tower) {
@@ -479,28 +461,12 @@ function teardownPsiTower(tower) {
   teardownPsiTowerHelper(this, tower);
 }
 
-function ensureT1State(tower) {
-  return ensureT1StateHelper(this, tower);
-}
-
-function teardownT1Tower(tower) {
-  teardownT1TowerHelper(this, tower);
-}
-
-function ensureT2State(tower) {
-  return ensureT2StateHelper(this, tower);
-}
-
 function ensureZetaOldState(tower) {
   return ensureZetaOldStateHelper(this, tower);
 }
 
 function teardownZetaOldTower(tower) {
   teardownZetaOldTowerHelper(this, tower);
-}
-
-function teardownT2Tower(tower) {
-  teardownT2TowerHelper(this, tower);
 }
 
 export {
@@ -566,8 +532,4 @@ export {
   teardownOmegaTower,
   ensurePsiState,
   teardownPsiTower,
-  ensureT1State,
-  teardownT1Tower,
-  ensureT2State,
-  teardownT2Tower,
 };

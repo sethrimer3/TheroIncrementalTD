@@ -15,7 +15,7 @@ This file serves four functions:
 
 ## Current Migration Dashboard
 
-<!-- migration-roadmap-counts: ts=68 generated=68 active_js=171 candidates=45 -->
+<!-- migration-roadmap-counts: ts=67 generated=67 active_js=169 candidates=45 -->
 <!-- migration-roadmap-authorization: phase=23 -->
 
 | Item | Current state |
@@ -24,8 +24,8 @@ This file serves four functions:
 | Completed migration history | Phases 0-22 remain complete; historical phase identities are preserved |
 | Next authorized implementation | **Phase 23 only:** Omicron, Pi, Chi, Psi, and Omega terminal equations |
 | Delivery branch | Work directly on `main`; create or switch to another branch only when the user explicitly requests it |
-| Active authored modules | 239 total: 68 TypeScript and 171 JavaScript |
-| Compatibility output | 68 generated `.js` siblings; they are runtime output, not backlog |
+| Active authored modules | 236 total: 67 TypeScript and 169 JavaScript |
+| Compatibility output | 67 generated `.js` siblings; they are runtime output, not backlog |
 | Decision candidates | 45 unreachable authored `.js` files requiring retirement, integration, or archival decisions |
 | Long-range sequence | Phases 22-55; Phase 54 is an extraction gate and assigns no backlog module |
 | Mechanical check | `npm run check:migration-roadmap` validates reachability, classifications, duplicate assignments, totals, and per-phase counts |
@@ -112,12 +112,12 @@ The obsolete-Spire retirement is an intentional product change, not a general mi
 
 Inventory was originally recalculated from the live tree on **2026-07-16**, starting on `codex/phases-17-20-advanced-equations` at exact commit `2bad7891ca88baa20c1a084c31ecd939e11b4eca`, then continuing on the documentation-only branch `codex/typescript-migration-roadmap`. It was reconciled again after equipment/gem retirement merge `c96df03` and audited at `main` commit `0802d21`. The browser entry root is `index.html` -> `assets/main.js`.
 
-- **68 authored `.ts` modules** (excluding `.d.ts`; none exist).
-- **68 build-generated `.js` siblings** of those TypeScript modules. These are runtime output, not backlog.
-- **171 active authored `.js` modules**, verified reachable through static local imports from `assets/main.js`.
+- **69 authored `.ts` modules** (excluding `.d.ts`; none exist).
+- **69 build-generated `.js` siblings** of those TypeScript modules. These are runtime output, not backlog.
+- **169 active authored `.js` modules**, verified reachable through static local imports from `assets/main.js`.
 - **0 intentionally preserved legacy `.js` modules** with current repository evidence. The previously documented 19-file disabled Terrarium tree was deleted by `64ebc5e`.
 - **45 ambiguous or retirement/deletion-candidate `.js` modules**, all currently unreachable from the browser entry graph. They are excluded from the active backlog pending a separate decision.
-- **239 active authored modules** in total, so active module-count conversion is **28.5%** (`68 / 239`). The raw authored-language tree is 284 modules when the 45 decision candidates are included.
+- **236 active authored modules** in total, so active module-count conversion is **28.4%** (`67 / 236`). The raw authored-language tree is 281 modules when the 45 decision candidates are included.
 - Supplemental authored-line snapshot: **8,309 TypeScript lines** and **81,526 active JavaScript lines**. Line counts do not represent migration difficulty.
 
 Method: recursively enumerate `assets/` and `scripts/`; exclude `node_modules/`, `dist/`, `build/`, generated output, dependencies, fixtures, and non-source material; remove each `.js` file with a same-path `.ts` sibling; parse static relative `import`/`export ... from` edges; traverse from `assets/main.js`; and audit unreachable files against tests, retirement documentation, HTML harnesses, and recent commits. The full classification, dependency evidence, 168-module coverage map, and 45-file retirement list are in [`docs/TypeScriptMigrationRoadmapInventory.md`](docs/TypeScriptMigrationRoadmapInventory.md). Run `npm run check:migration-roadmap` to verify that classification against the current checkout.
@@ -280,7 +280,7 @@ Exact file lists and per-module risk notes are in the linked coverage appendix. 
 | 35 | **TENTATIVE LATER** | Delta through Iota mid-tier towers; 6 modules | 34 | Mid-tier orbit/beam/chain/integration states | TowerManager, playfield, sprite/projectile systems | Per-tower deterministic math/state/audio tests and manual placement; high Canvas/audio risk. |
 | 36 | **TENTATIVE LATER** | Kappa through Xi simulation chain; 5 modules | 34-35 | Mine/beam/chain/target/teardown states | Playfield update, damage and renderer systems | Seeded lifecycle/teardown/cross-tower tests; manual upgrade and wave pass; preserve formulas. |
 | 37 | **TENTATIVE LATER** | Omicron/Pi/Sigma/Tau/Upsilon simulations; 5 modules | 34-36 | Geometry/fleet/stored-damage state types | TowerManager, dispatch, sprite renderer, playfield | Golden entity transitions/audio and render-call traces; manual all-five tower pass. |
-| 38 | **TENTATIVE LATER** | Phi/Chi/Psi/Omega/Infinity/T1/T2; 7 modules | 34-37 | Terminal/experimental tower state and effect types | Completes tower types consumed by playfield/managers/renderers | Seeded spawn/HP-slice/thrall/merge tests; manual placement; explicitly exclude unreachable graph towers. |
+| 38 | **TENTATIVE LATER** | Phi/Chi/Psi/Omega/Infinity; 5 modules | 34-37 | Terminal tower state and effect types | Completes tower types consumed by playfield/managers/renderers | Seeded spawn/HP-slice/thrall/merge tests and manual placement. |
 | 39 | **TENTATIVE LATER** | Powder/Tower controllers and DOM/viewport owners; 7 modules | 28-31 | Controllers consume the Powder owner API, preference/persistence and viewport types | Main and Tower tab | DOM/resize/tier/drop/touch tests; portrait and landscape manual pass; exclude simulation formula changes. |
 | 40 | **TENTATIVE LATER** | Playfield geometry/preferences/background systems; 6 modules | 26-31, 33 | Normalized points, paths, viewport, playfield preferences, background entities | `playfield.js`, input, rendering | Geometry invariants, storage and controlled-random tests; manual orientation/track checks. |
 | 41 | **TENTATIVE LATER** | Enemy metadata and specialist systems; 10 modules | 27, 34-40 | Shared enemy/effect/boss state types owned by enemy/playfield boundaries | Enemy update/damage/render consumers | Seeded state-machine tests per specialist; manual representative waves; do not migrate unreachable Integral scaffold. |
@@ -299,7 +299,7 @@ Exact file lists and per-module risk notes are in the linked coverage appendix. 
 | 54 | **TENTATIVE LATER** | Main responsibility-extraction gate; 0 backlog conversions | All active modules except `main.js` typed | Extract only still-owned cohesive responsibilities into new typed owners; define composition contract | Compatibility edits inside `assets/main.js` are expected, but it remains `.js` | Characterize startup order and globals before extraction; browser/Electron; completion means residual main is composition-only. No extension conversion yet. |
 | 55 | **TENTATIVE LATER** | Final `assets/main.js` → `assets/main.ts`; 1 module | 54 and every prior active-module phase | Typed application composition/startup/window API | `index.html` keeps loading generated `assets/main.js` | Startup order/global/API tests, browser portrait/desktop, save reload, full level, audio, and Electron. Complete only with no broad assertions and no owned feature logic left. |
 
-Phases 23-55 cover all 171 active authored JavaScript modules. Across Phases 21-55 there are **35 roadmap phases**: two completed conversion phases, one authorized conversion phase, 31 tentative conversion phases, and one tentative zero-module extraction gate (Phase 54). The remaining 32 conversion phases assign the active backlog and the gate prepares the final root without double-counting it. No active module is assigned twice.
+Phases 23-55 cover all 169 active authored JavaScript modules. Across Phases 21-55 there are **35 roadmap phases**: two completed conversion phases, one authorized conversion phase, 31 tentative conversion phases, and one tentative zero-module extraction gate (Phase 54). The remaining 32 conversion phases assign the active backlog and the gate prepares the final root without double-counting it. No active module is assigned twice.
 
 ### Critical path
 

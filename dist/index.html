@@ -1255,20 +1255,37 @@
             <article class="card" data-tower-id="zeta" hidden aria-hidden="true">
               <header class="tower-header">
                 <span class="tower-tier">Tier VI</span>
-                <h3>ζ zeta</h3>
+                <h3>ζ graphing calculator</h3>
               </header>
               <div class="formula-block">
-                <p class="formula-line">\( \zeta = \sqrt{\varepsilon} \)</p>
+                <p class="formula-line">\( r(\theta)=Rs|\sin(k\theta+\phi)| \)</p>
+                <p class="formula-line">\( (x(t),y(t))=R(a\sin(ft)+b\cos(ft),c\sin(gt+\delta)+d\cos(gt+\delta)) \)</p>
                 <ul class="formula-definition">
-                  <li>ε → needle storm potential moderated into harmonic splash</li>
+                  <li>Two large projectiles trace one polar and one parametric curve.</li>
+                  <li>Heads deal critical damage; fading graph trails deal base attack damage.</li>
                 </ul>
-                <p class="formula-line result">Roots ε into controlled harmonic cascades.</p>
+                <p class="formula-line result" id="zeta-formula-display">Polar: 3 petals · Parametric: x sin(3t), y sin(2t + 90°)</p>
+              </div>
+              <div class="zeta-graph-controls" aria-label="Free Zeta graph parameters">
+                <p class="zeta-controls-title">Free graph parameters</p>
+                <label>Polar petals <input type="range" min="1" max="8" step="1" value="3" data-zeta-param="polarPetals"><output>3</output></label>
+                <label>Polar scale <input type="range" min="0.2" max="1" step="0.05" value="0.9" data-zeta-param="polarScale"><output>0.9</output></label>
+                <label>Polar phase° <input type="range" min="0" max="360" step="15" value="0" data-zeta-param="polarPhase"><output>0</output></label>
+                <label>x frequency <input type="range" min="1" max="8" step="1" value="3" data-zeta-param="parametricXFrequency"><output>3</output></label>
+                <label>y frequency <input type="range" min="1" max="8" step="1" value="2" data-zeta-param="parametricYFrequency"><output>2</output></label>
+                <label>y phase° <input type="range" min="0" max="360" step="15" value="90" data-zeta-param="parametricPhase"><output>90</output></label>
+                <div class="zeta-coefficient-grid">
+                  <label>x sin <input type="number" min="-2" max="2" step="0.25" value="1" data-zeta-param="parametricSinX"></label>
+                  <label>x cos <input type="number" min="-2" max="2" step="0.25" value="0" data-zeta-param="parametricCosX"></label>
+                  <label>y sin <input type="number" min="-2" max="2" step="0.25" value="1" data-zeta-param="parametricSinY"></label>
+                  <label>y cos <input type="number" min="-2" max="2" step="0.25" value="0" data-zeta-param="parametricCosY"></label>
+                </div>
               </div>
               <ul class="upgrade-list">
-                <li>Focus ε residue into denser splash pools</li>
-                <li>Delay the release to stack ε charges before bursting</li>
+                <li>Upgrade Critical Multiplier, Attack, and Speed.</li>
+                <li>Path parameters are free and update every placed ζ tower immediately.</li>
               </ul>
-              <footer class="card-footer">Turns ε's swell into rolling resonance detonations.</footer>
+              <footer class="card-footer">Experiment with rose curves and Lissajous figures like a graphing calculator.</footer>
               <button class="tower-equip-button" type="button" data-tower-toggle="zeta">
                 Equip ζ
               </button>
@@ -1684,75 +1701,34 @@
                 Equip ∞
               </button>
             </article>
-            <article class="card" data-tower-id="t1" aria-hidden="false">
-              <header class="tower-header">
-                <span class="tower-tier">Test</span>
-                <h3>T₁ polar graph</h3>
-              </header>
+            <article class="card" data-tower-id="zeta-old" hidden aria-hidden="true">
+              <header class="tower-header"><span class="tower-tier">Legacy</span><h3>Zeta (OLD)</h3></header>
               <div class="formula-block">
-                <p class="formula-line">\( r(\theta) = R \cdot |\sin(3\theta)| \)</p>
-                <ul class="formula-definition">
-                  <li>\(r\) → radial distance from the tower (max \(R = 8\) m)</li>
-                  <li>\(\theta\) → sweep angle advancing at \( 0.9 \) rad s⁻¹</li>
-                  <li>Curve bounded within 10 m in every direction</li>
-                </ul>
+                <p class="formula-line">\( \zeta_{old}=\text{Atk}\times\text{Crt}\times\text{Spd}\times\text{Rng}\times\text{Tot} \)</p>
+                <p class="formula-line result">The original cascading pendulum tower, preserved unchanged.</p>
               </div>
-              <ul class="upgrade-list">
-                <li>A glowing tracer head sweeps the 3-petal rose curve continuously.</li>
-                <li>The fading trail damages every enemy it touches on contact.</li>
-              </ul>
-              <footer class="card-footer">
-                Plots a polar rose graph; the luminous trail deals ongoing damage.
-                Cost: 1 \(\Theta\).
-              </footer>
-              <button class="tower-equip-button" type="button" data-tower-toggle="t1">
-                Equip T₁
-              </button>
+              <ul class="upgrade-list"><li>Orbiting pendulum heads deal critical impacts.</li><li>Range and Total Pendulums remain available on this legacy version.</li></ul>
+              <footer class="card-footer">The original Zeta pendulum design.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="zeta-old">Equip Zeta (OLD)</button>
             </article>
 
-            <article class="card" data-tower-id="t2" aria-hidden="false">
+            <!-- Tease one undiscovered lattice without exposing its identity or mechanics. -->
+            <article class="card card--mystery-tower" data-mystery-tower hidden aria-hidden="true">
               <header class="tower-header">
-                <span class="tower-tier">Test</span>
-                <h3>T₂ parametric graph</h3>
+                <span class="tower-tier">Undiscovered</span>
+                <h3>???</h3>
               </header>
+              <div class="tower-preview tower-preview--mystery" aria-hidden="true">
+                <span class="mystery-tower-icon">?</span>
+              </div>
               <div class="formula-block">
-                <p class="formula-line">\( \vec{p}(t) = \bigl(\,x(t),\; y(t)\,\bigr) \cdot R \)</p>
-                <ul class="formula-definition">
-                  <li>\(x(t)\) — sum of enabled x-axis functions applied to \(t\)</li>
-                  <li>\(y(t)\) — sum of enabled y-axis functions applied to \(t\)</li>
-                  <li>Default \((cos\,t,\; sin\,t)\) traces a circle of radius \(R = 8\) m</li>
-                </ul>
-                <p class="formula-line result" id="t2-formula-display">x = cos(t) &nbsp;·&nbsp; y = sin(t)</p>
+                <p class="formula-line">???</p>
+                <p class="formula-line result">???</p>
               </div>
-
-              <!-- Parametric function toggles -->
-              <div class="t2-param-controls">
-                <div class="t2-param-row">
-                  <span class="t2-axis-label">x(t) =</span>
-                  <button class="t2-fn-toggle" type="button" data-t2-toggle="sinX">sin(t)</button>
-                  <button class="t2-fn-toggle active" type="button" data-t2-toggle="cosX">cos(t)</button>
-                  <button class="t2-fn-toggle" type="button" data-t2-toggle="tanX">tan(t)</button>
-                </div>
-                <div class="t2-param-row">
-                  <span class="t2-axis-label">y(t) =</span>
-                  <button class="t2-fn-toggle active" type="button" data-t2-toggle="sinY">sin(t)</button>
-                  <button class="t2-fn-toggle" type="button" data-t2-toggle="cosY">cos(t)</button>
-                  <button class="t2-fn-toggle" type="button" data-t2-toggle="tanY">tan(t)</button>
-                </div>
-              </div>
-
               <ul class="upgrade-list">
-                <li>Toggle trig functions to reshape the tracer curve in real-time.</li>
-                <li>Multiple active functions on the same axis are <em>additive</em>.</li>
-                <li>tan(t) is clamped to ±1.5 to prevent the tracer leaving the arena.</li>
+                <li>???</li>
               </ul>
-              <footer class="card-footer">
-                Plots a parametric curve; the luminous trail deals ongoing damage.
-                Cost: 1 \(\Theta\).
-              </footer>
-              <button class="tower-equip-button" type="button" data-tower-toggle="t2">
-                Equip T₂
-              </button>
+              <footer class="card-footer">???</footer>
             </article>
 
           

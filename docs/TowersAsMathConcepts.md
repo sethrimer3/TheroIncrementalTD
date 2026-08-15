@@ -191,24 +191,6 @@ The Tower is an active falling-mote simulation, not an idle game. Motes earned t
 
 ---
 
-## Test Towers
-
-### T₁ — Test Tower 1
-**Math concept:** Polar rose curves  
-**Formula:** r(θ) = maxRadius × |sin(3θ)| (3-petal rose)  
-**Offensive translation:** A glowing tracer head sweeps the 3-petal polar rose continuously. Any enemy caught inside the fading trail takes ongoing damage. The trail persists 3 seconds with up to 80 recorded points, so the damage zone literally is the curve — a mathematical shape that attacks by existing.
-
----
-
-### T₂ — Test Tower 2
-**Math concept:** Parametric trigonometric curves (Lissajous / custom)  
-**Formulas:**  
-- x = R × (sinX·sin(t) + cosX·cos(t) + tanX·clamp(tan(t)))  
-- y = R × (sinY·sin(t) + cosY·cos(t) + tanY·clamp(tan(t)))  
-**Offensive translation:** The player toggles sin / cos / tan independently for each axis (default: cos t, sin t = circle). Combining functions produces Lissajous figures, hypocycloid-like shapes, or chaotic paths. The tracer head damages enemies on contact; curve complexity determines coverage. Tangent values are clamped to ±1.5 to prevent the path from flying off-screen.
-
----
-
 ## Gate Structures
 
 ### Mind Gate (𝔊)

@@ -13,7 +13,7 @@ export interface TowerDefinition {
   readonly symbol: string;
   /** Display name shown in UI. */
   readonly name: string;
-  /** Numeric progression tier; 0 is used by the gates and the two experimental T-towers. */
+  /** Numeric progression tier; 0 is used by the gate structures. */
   readonly tier: number;
   /** Optional display override for the tier badge (e.g. "Origin" for the gates). */
   readonly tierLabel?: string;
@@ -29,7 +29,7 @@ export interface TowerDefinition {
   /** Footprint diameter in meters, only present when it differs from the implicit default. */
   readonly diameterMeters?: number;
   readonly icon: string;
-  /** Id of the tower this one upgrades into. `null` marks the end of a chain (e.g. Infinity); omitted entirely on towers with no successor (T1/T2). */
+  /** Id of the tower this one upgrades into. `null` marks the end of a chain (e.g. Infinity). */
   readonly nextTierId?: string | null;
   /** Flavor/mechanic description shown in tooltips for towers that have one (gates, graph-based test arsenal). */
   readonly description?: string;

@@ -1,5 +1,3 @@
-import T1_TOWER from './t1.js';
-import T2_TOWER from './t2.js';
 import MIND_GATE_TOWER from './mind-gate.js';
 import SHADOW_GATE_TOWER from './shadow-gate.js';
 import ALPHA_TOWER from './alpha.js';
@@ -32,12 +30,8 @@ import DENSITY_COLLAPSE_TOWER from './density-collapse.js';
 import ORBITAL_COLLAPSE_TOWER from './orbital-collapse.js';
 import POLYNOMIAL_ENGINE_TOWER from './polynomial-engine.js';
 import ZETA_OLD_TOWER from './zeta-old.js';
-export { T1_TOWER as t1Tower, T2_TOWER as t2Tower, MIND_GATE_TOWER as mind_gateTower, SHADOW_GATE_TOWER as shadow_gateTower, ALPHA_TOWER as alphaTower, BETA_TOWER as betaTower, GAMMA_TOWER as gammaTower, DELTA_TOWER as deltaTower, EPSILON_TOWER as epsilonTower, ZETA_TOWER as zetaTower, ETA_TOWER as etaTower, THETA_TOWER as thetaTower, IOTA_TOWER as iotaTower, KAPPA_TOWER as kappaTower, LAMBDA_TOWER as lambdaTower, MU_TOWER as muTower, NU_TOWER as nuTower, XI_TOWER as xiTower, OMICRON_TOWER as omicronTower, PI_TOWER as piTower, RHO_TOWER as rhoTower, SIGMA_TOWER as sigmaTower, TAU_TOWER as tauTower, UPSILON_TOWER as upsilonTower, PHI_TOWER as phiTower, CHI_TOWER as chiTower, PSI_TOWER as psiTower, OMEGA_TOWER as omegaTower, INFINITY_TOWER as infinityTower, REGRESSION_TOWER as regressionTower, DENSITY_COLLAPSE_TOWER as densityCollapseTower, ORBITAL_COLLAPSE_TOWER as orbitalCollapseTower, POLYNOMIAL_ENGINE_TOWER as polynomialEngineTower, ZETA_OLD_TOWER as zetaOldTower, };
+export { MIND_GATE_TOWER as mind_gateTower, SHADOW_GATE_TOWER as shadow_gateTower, ALPHA_TOWER as alphaTower, BETA_TOWER as betaTower, GAMMA_TOWER as gammaTower, DELTA_TOWER as deltaTower, EPSILON_TOWER as epsilonTower, ZETA_TOWER as zetaTower, ETA_TOWER as etaTower, THETA_TOWER as thetaTower, IOTA_TOWER as iotaTower, KAPPA_TOWER as kappaTower, LAMBDA_TOWER as lambdaTower, MU_TOWER as muTower, NU_TOWER as nuTower, XI_TOWER as xiTower, OMICRON_TOWER as omicronTower, PI_TOWER as piTower, RHO_TOWER as rhoTower, SIGMA_TOWER as sigmaTower, TAU_TOWER as tauTower, UPSILON_TOWER as upsilonTower, PHI_TOWER as phiTower, CHI_TOWER as chiTower, PSI_TOWER as psiTower, OMEGA_TOWER as omegaTower, INFINITY_TOWER as infinityTower, REGRESSION_TOWER as regressionTower, DENSITY_COLLAPSE_TOWER as densityCollapseTower, ORBITAL_COLLAPSE_TOWER as orbitalCollapseTower, POLYNOMIAL_ENGINE_TOWER as polynomialEngineTower, ZETA_OLD_TOWER as zetaOldTower, };
 export const towers = [
-    // T₁ tower — available from the start for rapid experimentation.
-    T1_TOWER,
-    // T₂ tower — parametric curve tracer with composable sin/cos/tan functions.
-    T2_TOWER,
     // Surface the Mind Gate first so upgrade systems can treat it as the foundation lattice.
     MIND_GATE_TOWER,
     // Shadow Gate follows immediately — the enemy spawn nexus with debuff upgrades.

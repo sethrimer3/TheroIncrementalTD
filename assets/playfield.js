@@ -107,16 +107,6 @@ import {
   updateZetaOldTower as updateZetaOldTowerHelper,
 } from '../scripts/features/towers/zetaTower.js';
 import {
-  updateT1Tower as updateT1TowerHelper,
-  ensureT1State as ensureT1StateHelper,
-  teardownT1Tower as teardownT1TowerHelper,
-} from '../scripts/features/towers/t1Tower.js';
-import {
-  updateT2Tower as updateT2TowerHelper,
-  ensureT2State as ensureT2StateHelper,
-  teardownT2Tower as teardownT2TowerHelper,
-} from '../scripts/features/towers/t2Tower.js';
-import {
   updateEtaTower as updateEtaTowerHelper,
   fireEtaLaser as fireEtaLaserHelper,
   applyEtaDamage as applyEtaDamageHelper,
@@ -1772,34 +1762,6 @@ export class SimplePlayfield {
   }
 
   /**
-   * Initialise or refresh T₁ polar tracer state.
-   */
-  ensureT1State(tower) {
-    return ensureT1StateHelper(this, tower);
-  }
-
-  /**
-   * Clean up T₁ state when the tower is removed or retyped.
-   */
-  teardownT1Tower(tower) {
-    teardownT1TowerHelper(this, tower);
-  }
-
-  /**
-   * Initialise or refresh T₂ parametric tracer state.
-   */
-  ensureT2State(tower) {
-    return ensureT2StateHelper(this, tower);
-  }
-
-  /**
-   * Clean up T₂ state when the tower is removed or retyped.
-   */
-  teardownT2Tower(tower) {
-    teardownT2TowerHelper(this, tower);
-  }
-
-  /**
    * Spawn a τ spiral projectile toward the current target.
    */
   spawnTauProjectile(tower, targetInfo) {
@@ -3016,16 +2978,6 @@ export class SimplePlayfield {
             this.updateZetaOldTower(tower, speedDelta);
             return;
           }
-          if (tower.type === 't1') {
-            // Keep the polar tracer animating while combat is paused.
-            this.updateT1Tower(tower, speedDelta);
-            return;
-          }
-          if (tower.type === 't2') {
-            // Keep the parametric tracer animating while combat is paused.
-            this.updateT2Tower(tower, speedDelta);
-            return;
-          }
           if (tower.type === 'eta') {
             this.updateEtaTower(tower, speedDelta);
             return;
@@ -3174,20 +3126,6 @@ export class SimplePlayfield {
   /** Advance the preserved pendulum Zeta implementation. */
   updateZetaOldTower(tower, delta) {
     updateZetaOldTowerHelper(this, tower, delta);
-  }
-
-  /**
-   * Advance T₁ polar tracer, update trail, and apply contact damage.
-   */
-  updateT1Tower(tower, delta) {
-    updateT1TowerHelper(this, tower, delta);
-  }
-
-  /**
-   * Advance T₂ parametric tracer, update trail, and apply contact damage.
-   */
-  updateT2Tower(tower, delta) {
-    updateT2TowerHelper(this, tower, delta);
   }
 
   /**

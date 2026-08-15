@@ -239,7 +239,7 @@ import {
   addDiscoveredVariablesListener,
   getDiscoveredVariables,
   getTowerUpgradeStateSnapshot,
-  initializeT2Toggles,
+  initializeZetaGraphControls,
   applyTowerUpgradeStateSnapshot,
   clearTowerUpgradeState,
   configureTowersTabCallbacks,
@@ -2123,7 +2123,7 @@ import { createSpireCameraController } from './spireCameraController.js';
     initializeTowerSelection();
     initializeTowerVisibilityToggle();
     initializeTowerElementDebugControls();
-    initializeT2Toggles();
+    initializeZetaGraphControls();
     bindTowerCardUpgradeInteractions();
     syncLoadoutToPlayfield();
     renderEnemyCodex();

@@ -333,7 +333,7 @@ async function importTowerEquationIndexModule() {
     'mindGate.js': ['mindGate'],
     'shadowGate.js': ['shadowGate'],
     'basicTowers.js': ['alpha', 'beta', 'gamma'],
-    'greekTowers.js': ['delta', 'epsilon', 'zeta', 'eta', 'theta', 'iota'],
+    'greekTowers.js': ['delta', 'epsilon', 'zeta', 'zetaOld', 'eta', 'theta', 'iota'],
     'advancedTowers.js': [
       'kappa', 'lambda', 'mu', 'nu', 'xi', 'omicron', 'pi', 'rho', 'sigma',
       'tau', 'upsilon', 'phi', 'chi', 'psi', 'omega',
@@ -355,6 +355,8 @@ async function importTowerEquationIndexModule() {
         ? 'mind-gate'
         : exportName === 'shadowGate'
           ? 'shadow-gate'
+          : exportName === 'zetaOld'
+            ? 'zeta-old'
           : exportName;
       sourceById[registryId] = sourceModule[exportName];
     }
@@ -762,11 +764,10 @@ async function run() {
   });
 
   await test('tower registry: ordering and named per-tower exports remain consistent', () => {
-    assert.equal(towers[0].id, 't1');
-    assert.equal(towers[1].id, 't2');
-    assert.equal(towers[2].id, 'mind-gate');
-    assert.equal(towers[3].id, 'shadow-gate');
-    assert.equal(towers[towers.length - 1].id, 'polynomial_engine');
+    assert.equal(towers[0].id, 'mind-gate');
+    assert.equal(towers[1].id, 'shadow-gate');
+    assert.equal(towers[towers.length - 2].id, 'polynomial_engine');
+    assert.equal(towers[towers.length - 1].id, 'zeta-old');
     assert.equal(towerRegistry.alphaTower.id, 'alpha');
     assert.equal(towerRegistry.omegaTower.id, 'omega');
     assert.equal(towerRegistry.infinityTower.id, 'infinity');
@@ -2511,11 +2512,11 @@ async function run() {
   });
 
   // --- assets/towerEquations/index.js ------------------------------------
-  await test('tower equation index: registry preserves all 27 keys, order, and imported identities', async () => {
+  await test('tower equation index: registry preserves all 28 keys, order, and imported identities', async () => {
     const { registryModule, sourceById } = await importTowerEquationIndexModule();
     const expectedIds = [
       'mind-gate', 'shadow-gate', 'alpha', 'beta', 'gamma', 'delta', 'epsilon',
-      'eta', 'theta', 'iota', 'kappa', 'lambda', 'mu', 'zeta', 'nu', 'xi',
+      'eta', 'theta', 'iota', 'kappa', 'lambda', 'mu', 'zeta', 'zeta-old', 'nu', 'xi',
       'omicron', 'pi', 'rho', 'sigma', 'tau', 'upsilon', 'phi', 'chi', 'psi',
       'omega', 'infinity',
     ];

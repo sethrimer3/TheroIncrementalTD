@@ -5,6 +5,7 @@ import {
   computeTowerVariableValue,
 } from '../../../assets/towersTab.js';
 import { samplePaletteGradient } from '../../../assets/colorSchemeUtils.js';
+import { metersToPixels } from '../../../assets/gameUnits.js';
 
 // Generate a color list for ζ pendulums by sampling the active palette gradient across their index range.
 function computePendulumPalette(count) {
@@ -529,7 +530,7 @@ export function ensureZetaState(playfield, tower) {
     return null;
   }
   const minDimension = Math.min(playfield.renderWidth || 0, playfield.renderHeight || 0) || 1;
-  const radius = Math.max(24, minDimension * (ZETA_GRAPH_RADIUS_METERS / 30));
+  const radius = Math.max(24, metersToPixels(ZETA_GRAPH_RADIUS_METERS, minDimension));
   let state = tower.zetaState;
   if (!state) {
     state = {

@@ -22,7 +22,7 @@ import { createTowerBlueprintPresenter } from './towerBlueprintPresenter.js';
 import { createTowerVariableDiscoveryManager } from './towerVariableDiscovery.js';
 import { createTowerLoadoutController } from './towerLoadoutController.js';
 import { getTowerVisualConfig } from './colorSchemeUtils.js';
-import { T2_FUNC_CONFIG } from '../scripts/features/towers/t2Tower.js';
+import { ZETA_GRAPH_CONFIG } from '../scripts/features/towers/zetaTower.js';
 import { CANONICAL_TOWER_IDS } from './data/towers/towerUnlockCost.js';
 
 // Callback to update status displays when glyphs change. Set via configureTowersTabCallbacks.
@@ -41,6 +41,7 @@ const HAS_POINTER_EVENTS = typeof window !== 'undefined' && 'PointerEvent' in wi
 const EQUATION_TOOLTIP_MARGIN_PX = 12; // Maintain consistent spacing between the tooltip and the hovered variable.
 const EQUATION_TOOLTIP_ID = 'tower-upgrade-equation-tooltip'; // Stable id so aria-describedby wiring stays deterministic.
 const TOWER_CARD_SELECTOR = '.card[data-tower-id]'; // Limit tower card queries so loadout buttons stay compact.
+const MYSTERY_TOWER_CARD_SELECTOR = '.card[data-mystery-tower]'; // Keep the locked teaser outside the real-tower interaction and save systems.
 // Resolve the decorative tower-card animated WebP through the module URL so the browser receives the correct asset path in every runtime.
 const TOWER_CARD_BACKGROUND_IMG_URL = new URL('./animations/cardBackground_animation.webp', import.meta.url).href;
 
@@ -156,7 +157,7 @@ const towerTabState = {
   towerPreviousTierMap: new Map(),
   towerLoadoutLimit: 1,
   loadoutState: { selected: ['alpha'] },
-  unlockState: { unlocked: new Set(['alpha', 't1', 't2']) },
+  unlockState: { unlocked: new Set(['alpha']) },
   mergeProgress: { mergingLogicUnlocked: false },
   mergingLogicElements: { card: null },
   loadoutElements: { shell: null, container: null, grid: null, note: null, toggle: null },
@@ -1161,6 +1162,9 @@ export function unlockTower(towerId, { silent = false } = {}) {
     return false;
   }
   towerTabState.unlockState.unlocked.add(towerId);
+  if (towerId === 'zeta' && towerTabState.towerDefinitionMap.has('zeta-old')) {
+    towerTabState.unlockState.unlocked.add('zeta-old');
+  }
   syncTowerLoadoutLimitFromUnlocks();
   discoverTowerVariables(towerId);
   if (typeof document !== 'undefined') {
@@ -1719,6 +1723,18 @@ export function updateTowerCardVisibility() {
     }
 
   });
+
+  // Show one non-interactive teaser until every canonical tower in the progression chain is discovered.
+  const mysteryCard = document.querySelector(MYSTERY_TOWER_CARD_SELECTOR);
+  if (mysteryCard instanceof HTMLElement) {
+    const hasLockedCanonicalTower = CANONICAL_TOWER_IDS.some(
+      (towerId) => towerTabState.towerDefinitionMap.has(towerId) && !isTowerUnlocked(towerId),
+    );
+    mysteryCard.hidden = !hasLockedCanonicalTower;
+    mysteryCard.style.display = hasLockedCanonicalTower ? '' : 'none';
+    mysteryCard.setAttribute('aria-hidden', hasLockedCanonicalTower ? 'false' : 'true');
+    mysteryCard.setAttribute('tabindex', '-1');
+  }
 }
 
 export function injectTowerCardPreviews() {
@@ -1960,7 +1976,9 @@ export function annotateTowerCardsWithCost() {
  */
 export function stageTowerCardEntrance({ delayBetweenMs = 40, initialDelayMs = 0 } = {}) {
   // Collect only the cards that are actually visible (unlocked / dev-mode shown).
-  const allCards = Array.from(document.querySelectorAll(TOWER_CARD_SELECTOR));
+  const allCards = Array.from(
+    document.querySelectorAll(`${TOWER_CARD_SELECTOR}, ${MYSTERY_TOWER_CARD_SELECTOR}`),
+  );
   const visibleCards = allCards.filter((card) => {
     if (!(card instanceof HTMLElement)) return false;
     if (card.hidden) return false;
@@ -2225,76 +2243,40 @@ export function syncLoadoutToPlayfield() {
   updateTowerSelectionButtons();
 }
 
-/**
- * Build a human-readable formula string from the current T₂ function config.
- *
- * @param {object} funcs - Boolean flags: sinX, cosX, tanX, sinY, cosY, tanY.
- * @returns {string} A text formula like "x = cos(t)  ·  y = sin(t) + cos(t)".
- */
-function buildT2FormulaText(funcs) {
-  const parts = (axis) => {
-    const terms = [];
-    if (funcs[`sin${axis}`]) terms.push('sin(t)');
-    if (funcs[`cos${axis}`]) terms.push('cos(t)');
-    if (funcs[`tan${axis}`]) terms.push('tan(t)');
-    return terms.length > 0 ? terms.join(' + ') : '0';
+/** Wire free graphing-calculator controls to every live modern ζ tower. */
+export function initializeZetaGraphControls() {
+  bindZetaGraphControls();
+}
+
+/** Connect every free graph parameter control to the shared modern ζ configuration. */
+function bindZetaGraphControls() {
+  const controls = document.querySelectorAll('[data-zeta-param]');
+  const phaseKeys = new Set(['polarPhase', 'parametricPhase']);
+  const refreshFormula = () => {
+    const display = document.getElementById('zeta-formula-display');
+    if (!display) return;
+    const phaseDegrees = Math.round(ZETA_GRAPH_CONFIG.parametricPhase * 180 / Math.PI);
+    display.textContent = `Polar: ${ZETA_GRAPH_CONFIG.polarPetals} petals · Parametric: x(${ZETA_GRAPH_CONFIG.parametricSinX} sin ${ZETA_GRAPH_CONFIG.parametricXFrequency}t + ${ZETA_GRAPH_CONFIG.parametricCosX} cos ${ZETA_GRAPH_CONFIG.parametricXFrequency}t), y(${ZETA_GRAPH_CONFIG.parametricSinY} sin(${ZETA_GRAPH_CONFIG.parametricYFrequency}t + ${phaseDegrees}°) + ${ZETA_GRAPH_CONFIG.parametricCosY} cos(${ZETA_GRAPH_CONFIG.parametricYFrequency}t + ${phaseDegrees}°))`;
   };
-  return `x = ${parts('X')}  ·  y = ${parts('Y')}`;
-}
-
-/**
- * Synchronise the active-state CSS class on all T₂ toggle buttons to reflect
- * the current T2_FUNC_CONFIG.  Safe to call at any time.
- */
-function refreshT2ToggleButtons() {
-  const buttons = document.querySelectorAll('[data-t2-toggle]');
-  buttons.forEach((btn) => {
-    const key = btn.dataset.t2Toggle;
-    if (key in T2_FUNC_CONFIG) {
-      btn.classList.toggle('active', !!T2_FUNC_CONFIG[key]);
-    }
-  });
-  const display = document.getElementById('t2-formula-display');
-  if (display) {
-    display.textContent = buildT2FormulaText(T2_FUNC_CONFIG);
-  }
-}
-
-/**
- * Wire up the T₂ parametric function toggle buttons in the tower card.
- * Each button with [data-t2-toggle] toggles the corresponding entry in
- * T2_FUNC_CONFIG and updates any live T₂ tower's state immediately.
- */
-export function initializeT2Toggles() {
-  const buttons = document.querySelectorAll('[data-t2-toggle]');
-  buttons.forEach((btn) => {
-    const key = btn.dataset.t2Toggle;
-    if (!(key in T2_FUNC_CONFIG)) {
-      return;
-    }
-    btn.addEventListener('click', () => {
-      // Flip the module-level config so newly placed towers start with this setting.
-      T2_FUNC_CONFIG[key] = !T2_FUNC_CONFIG[key];
-
-      // If a T₂ tower is currently placed in the playfield, update it immediately.
-      const playfield = towerTabState.playfield;
-      if (playfield && Array.isArray(playfield.towers)) {
-        playfield.towers.forEach((tower) => {
-          if (tower && tower.type === 't2' && tower.t2State) {
-            tower.t2State.funcs[key] = T2_FUNC_CONFIG[key];
-            // Clear the trail so the new curve shape begins drawing from scratch,
-            // giving the player immediate visual feedback on the function change.
-            tower.t2State.trail.length = 0;
-          }
-        });
-      }
-
-      refreshT2ToggleButtons();
+  controls.forEach((control) => {
+    const key = control.dataset.zetaParam;
+    if (!(key in ZETA_GRAPH_CONFIG)) return;
+    control.addEventListener('input', () => {
+      const numeric = Number(control.value);
+      if (!Number.isFinite(numeric)) return;
+      ZETA_GRAPH_CONFIG[key] = phaseKeys.has(key) ? numeric * Math.PI / 180 : numeric;
+      const output = control.parentElement?.querySelector('output');
+      if (output) output.value = control.value;
+      towerTabState.playfield?.towers?.forEach((tower) => {
+        if (tower?.type === 'zeta' && tower.zetaState) {
+          tower.zetaState.polar.trail.length = 0;
+          tower.zetaState.parametric.trail.length = 0;
+        }
+      });
+      refreshFormula();
     });
   });
-
-  // Ensure initial button state matches the default config.
-  refreshT2ToggleButtons();
+  refreshFormula();
 }
 
 // Initialize blueprint context with helper functions so tower blueprints can access them

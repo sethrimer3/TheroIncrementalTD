@@ -22,7 +22,6 @@ import { createTowerBlueprintPresenter } from './towerBlueprintPresenter.js';
 import { createTowerVariableDiscoveryManager } from './towerVariableDiscovery.js';
 import { createTowerLoadoutController } from './towerLoadoutController.js';
 import { getTowerVisualConfig } from './colorSchemeUtils.js';
-import { T2_FUNC_CONFIG } from '../scripts/features/towers/t2Tower.js';
 import { ZETA_GRAPH_CONFIG } from '../scripts/features/towers/zetaTower.js';
 import { CANONICAL_TOWER_IDS } from './data/towers/towerUnlockCost.js';
 
@@ -158,7 +157,7 @@ const towerTabState = {
   towerPreviousTierMap: new Map(),
   towerLoadoutLimit: 1,
   loadoutState: { selected: ['alpha'] },
-  unlockState: { unlocked: new Set(['alpha', 't1', 't2']) },
+  unlockState: { unlocked: new Set(['alpha']) },
   mergeProgress: { mergingLogicUnlocked: false },
   mergingLogicElements: { card: null },
   loadoutElements: { shell: null, container: null, grid: null, note: null, toggle: null },
@@ -2244,81 +2243,13 @@ export function syncLoadoutToPlayfield() {
   updateTowerSelectionButtons();
 }
 
-/**
- * Build a human-readable formula string from the current T₂ function config.
- *
- * @param {object} funcs - Boolean flags: sinX, cosX, tanX, sinY, cosY, tanY.
- * @returns {string} A text formula like "x = cos(t)  ·  y = sin(t) + cos(t)".
- */
-function buildT2FormulaText(funcs) {
-  const parts = (axis) => {
-    const terms = [];
-    if (funcs[`sin${axis}`]) terms.push('sin(t)');
-    if (funcs[`cos${axis}`]) terms.push('cos(t)');
-    if (funcs[`tan${axis}`]) terms.push('tan(t)');
-    return terms.length > 0 ? terms.join(' + ') : '0';
-  };
-  return `x = ${parts('X')}  ·  y = ${parts('Y')}`;
-}
-
-/**
- * Synchronise the active-state CSS class on all T₂ toggle buttons to reflect
- * the current T2_FUNC_CONFIG.  Safe to call at any time.
- */
-function refreshT2ToggleButtons() {
-  const buttons = document.querySelectorAll('[data-t2-toggle]');
-  buttons.forEach((btn) => {
-    const key = btn.dataset.t2Toggle;
-    if (key in T2_FUNC_CONFIG) {
-      btn.classList.toggle('active', !!T2_FUNC_CONFIG[key]);
-    }
-  });
-  const display = document.getElementById('t2-formula-display');
-  if (display) {
-    display.textContent = buildT2FormulaText(T2_FUNC_CONFIG);
-  }
-}
-
-/**
- * Wire up the T₂ parametric function toggle buttons in the tower card.
- * Each button with [data-t2-toggle] toggles the corresponding entry in
- * T2_FUNC_CONFIG and updates any live T₂ tower's state immediately.
- */
-export function initializeT2Toggles() {
-  const buttons = document.querySelectorAll('[data-t2-toggle]');
-  buttons.forEach((btn) => {
-    const key = btn.dataset.t2Toggle;
-    if (!(key in T2_FUNC_CONFIG)) {
-      return;
-    }
-    btn.addEventListener('click', () => {
-      // Flip the module-level config so newly placed towers start with this setting.
-      T2_FUNC_CONFIG[key] = !T2_FUNC_CONFIG[key];
-
-      // If a T₂ tower is currently placed in the playfield, update it immediately.
-      const playfield = towerTabState.playfield;
-      if (playfield && Array.isArray(playfield.towers)) {
-        playfield.towers.forEach((tower) => {
-          if (tower && tower.type === 't2' && tower.t2State) {
-            tower.t2State.funcs[key] = T2_FUNC_CONFIG[key];
-            // Clear the trail so the new curve shape begins drawing from scratch,
-            // giving the player immediate visual feedback on the function change.
-            tower.t2State.trail.length = 0;
-          }
-        });
-      }
-
-      refreshT2ToggleButtons();
-    });
-  });
-
-  // Ensure initial button state matches the default config.
-  refreshT2ToggleButtons();
-  initializeZetaGraphControls();
-}
-
 /** Wire free graphing-calculator controls to every live modern ζ tower. */
-function initializeZetaGraphControls() {
+export function initializeZetaGraphControls() {
+  bindZetaGraphControls();
+}
+
+/** Connect every free graph parameter control to the shared modern ζ configuration. */
+function bindZetaGraphControls() {
   const controls = document.querySelectorAll('[data-zeta-param]');
   const phaseKeys = new Set(['polarPhase', 'parametricPhase']);
   const refreshFormula = () => {

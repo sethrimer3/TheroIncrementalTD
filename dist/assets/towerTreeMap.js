@@ -12,7 +12,7 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 
 // Keep the constellation aligned with the production tower-card roster. The
 // canonical chain covers every Greek tower through Infinity; only the two gate
-// cards sit outside that chain. Experimental T1/T2 and graph towers stay excluded.
+// cards sit outside that chain. The graph-based test arsenal stays excluded.
 function isTowerTreeDefinition(definition) {
   const towerId = definition?.id;
   return towerId === 'mind-gate' || towerId === 'shadow-gate' || isCanonicalTowerId(towerId);
