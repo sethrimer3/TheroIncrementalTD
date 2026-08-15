@@ -9073,31 +9073,6 @@ body.show-glyph-equations .tower-upgrade-variable-equations {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
-.tower-upgrade-variable-glyph-control--attachment {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(28px, auto));
-  align-items: end;
-  gap: 10px;
-}
-
-.tower-upgrade-variable-glyph-column {
-  display: grid;
-  justify-items: center;
-  gap: 3px;
-}
-
-.tower-upgrade-variable-glyph-amount {
-  min-height: 0.8rem;
-  color: rgba(255, 255, 255, 0.68);
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 0.72rem;
-  line-height: 1;
-}
-
-.tower-upgrade-variable-glyph-column--allocated .tower-upgrade-variable-glyph-amount {
-  color: rgba(255, 255, 255, 0.92);
-}
-
 .tower-upgrade-variable-glyph-button {
   width: 28px;
   height: 28px;
@@ -9139,6 +9114,31 @@ body.show-glyph-equations .tower-upgrade-variable-equations {
   color: rgba(255, 255, 255, 0.68);
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.tower-upgrade-variable-glyph-control--attachment {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(28px, auto));
+  align-items: end;
+  gap: 10px;
+}
+
+.tower-upgrade-variable-glyph-column {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+}
+
+.tower-upgrade-variable-glyph-amount {
+  min-height: 0.8rem;
+  color: rgba(255, 255, 255, 0.68);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
+.tower-upgrade-variable-glyph-column--allocated .tower-upgrade-variable-glyph-amount {
+  color: rgba(255, 255, 255, 0.92);
 }
 
 @media (max-width: 640px) {

@@ -1718,8 +1718,6 @@ export function bindTowerCardUpgradeInteractions() {
 }
 export function updateTowerCardVisibility() {
   const cards = document.querySelectorAll(TOWER_CARD_SELECTOR);
-  const developerVisibilityToggle = document.getElementById('tower-visibility-developer-mode');
-  const showAllCards = developerVisibilityToggle?.checked || false;
   
   cards.forEach((card) => {
     if (!(card instanceof HTMLElement)) {
@@ -1732,23 +1730,15 @@ export function updateTowerCardVisibility() {
     const unlocked = isTowerUnlocked(towerId);
     card.dataset.locked = unlocked ? 'false' : 'true';
     
-    // If developer visibility is enabled, show all cards regardless of unlock status
-    if (showAllCards) {
-      card.setAttribute('tabindex', '0');
-      card.hidden = false;
+    // Tower cards now always follow normal player progression; debug visibility overrides are retired.
+    card.setAttribute('tabindex', unlocked ? '0' : '-1');
+    card.hidden = !unlocked;
+    if (unlocked) {
       card.style.removeProperty('display');
-      card.setAttribute('aria-hidden', 'false');
     } else {
-      // Otherwise, only show unlocked cards
-      card.setAttribute('tabindex', unlocked ? '0' : '-1');
-      card.hidden = !unlocked;
-      if (unlocked) {
-        card.style.removeProperty('display');
-      } else {
-        card.style.display = 'none';
-      }
-      card.setAttribute('aria-hidden', unlocked ? 'false' : 'true');
+      card.style.display = 'none';
     }
+    card.setAttribute('aria-hidden', unlocked ? 'false' : 'true');
 
   });
 
@@ -2072,190 +2062,6 @@ export function initializeTowerSelection() {
     button.addEventListener('click', () => toggleTowerSelection(towerId, { anchorButton: button }));
   });
   updateTowerSelectionButtons();
-}
-
-export function initializeTowerVisibilityToggle() {
-  const toggle = document.getElementById('tower-visibility-developer-mode');
-  if (!toggle) {
-    return;
-  }
-  
-  // Add event listener for toggle changes
-  toggle.addEventListener('change', () => {
-    updateTowerCardVisibility();
-  });
-  
-  // Initialize visibility state based on current checkbox state
-  updateTowerCardVisibility();
-  
-  // Initialize individual tower card toggles
-  initializeIndividualTowerToggles();
-}
-
-/**
- * Initialize individual tower card visibility toggles for debugging scrolling issues
- */
-function initializeIndividualTowerToggles() {
-  const grid = document.getElementById('tower-individual-toggles-grid');
-  if (!grid) {
-    return;
-  }
-  
-  // Get all tower cards
-  const cards = document.querySelectorAll(TOWER_CARD_SELECTOR);
-  
-  // Clear existing toggles
-  grid.innerHTML = '';
-  
-  // Create a toggle for each tower card
-  cards.forEach((card) => {
-    if (!(card instanceof HTMLElement)) {
-      return;
-    }
-    
-    const towerId = card.dataset.towerId;
-    if (!towerId) {
-      return;
-    }
-    
-    // Get tower name from the card
-    const towerHeader = card.querySelector('.tower-header h3');
-    const towerName = towerHeader ? towerHeader.textContent : towerId;
-    
-    // Create toggle container
-    const toggleContainer = document.createElement('label');
-    toggleContainer.className = 'tower-individual-toggle';
-    
-    // Create checkbox
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.id = `tower-toggle-${towerId}`;
-    checkbox.checked = true; // Start with all cards visible
-    checkbox.dataset.towerId = towerId;
-    
-    // Add event listener to checkbox
-    checkbox.addEventListener('change', () => {
-      updateIndividualTowerCardVisibility(towerId, checkbox.checked);
-    });
-    
-    // Create label text
-    const labelText = document.createElement('span');
-    labelText.textContent = towerName;
-    
-    // Assemble the toggle
-    toggleContainer.appendChild(checkbox);
-    toggleContainer.appendChild(labelText);
-    
-    // Add to grid
-    grid.appendChild(toggleContainer);
-  });
-}
-
-/**
- * Update visibility of an individual tower card
- */
-function updateIndividualTowerCardVisibility(towerId, visible) {
-  const card = document.querySelector(`[data-tower-id="${towerId}"]`);
-  if (!card || !(card instanceof HTMLElement)) {
-    return;
-  }
-  
-  if (visible) {
-    card.style.removeProperty('display');
-    card.removeAttribute('hidden');
-    card.setAttribute('aria-hidden', 'false');
-  } else {
-    card.style.display = 'none';
-    card.setAttribute('hidden', '');
-    card.setAttribute('aria-hidden', 'true');
-  }
-}
-
-/**
- * Initialize Nu and Xi tower card element debugging controls
- * to help identify which specific elements are blocking scroll gestures.
- */
-export function initializeTowerElementDebugControls() {
-  const debugSection = document.getElementById('tower-element-debug');
-  if (!debugSection) {
-    return;
-  }
-  
-  // Define the element debug controls for Nu and Xi towers
-  const elementControls = [
-    { id: 'debug-nu-card', towerId: 'nu', selector: '[data-tower-id="nu"]' },
-    { id: 'debug-nu-preview', towerId: 'nu', selector: '[data-tower-id="nu"] .tower-preview' },
-    { id: 'debug-nu-header', towerId: 'nu', selector: '[data-tower-id="nu"] .tower-header' },
-    { id: 'debug-nu-formula', towerId: 'nu', selector: '[data-tower-id="nu"] .formula-block' },
-    { id: 'debug-nu-footer', towerId: 'nu', selector: '[data-tower-id="nu"] .card-footer' },
-    { id: 'debug-nu-button', towerId: 'nu', selector: '[data-tower-id="nu"] .tower-equip-button' },
-    { id: 'debug-xi-card', towerId: 'xi', selector: '[data-tower-id="xi"]' },
-    { id: 'debug-xi-preview', towerId: 'xi', selector: '[data-tower-id="xi"] .tower-preview' },
-    { id: 'debug-xi-header', towerId: 'xi', selector: '[data-tower-id="xi"] .tower-header' },
-    { id: 'debug-xi-formula', towerId: 'xi', selector: '[data-tower-id="xi"] .formula-block' },
-    { id: 'debug-xi-footer', towerId: 'xi', selector: '[data-tower-id="xi"] .card-footer' },
-    { id: 'debug-xi-button', towerId: 'xi', selector: '[data-tower-id="xi"] .tower-equip-button' },
-  ];
-  
-  // Set up event listeners for each toggle
-  elementControls.forEach(({ id, selector }) => {
-    const checkbox = document.getElementById(id);
-    if (!checkbox) {
-      return;
-    }
-    
-    // Add change event listener
-    checkbox.addEventListener('change', () => {
-      const element = document.querySelector(selector);
-      if (!element || !(element instanceof HTMLElement)) {
-        return;
-      }
-      
-      if (checkbox.checked) {
-        // Show the element
-        element.style.removeProperty('display');
-        element.style.removeProperty('visibility');
-        element.removeAttribute('hidden');
-        element.setAttribute('aria-hidden', 'false');
-      } else {
-        // Hide the element
-        element.style.display = 'none';
-        element.setAttribute('aria-hidden', 'true');
-      }
-    });
-  });
-  
-  // Add special handling for master card toggles
-  const nuCardToggle = document.getElementById('debug-nu-card');
-  const xiCardToggle = document.getElementById('debug-xi-card');
-  
-  if (nuCardToggle) {
-    nuCardToggle.addEventListener('change', () => {
-      // When master toggle changes, update all child element toggles
-      const isChecked = nuCardToggle.checked;
-      ['debug-nu-preview', 'debug-nu-header', 'debug-nu-formula', 'debug-nu-footer', 'debug-nu-button'].forEach((id) => {
-        const childToggle = document.getElementById(id);
-        if (childToggle && childToggle.checked !== isChecked) {
-          childToggle.checked = isChecked;
-          childToggle.dispatchEvent(new Event('change'));
-        }
-      });
-    });
-  }
-  
-  if (xiCardToggle) {
-    xiCardToggle.addEventListener('change', () => {
-      // When master toggle changes, update all child element toggles
-      const isChecked = xiCardToggle.checked;
-      ['debug-xi-preview', 'debug-xi-header', 'debug-xi-formula', 'debug-xi-footer', 'debug-xi-button'].forEach((id) => {
-        const childToggle = document.getElementById(id);
-        if (childToggle && childToggle.checked !== isChecked) {
-          childToggle.checked = isChecked;
-          childToggle.dispatchEvent(new Event('change'));
-        }
-      });
-    });
-  }
 }
 
 export function syncLoadoutToPlayfield() {

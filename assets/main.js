@@ -228,8 +228,6 @@ import {
   annotateTowerCardsWithCost,
   stageTowerCardEntrance,
   initializeTowerSelection,
-  initializeTowerVisibilityToggle,
-  initializeTowerElementDebugControls,
   synchronizeTowerCardMasterEquations,
   syncLoadoutToPlayfield,
   pruneLockedTowersFromLoadout,
@@ -2121,8 +2119,6 @@ import { createSpireCameraController } from './spireCameraController.js';
     });
     refreshTowerTreeMap();
     initializeTowerSelection();
-    initializeTowerVisibilityToggle();
-    initializeTowerElementDebugControls();
     initializeZetaGraphControls();
     bindTowerCardUpgradeInteractions();
     syncLoadoutToPlayfield();
