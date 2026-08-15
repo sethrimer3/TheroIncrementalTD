@@ -2,6 +2,11 @@
 // Renders golden polygon thumb with orbiting satellite polygons along the viewport edge.
 // Holding a thumb expands its satellites into a vertical scrollbar track; dragging scrolls the active panel.
 
+import {
+  drawProjectileTrail,
+  recordProjectileTrail,
+} from '../scripts/features/towers/shared/ProjectileTrails.js';
+
 // ─── Configuration ────────────────────────────────────────────────────────────
 
 // Diameter (CSS px) of the main thumb particle.
@@ -49,10 +54,17 @@ const POLYGON_EDGE_ALPHA_HELD = 0.80;
 // Polygon side counts cycled through the satellite list.
 const POLYGON_SIDES = [3, 4, 5, 6, 7, 8];
 
-// Thin golden curve trail settings.
-const TRAIL_POINT_LIMIT = 14;
-const TRAIL_MIN_MOVEMENT = 1.4;
-const TRAIL_DECAY_PER_SECOND = 2.6;
+// Match the layered tapered ribbons used by current tower projectiles while
+// retaining the scrollbar's gold palette and compact screen-space proportions.
+const SCROLLBAR_TRAIL_STYLE = Object.freeze({
+  length: 10,
+  width: 3.8,
+  sampleDistance: 2,
+  outerAlpha: 0.06,
+  innerAlpha: 0.15,
+  coreAlpha: 0.35,
+});
+const SCROLLBAR_TRAIL_COLOR = Object.freeze({ r: 255, g: 225, b: 100 });
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 
@@ -81,9 +93,9 @@ function buildSatellites() {
         orbitSpeed,
         linearIndex: sizeIndex,
         above: copy === 0,
-        lastX: null,
-        lastY: null,
-        trail: [],
+        trailStyle: SCROLLBAR_TRAIL_STYLE,
+        trailColor: SCROLLBAR_TRAIL_COLOR,
+        trailOpacity: 0,
         sides,
         rotationAngle: (Math.PI * 2 * globalIndex) / NUM_SATELLITES,
         rotationSpeed,
@@ -138,36 +150,6 @@ function drawGoldenPolygon(ctx, x, y, radius, sides, rotAngle, edgeAlpha) {
   ctx.lineWidth = Math.max(0.8, radius * 0.12);
   ctx.strokeStyle = `rgba(255, 230, 120, ${edgeAlpha})`;
   ctx.stroke();
-
-  ctx.restore();
-}
-
-// Draw a thin golden trail through a series of position history points using linear segments.
-// Segments fade from oldest to newest, giving a clean, fading golden curve effect.
-function drawGoldenCurveTrail(ctx, trail, alpha) {
-  if (!Array.isArray(trail) || trail.length < 2) {
-    return;
-  }
-  ctx.save();
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-
-  // Draw segments pairwise, fading from oldest to newest.
-  for (let i = 1; i < trail.length; i++) {
-    const prev = trail[i - 1];
-    const curr = trail[i];
-    const progress = i / (trail.length - 1);
-    const segAlpha = alpha * curr.life * progress * 0.7;
-    if (segAlpha < 0.01) {
-      continue;
-    }
-    ctx.beginPath();
-    ctx.moveTo(prev.x, prev.y);
-    ctx.lineTo(curr.x, curr.y);
-    ctx.lineWidth = Math.max(0.5, 1.2 * progress);
-    ctx.strokeStyle = `rgba(255, 225, 100, ${segAlpha})`;
-    ctx.stroke();
-  }
 
   ctx.restore();
 }
@@ -254,27 +236,16 @@ function createScrollbarInstance({
     state.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
-  function updateSatelliteTrail(satellite, x, y, dt, shouldLeaveTrail) {
-    if (!Number.isFinite(satellite.lastX) || !Number.isFinite(satellite.lastY)) {
-      satellite.lastX = x;
-      satellite.lastY = y;
+  function updateSatelliteTrail(satellite, x, y, shouldLeaveTrail, opacity) {
+    if (!shouldLeaveTrail) {
+      // Discard settled history so the next press cannot bridge from an old position.
+      satellite.trailCount = 0;
+      satellite.trailStart = 0;
+      satellite.trailOpacity = 0;
+      return;
     }
-
-    const movement = Math.hypot(x - satellite.lastX, y - satellite.lastY);
-    if (shouldLeaveTrail && movement >= TRAIL_MIN_MOVEMENT) {
-      satellite.trail.push({ x: satellite.lastX, y: satellite.lastY, life: 1 });
-      if (satellite.trail.length > TRAIL_POINT_LIMIT) {
-        satellite.trail.shift();
-      }
-    }
-
-    satellite.trail = satellite.trail.filter((point) => {
-      point.life -= dt * TRAIL_DECAY_PER_SECOND;
-      return point.life > 0;
-    });
-
-    satellite.lastX = x;
-    satellite.lastY = y;
+    satellite.trailOpacity = opacity;
+    recordProjectileTrail(satellite, x, y, satellite.trailStyle);
   }
 
   function handlePointerDown(event) {
@@ -450,14 +421,14 @@ function createScrollbarInstance({
       const x = orbitX + (cx - orbitX) * ep;
       const y = orbitY + (linearY - orbitY) * ep;
 
-      updateSatelliteTrail(satellite, x, y, 1 / 60, trailActive);
+      updateSatelliteTrail(satellite, x, y, trailActive, edgeAlpha * 1.5);
 
       if (y < -30 || y > H + 30) {
         return;
       }
 
-      // Draw the golden curve trail instead of a fiery particle trail.
-      drawGoldenCurveTrail(state.ctx, satellite.trail, edgeAlpha * 1.5);
+      // Reuse the tower projectile renderer for the same tapered three-layer ribbon.
+      drawProjectileTrail(state.ctx, satellite, satellite.trailColor, satellite.trailStyle);
       // Draw the transparent golden-edged polygon.
       drawGoldenPolygon(state.ctx, x, y, satellite.radius, satellite.sides, satellite.rotationAngle, edgeAlpha);
     });
