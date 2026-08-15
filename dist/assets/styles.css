@@ -6759,7 +6759,8 @@ body.playfield-fullscreen .playfield canvas {
   border: 2px solid rgba(212, 175, 55, 0.45);
   overflow: hidden;
   background: #000;
-  box-shadow: inset 0 0 0 2px rgba(212, 175, 55, 0.35), inset 0 -20px 40px rgba(8, 8, 12, 0.6);
+  /* Keep the gold rim without the former inset black veil over the sand. */
+  box-shadow: inset 0 0 0 2px rgba(212, 175, 55, 0.35);
   --powder-crest: 0;
   touch-action: none;
 }
@@ -6882,7 +6883,7 @@ body.playfield-fullscreen .playfield canvas {
 
 @keyframes powder-basin-pulse {
   0% {
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12), inset 0 -20px 40px rgba(8, 8, 12, 0.6);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
   }
   40% {
     box-shadow:
@@ -6891,7 +6892,7 @@ body.playfield-fullscreen .playfield canvas {
       0 0 48px rgba(255, 228, 120, 0.18);
   }
   100% {
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12), inset 0 -20px 40px rgba(8, 8, 12, 0.6);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
   }
 }
 
