@@ -1557,25 +1557,19 @@ export class PowderSimulation {
   }
 
   getMoteColorForSize(size, isFreefall, baseColor) {
-    const palette = this.getEffectiveMotePalette();
     const normalizedSize = Number.isFinite(size) ? Math.max(1, size) : 1;
     const sizeRatio = clampUnitInterval((normalizedSize - 1) / Math.max(1, (this.maxDropSize || normalizedSize) - 1));
-    const baseRestAlpha = Number.isFinite(palette?.restAlpha) ? palette.restAlpha : 1;
-    const baseFreefallAlpha = Number.isFinite(palette?.freefallAlpha) ? palette.freefallAlpha : 1;
-    // Keep mote fills fully opaque so grains render as solid blocks without halo outlines.
-    const alpha = Math.min(1, Math.max(1, isFreefall ? baseFreefallAlpha : baseRestAlpha));
+    // Keep mote fills fully opaque so grains render as solid blocks without a dark translucent appearance.
+    const alpha = 1;
     const resolvedColor = this.normalizeDropColor(baseColor);
     if (resolvedColor) {
-      const highlight = mixRgbColors(resolvedColor, { r: 255, g: 255, b: 255 }, 0.28 + sizeRatio * 0.22);
-      const shadowAnchor = mixRgbColors(resolvedColor, { r: 12, g: 8, b: 4 }, 0.35 + sizeRatio * 0.2);
-      const body = mixRgbColors(shadowAnchor, highlight, 0.6 + sizeRatio * 0.25);
-      return colorToRgbaString(body, alpha);
+      // Lift the palette color directly; the former near-black shadow mix made every mote look veiled.
+      const brightness = (isFreefall ? 0.24 : 0.16) + sizeRatio * 0.14;
+      return colorToRgbaString(mixRgbColors(resolvedColor, { r: 255, g: 255, b: 255 }, brightness), alpha);
     }
     const baseSand = { r: 255, g: 222, b: 137 };
-    const shadowSand = { r: 204, g: 170, b: 82 };
-    const highlight = mixRgbColors(baseSand, { r: 255, g: 255, b: 255 }, 0.35 + sizeRatio * 0.15);
-    const body = mixRgbColors(shadowSand, highlight, 0.68 + sizeRatio * 0.2);
-    return colorToRgbaString(body, alpha);
+    const brightness = (isFreefall ? 0.28 : 0.2) + sizeRatio * 0.12;
+    return colorToRgbaString(mixRgbColors(baseSand, { r: 255, g: 255, b: 255 }, brightness), alpha);
   }
 
   setFlowOffset(offset) {
