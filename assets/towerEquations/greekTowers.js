@@ -654,7 +654,14 @@ export const zeta = {
       if (variable.key === 'atk') return { ...variable, description: 'Damage traced through both the polar and parametric projectiles.' };
       if (variable.key === 'spd') return { ...variable, description: 'Graphing speed shared by both projectile parameters.' };
       if (variable.key === 'aleph2') return { ...variable, description: 'Accelerates both graph parameters around their curves.' };
-      if (variable.key === 'aleph5' || variable.key === 'aleph6') return { ...variable, description: 'Sharpens critical contact from both graph projectile heads.' };
+      // Keep Zeta's two critical glyph channels as compact controls beneath Crt.
+      if (variable.key === 'aleph5' || variable.key === 'aleph6') {
+        return {
+          ...variable,
+          description: 'Sharpens critical contact from both graph projectile heads.',
+          renderControlsInline: true,
+        };
+      }
       return { ...variable, description: 'Amplifies ζ graph projectile attack.' };
     }),
   computeResult(values) {

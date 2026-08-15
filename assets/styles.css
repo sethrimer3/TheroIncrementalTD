@@ -9042,6 +9042,31 @@ body.show-glyph-equations .tower-upgrade-variable-equations {
   margin-left: auto;
 }
 
+/* Compact attached upgrades keep their label, allocation buttons, and cost on one clean row. */
+.tower-upgrade-variable-inline-attachment {
+  display: grid;
+  grid-template-columns: minmax(5rem, 1fr) auto;
+  align-items: center;
+  gap: 10px 16px;
+  min-width: 0;
+}
+
+.tower-upgrade-variable-inline-attachment .tower-upgrade-variable-description {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.tower-upgrade-variable-controls--attachment {
+  display: grid;
+  grid-template-columns: auto max-content;
+  justify-content: end;
+  margin-left: 0;
+}
+
+.tower-upgrade-variable-controls--attachment .tower-upgrade-variable-cost {
+  text-align: right;
+}
+
 .tower-upgrade-variable-glyph-control {
   display: flex;
   align-items: center;
@@ -9094,6 +9119,17 @@ body.show-glyph-equations .tower-upgrade-variable-equations {
   color: rgba(255, 255, 255, 0.68);
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+@media (max-width: 640px) {
+  .tower-upgrade-variable-inline-attachment {
+    grid-template-columns: 1fr;
+  }
+
+  .tower-upgrade-variable-controls--attachment {
+    grid-template-columns: auto 1fr;
+    justify-content: stretch;
+  }
 }
 
 .tower-upgrade-variable-note {

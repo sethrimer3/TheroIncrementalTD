@@ -1557,7 +1557,10 @@ function _buildVariableGlyphControls(variable, towerId, level, options = {}) {
   const costNote = document.createElement('span');
   costNote.className = 'tower-upgrade-variable-cost';
   const costLabel = cost === 1 ? currencyMeta.singular : currencyMeta.plural;
-  costNote.textContent = `COST: ${cost} ${costLabel.toUpperCase()}`;
+  // Compact attachment rows use the shared tower-glyph symbol to keep the cost legible on mobile.
+  costNote.textContent = asAttachment
+    ? `COST: ${cost} ${currencyMeta.symbol}`
+    : `COST: ${cost} ${costLabel.toUpperCase()}`;
   controls.append(costNote);
 
   if (maxLevel !== null) {
