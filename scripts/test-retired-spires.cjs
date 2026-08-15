@@ -43,7 +43,8 @@ for (const label of retiredLabels) {
 
 const tabIds = [...nav.matchAll(/data-tab="([^"]+)"/g)].map((match) => match[1]);
 assert.deepEqual(tabIds, ['tower', 'towers', 'powder', 'achievements', 'options']);
-assert.equal((nav.match(/class="[^"]*tab-button--stacked/g) || []).length, 1);
+// The retired multi-Spire navigation no longer leaves a stacked tab button behind.
+assert.equal((nav.match(/class="[^"]*tab-button--stacked/g) || []).length, 0);
 assert.match(nav, /data-tab="powder"[\s\S]*?aria-label="Tower of Inspiration"/);
 assert.match(nav, /aria-controls="panel-powder"/);
 assert.match(index, /id="panel-powder"[\s\S]*?aria-labelledby="tab-powder"/);

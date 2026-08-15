@@ -1556,10 +1556,21 @@ async function run() {
     const { shadowGate } = await importShadowGateEquationModule();
     assert.equal(shadowGate.mathSymbol, String.raw`\wp`);
     assert.equal(shadowGate.baseEquation, String.raw`\( \wp = x \)`);
-    assert.equal(shadowGate.variables.length, 1);
+    // The symbolic enemy set is followed by the three purchasable Shadow Gate curses.
+    assert.equal(shadowGate.variables.length, 4);
     assert.equal(shadowGate.variables[0].key, 'enemies');
     assert.equal(shadowGate.variables[0].symbol, 'x');
     assert.equal(shadowGate.variables[0].upgradable, false);
+    assert.deepEqual(
+      shadowGate.variables.slice(1).map(({ key, symbol, maxLevel, cost, step }) => (
+        { key, symbol, maxLevel, cost, step }
+      )),
+      [
+        { key: 'enemyHpReduction', symbol: 'h', maxLevel: 50, cost: 1, step: 1 },
+        { key: 'enemySpeedReduction', symbol: 'v', maxLevel: 50, cost: 1, step: 1 },
+        { key: 'enemyDamageReduction', symbol: 'd', maxLevel: 9, cost: 5, step: 10 },
+      ],
+    );
     assert.equal(shadowGate.computeResult(), 0);
     assert.equal(shadowGate.formatGoldenEquation(), String.raw`\( \wp = x \)`);
   });
