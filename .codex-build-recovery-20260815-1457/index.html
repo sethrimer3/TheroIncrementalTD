@@ -1,0 +1,2857 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thero Idle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Great+Vibes&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./assets/styles.css" />
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [
+            ['\\(', '\\)'],
+            ['$', '$'],
+          ],
+          displayMath: [
+            ['\\[', '\\]'],
+          ],
+          packages: { '[+]': ['color', 'html'] },
+        },
+        options: {
+          renderActions: {
+            addMenu: [],
+          },
+        },
+      };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  </head>
+  <body>
+    <div class="startup-overlay" id="startup-overlay" role="status" aria-live="polite">
+      <div class="startup-overlay__build" data-startup-build aria-label="Build number">Build —</div>
+      <div class="startup-overlay__content" role="presentation">
+        <!-- Allow the logo animation to run even when low graphics mode disables other animations. -->
+        <img
+          class="startup-overlay__logo"
+          src="./assets/sprites/logo/gravy_thyme_logo.webp"
+          alt="Thero Idle sigil"
+          data-startup-logo
+          data-allow-animation
+        />
+        <!-- Keep the loading glyph animated on mobile by opting it into animations explicitly. -->
+        <div
+          class="startup-overlay__loading"
+          data-startup-loading
+          role="img"
+          aria-label="Loading glyph animation"
+          data-allow-animation
+        ></div>
+        <p class="startup-overlay__hint">Calibrating glyph lattice…</p>
+      </div>
+    </div>
+    <!-- Loading overlay shown briefly while an interactive level initialises after "Enter Level". -->
+    <div
+      class="level-loading-overlay"
+      id="level-loading-overlay"
+      role="status"
+      aria-live="polite"
+      aria-label="Loading level"
+      hidden
+    >
+      <div class="level-loading-overlay__content">
+        <div class="level-loading-overlay__spinner" aria-hidden="true"></div>
+        <p class="level-loading-overlay__hint">Marshalling defenses…</p>
+      </div>
+    </div>
+    <div
+      class="level-story-overlay"
+      id="level-story-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      tabindex="-1"
+    >
+      <div class="level-story-overlay__content" role="presentation">
+        <p class="level-story-overlay__level" id="level-story-label">Level · Title</p>
+        <div class="level-story-overlay__sections" id="level-story-sections"></div>
+        <p class="level-story-overlay__prompt" id="level-story-prompt">
+          
+        </p>
+      </div>
+    </div>
+    <div class="app-shell">
+      <!-- FPS counter displayed in the top-left corner regardless of active tab. -->
+      <div class="fps-counter" id="fps-counter" hidden aria-hidden="true" aria-label="Frames per second">--</div>
+      <main class="main-stage" id="main-stage">
+        <!-- Shared looping animation textures the entire menu surface behind every tab panel. -->
+        <div class="menu-background-media" aria-hidden="true">
+          <img
+            class="menu-background-media__video"
+            data-menu-background-video
+            src="./assets/animations/menuBackground_animation.webp"
+            alt=""
+            decoding="async"
+            fetchpriority="high"
+          />
+        </div>
+        <section
+          class="panel active"
+          data-panel="tower"
+          id="panel-tower"
+          role="tabpanel"
+          aria-labelledby="tab-tower"
+        >
+          <section class="playfield-wrapper" id="playfield-wrapper" aria-live="polite">
+            <div class="playfield-shell">
+              <div
+                class="playfield"
+                id="playfield"
+                role="img"
+                aria-label="Interactive glyph defense lane"
+              >
+                <!-- Playfield menu surfaces layout toggles when a level is active. -->
+                <button
+                  class="playfield-menu-button"
+                  type="button"
+                  id="playfield-menu-button"
+                  aria-label="Open playfield menu"
+                  aria-controls="playfield-menu-panel"
+                  aria-expanded="false"
+                >
+                  ☰
+                </button>
+                <div class="playfield-menu-panel" id="playfield-menu-panel" role="menu" hidden>
+                  <!-- Replicate the stage control commence trigger within the quick menu. -->
+                  <button
+                    class="playfield-menu-item"
+                    type="button"
+                    id="playfield-menu-commence"
+                    role="menuitem"
+                  >
+                    Commence Wave
+                  </button>
+                  <button
+                    class="playfield-menu-item"
+                    type="button"
+                    id="playfield-menu-level-select"
+                    role="menuitem"
+                  >
+                    Level Selection
+                  </button>
+                  <button
+                    class="playfield-menu-item"
+                    type="button"
+                    id="playfield-menu-retry-wave"
+                    role="menuitem"
+                  >
+                    Retry Wave
+                  </button>
+                  <button
+                    class="playfield-menu-item"
+                    type="button"
+                    id="playfield-menu-dev-tools"
+                    role="menuitem"
+                  >
+                    Dev Map Tools
+                  </button>
+                  <button
+                    class="playfield-menu-item"
+                    type="button"
+                    id="playfield-speed"
+                    role="menuitem"
+                  >
+                    Speed ×1
+                  </button>
+                  <button
+                    class="playfield-menu-item"
+                    type="button"
+                    id="playfield-auto"
+                    role="menuitem"
+                  >
+                    Loadout Placement
+                  </button>
+                  <button
+                    class="playfield-menu-item"
+                    type="button"
+                    id="playfield-menu-stats"
+                    role="menuitem"
+                    aria-pressed="false"
+                  >
+                    Show Combat Stats
+                  </button>
+                  <label class="playfield-menu-toggle" for="playfield-auto-wave">
+                    <input type="checkbox" id="playfield-auto-wave" checked />
+                    <span>Auto-send next wave</span>
+                  </label>
+                </div>
+                <canvas id="playfield-canvas"></canvas>
+                <!-- Outcome overlay dims the battlefield and surfaces victory or defeat messaging. -->
+                <div
+                  class="playfield-outcome"
+                  id="playfield-outcome"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-hidden="true"
+                  tabindex="-1"
+                  hidden
+                >
+                  <div class="playfield-outcome__panel">
+                    <p class="playfield-outcome__title" id="playfield-outcome-title"></p>
+                    <p class="playfield-outcome__subtitle" id="playfield-outcome-subtitle"></p>
+                    <div class="playfield-outcome__actions">
+                      <button
+                        class="playfield-outcome__button"
+                        type="button"
+                        id="playfield-outcome-primary"
+                      >
+                        Back to Level Selection
+                      </button>
+                      <button
+                        class="playfield-outcome__button playfield-outcome__button--secondary"
+                        type="button"
+                        id="playfield-outcome-secondary"
+                        hidden
+                      ></button>
+                    </div>
+                  </div>
+                </div>
+                <dl class="playfield-stats" aria-live="polite">
+                  <div class="playfield-stats__item">
+                    <dt>Wave</dt>
+                    <dd id="playfield-wave">—</dd>
+                  </div>
+                  <div class="playfield-stats__item">
+                    <dt>Gate</dt>
+                    <dd id="playfield-health">—</dd>
+                  </div>
+                  <div class="playfield-stats__item">
+                    <dt>Thero</dt>
+                    <dd id="playfield-energy">—</dd>
+                  </div>
+                </dl>
+                <div class="tower-loadout-shell" id="tower-loadout-shell" data-toggle-side="left">
+                  <div class="tower-loadout" id="tower-loadout" aria-label="Tower loadout" role="region">
+                    <p class="tower-loadout-note screen-reader-only" id="tower-loadout-note">
+                      Select four towers to bring into the defense. Drag the glyph chips onto the plane to
+                      lattice them; drop a chip atop a matching tower to merge into the next tier.
+                    </p>
+                    <div class="tower-loadout-grid" id="tower-loadout-grid" role="list"></div>
+                  </div>
+                </div>
+              </div>
+              <!-- Playfield Visual Settings - Only visible when in a level -->
+              <div class="playfield-settings-wrapper" id="playfield-settings-wrapper" hidden aria-hidden="true">
+                <button
+                  class="action-button playfield-settings-trigger"
+                  type="button"
+                  id="playfield-settings-toggle"
+                  aria-expanded="false"
+                  aria-controls="playfield-settings-menu"
+                >
+                  <span class="playfield-settings-trigger__icon" aria-hidden="true">℘</span>
+                  <span class="playfield-settings-trigger__label">Settings</span>
+                </button>
+                <div
+                  class="playfield-settings-menu"
+                  id="playfield-settings-menu"
+                  data-open="false"
+                  aria-hidden="true"
+                  hidden
+                >
+                  <div class="settings-toggle" id="playfield-enemy-particles-toggle-row">
+                    <div class="settings-toggle-text">
+                      <span class="settings-toggle-title" id="playfield-enemy-particles-title">Enemy Particles</span>
+                      <span
+                        class="settings-toggle-description"
+                        id="playfield-enemy-particles-description"
+                        >Particle effects around enemies for enhanced visual feedback.</span
+                      >
+                    </div>
+                    <label class="settings-toggle-control" for="playfield-enemy-particles-toggle">
+                      <input
+                        type="checkbox"
+                        id="playfield-enemy-particles-toggle"
+                        class="settings-toggle-input"
+                        role="switch"
+                        aria-labelledby="playfield-enemy-particles-title"
+                        aria-describedby="playfield-enemy-particles-description"
+                        aria-checked="true"
+                        checked
+                      />
+                      <span class="settings-toggle-slider" aria-hidden="true"></span>
+                      <span class="settings-toggle-state" id="playfield-enemy-particles-state">On</span>
+                    </label>
+                  </div>
+                  <!-- Edge Crystals toggle for playfield edge polygons. -->
+                  <div class="settings-toggle" id="playfield-edge-crystals-toggle-row">
+                    <div class="settings-toggle-text">
+                      <span class="settings-toggle-title" id="playfield-edge-crystals-title">Edge Crystals</span>
+                      <span
+                        class="settings-toggle-description"
+                        id="playfield-edge-crystals-description"
+                        >Decorative polygons around the edge of the playfield.</span
+                      >
+                    </div>
+                    <label class="settings-toggle-control" for="playfield-edge-crystals-toggle">
+                      <input
+                        type="checkbox"
+                        id="playfield-edge-crystals-toggle"
+                        class="settings-toggle-input"
+                        role="switch"
+                        aria-labelledby="playfield-edge-crystals-title"
+                        aria-describedby="playfield-edge-crystals-description"
+                        aria-checked="false"
+                      />
+                      <span class="settings-toggle-slider" aria-hidden="true"></span>
+                      <span class="settings-toggle-state" id="playfield-edge-crystals-state">Off</span>
+                    </label>
+                  </div>
+                  <!-- Crystal Background Sprites toggle for large layered crystal art around the playfield edge. -->
+                  <div class="settings-toggle" id="crystal-background-sprites-toggle-row">
+                    <div class="settings-toggle-text">
+                      <span class="settings-toggle-title" id="crystal-background-sprites-title">Crystal Background</span>
+                      <span
+                        class="settings-toggle-description"
+                        id="crystal-background-sprites-description"
+                        >Layered crystal artwork rendered around the edge of the playing field.</span
+                      >
+                    </div>
+                    <label class="settings-toggle-control" for="crystal-background-sprites-toggle">
+                      <input
+                        type="checkbox"
+                        id="crystal-background-sprites-toggle"
+                        class="settings-toggle-input"
+                        role="switch"
+                        aria-labelledby="crystal-background-sprites-title"
+                        aria-describedby="crystal-background-sprites-description"
+                        aria-checked="false"
+                      />
+                      <span class="settings-toggle-slider" aria-hidden="true"></span>
+                      <span class="settings-toggle-state" id="crystal-background-sprites-state">Off</span>
+                    </label>
+                  </div>
+                  <!-- Background Particles toggle for floaters and swimmers. -->
+                  <div class="settings-toggle" id="playfield-background-particles-toggle-row">
+                    <div class="settings-toggle-text">
+                      <span class="settings-toggle-title" id="playfield-background-particles-title">Background Particles</span>
+                      <span
+                        class="settings-toggle-description"
+                        id="playfield-background-particles-description"
+                        >Floating circles and connecting lines in the playfield background.</span
+                      >
+                    </div>
+                    <label class="settings-toggle-control" for="playfield-background-particles-toggle">
+                      <input
+                        type="checkbox"
+                        id="playfield-background-particles-toggle"
+                        class="settings-toggle-input"
+                        role="switch"
+                        aria-labelledby="playfield-background-particles-title"
+                        aria-describedby="playfield-background-particles-description"
+                        aria-checked="true"
+                        checked
+                      />
+                      <span class="settings-toggle-slider" aria-hidden="true"></span>
+                      <span class="settings-toggle-state" id="playfield-background-particles-state">On</span>
+                    </label>
+                  </div>
+                  <!-- Render size option for Playfield. -->
+                  <div class="settings-toggle" id="playfield-render-size-row">
+                    <div class="settings-toggle-text">
+                      <span class="settings-toggle-title" id="playfield-render-size-title">Render Size</span>
+                      <span
+                        class="settings-toggle-description"
+                        id="playfield-render-size-description"
+                        >Adjust the Playfield render size.</span
+                      >
+                    </div>
+                    <label class="settings-toggle-control" for="playfield-render-size-select">
+                      <span class="screen-reader-only">Render size</span>
+                      <select
+                        id="playfield-render-size-select"
+                        class="settings-select"
+                        aria-labelledby="playfield-render-size-title"
+                        aria-describedby="playfield-render-size-description"
+                      >
+                        <option value="0">Small</option>
+                        <option value="1" selected>Medium</option>
+                        <option value="2">Large</option>
+                      </select>
+                    </label>
+                  </div>
+                  <!-- High-resolution toggle for the Playfield canvas. -->
+                  <div class="settings-toggle" id="playfield-high-res-row">
+                    <div class="settings-toggle-text">
+                      <span class="settings-toggle-title" id="playfield-high-res-title">Playfield Resolution</span>
+                      <span
+                        class="settings-toggle-description"
+                        id="playfield-high-res-description"
+                        >Increase render resolution for sharper playfield visuals.</span
+                      >
+                    </div>
+                    <label class="settings-toggle-control" for="playfield-high-res-toggle">
+                      <input
+                        type="checkbox"
+                        id="playfield-high-res-toggle"
+                        class="settings-toggle-input"
+                        role="switch"
+                        aria-labelledby="playfield-high-res-title"
+                        aria-describedby="playfield-high-res-description"
+                        aria-checked="false"
+                      />
+                      <span class="settings-toggle-slider" aria-hidden="true"></span>
+                      <span class="settings-toggle-state" id="playfield-high-res-state">Standard</span>
+                    </label>
+                  </div>
+                  <button class="action-button ghost" type="button" id="playfield-track-type-button">
+                    Track Type · Gradient
+                  </button>
+                  <button class="action-button ghost playfield-settings-close" type="button">Close</button>
+                  <!-- Developer-only: render layer toggles for debugging (hidden when dev mode is off) -->
+                  <div id="playfield-dev-layers-section" hidden aria-hidden="true">
+                    <div class="settings-toggle settings-divider-label" aria-hidden="true">
+                      <span class="settings-toggle-title" style="opacity:0.6;font-size:0.78em;letter-spacing:0.06em;">DEV LAYERS</span>
+                    </div>
+                    <div class="settings-toggle" id="dev-layer-background-row">
+                      <div class="settings-toggle-text">
+                        <span class="settings-toggle-title">Background</span>
+                        <span class="settings-toggle-description">Sketches, floaters, crystal mosaic.</span>
+                      </div>
+                      <label class="settings-toggle-control" for="dev-layer-background-toggle">
+                        <input type="checkbox" id="dev-layer-background-toggle" class="settings-toggle-input" role="switch" checked />
+                        <span class="settings-toggle-slider" aria-hidden="true"></span>
+                        <span class="settings-toggle-state" id="dev-layer-background-state">On</span>
+                      </label>
+                    </div>
+                    <div class="settings-toggle" id="dev-layer-track-row">
+                      <div class="settings-toggle-text">
+                        <span class="settings-toggle-title">Track</span>
+                        <span class="settings-toggle-description">Path, arc light, nodes, and Thero crystals.</span>
+                      </div>
+                      <label class="settings-toggle-control" for="dev-layer-track-toggle">
+                        <input type="checkbox" id="dev-layer-track-toggle" class="settings-toggle-input" role="switch" checked />
+                        <span class="settings-toggle-slider" aria-hidden="true"></span>
+                        <span class="settings-toggle-state" id="dev-layer-track-state">On</span>
+                      </label>
+                    </div>
+                    <!-- Developer-only gate visuals toggles to isolate Mind/Shadow Gate rendering costs. -->
+                    <div class="settings-toggle" id="dev-layer-mind-gate-background-row">
+                      <div class="settings-toggle-text">
+                        <span class="settings-toggle-title">Mind Gate Background</span>
+                        <span class="settings-toggle-description">Rotating Mind Gate backdrop rings.</span>
+                      </div>
+                      <label class="settings-toggle-control" for="dev-layer-mind-gate-background-toggle">
+                        <input type="checkbox" id="dev-layer-mind-gate-background-toggle" class="settings-toggle-input" role="switch" checked />
+                        <span class="settings-toggle-slider" aria-hidden="true"></span>
+                        <span class="settings-toggle-state" id="dev-layer-mind-gate-background-state">On</span>
+                      </label>
+                    </div>
+                    <div class="settings-toggle" id="dev-layer-mind-gate-wave-row">
+                      <div class="settings-toggle-text">
+                        <span class="settings-toggle-title">Mind Gate Wave</span>
+                        <span class="settings-toggle-description">Consciousness sine-wave ribbon through the gate.</span>
+                      </div>
+                      <label class="settings-toggle-control" for="dev-layer-mind-gate-wave-toggle">
+                        <input type="checkbox" id="dev-layer-mind-gate-wave-toggle" class="settings-toggle-input" role="switch" checked />
+                        <span class="settings-toggle-slider" aria-hidden="true"></span>
+                        <span class="settings-toggle-state" id="dev-layer-mind-gate-wave-state">On</span>
+                      </label>
+                    </div>
+                    <div class="settings-toggle" id="dev-layer-mind-gate-particles-row">
+                      <div class="settings-toggle-text">
+                        <span class="settings-toggle-title">Mind Gate Particles</span>
+                        <span class="settings-toggle-description">Warm particle halo around the Mind Gate core.</span>
+                      </div>
+                      <label class="settings-toggle-control" for="dev-layer-mind-gate-particles-toggle">
+                        <input type="checkbox" id="dev-layer-mind-gate-particles-toggle" class="settings-toggle-input" role="switch" checked />
+                        <span class="settings-toggle-slider" aria-hidden="true"></span>
+                        <span class="settings-toggle-state" id="dev-layer-mind-gate-particles-state">On</span>
+                      </label>
+                    </div>
+                    <div class="settings-toggle" id="dev-layer-mind-gate-symbol-row">
+                      <div class="settings-toggle-text">
+                        <span class="settings-toggle-title">Mind Gate Symbol</span>
+                        <span class="settings-toggle-description">Mind Gate sprite and exponent marker.</span>
+                      </div>
+                      <label class="settings-toggle-control" for="dev-layer-mind-gate-symbol-toggle">
+                        <input type="checkbox" id="dev-layer-mind-gate-symbol-toggle" class="settings-toggle-input" role="switch" checked />
+                        <span class="settings-toggle-slider" aria-hidden="true"></span>
+                        <span class="settings-toggle-state" id="dev-layer-mind-gate-symbol-state">On</span>
+                      </label>
+                    </div>
+                    <div class="settings-toggle" id="dev-layer-shadow-gate-background-row">
+                      <div class="settings-toggle-text">
+                        <span class="settings-toggle-title">Shadow Gate Background</span>
+                        <span class="settings-toggle-description">Rotating Shadow Gate void layers.</span>
+                      </div>
+                      <label class="settings-toggle-control" for="dev-layer-shadow-gate-background-toggle">
+                        <input type="checkbox" id="dev-layer-shadow-gate-background-toggle" class="settings-toggle-input" role="switch" checked />
+                        <span class="settings-toggle-slider" aria-hidden="true"></span>
+                        <span class="settings-toggle-state" id="dev-layer-shadow-gate-background-state">On</span>
+                      </label>
+                    </div>
+                    <div class="settings-toggle" id="dev-layer-shadow-gate-particles-row">
+                      <div class="settings-toggle-text">
+                        <span class="settings-toggle-title">Shadow Gate Particles</span>
+                        <span class="settings-toggle-description">Counter-rotating void particles around the spawn gate.</span>
+                      </div>
+                      <label class="settings-toggle-control" for="dev-layer-shadow-gate-particles-toggle">
+                        <input type="checkbox" id="dev-layer-shadow-gate-particles-toggle" class="settings-toggle-input" role="switch" checked />
+                        <span class="settings-toggle-slider" aria-hidden="true"></span>
+                        <span class="settings-toggle-state" id="dev-layer-shadow-gate-particles-state">On</span>
+                      </label>
+                    </div>
+                    <div class="settings-toggle" id="dev-layer-shadow-gate-symbol-row">
+                      <div class="settings-toggle-text">
+                        <span class="settings-toggle-title">Shadow Gate Symbol</span>
+                        <span class="settings-toggle-description">Shadow Gate glyph sprite and fallback mark.</span>
+                      </div>
+                      <label class="settings-toggle-control" for="dev-layer-shadow-gate-symbol-toggle">
+                        <input type="checkbox" id="dev-layer-shadow-gate-symbol-toggle" class="settings-toggle-input" role="switch" checked />
+                        <span class="settings-toggle-slider" aria-hidden="true"></span>
+                        <span class="settings-toggle-state" id="dev-layer-shadow-gate-symbol-state">On</span>
+                      </label>
+                    </div>
+
+                    <div class="settings-toggle" id="dev-layer-sunlight-row">
+                      <div class="settings-toggle-text">
+                        <span class="settings-toggle-title">Sunlight</span>
+                        <span class="settings-toggle-description">Mind Gate warm glow and tower shadows.</span>
+                      </div>
+                      <label class="settings-toggle-control" for="dev-layer-sunlight-toggle">
+                        <input type="checkbox" id="dev-layer-sunlight-toggle" class="settings-toggle-input" role="switch" checked />
+                        <span class="settings-toggle-slider" aria-hidden="true"></span>
+                        <span class="settings-toggle-state" id="dev-layer-sunlight-state">On</span>
+                      </label>
+                    </div>
+                    <div class="settings-toggle" id="dev-layer-sunlight-v2-row">
+                      <div class="settings-toggle-text">
+                        <span class="settings-toggle-title">Sunlight V2</span>
+                        <span class="settings-toggle-description">Alternate glow with baked shadow cut-outs (replaces V1 when on).</span>
+                      </div>
+                      <label class="settings-toggle-control" for="dev-layer-sunlight-v2-toggle">
+                        <input type="checkbox" id="dev-layer-sunlight-v2-toggle" class="settings-toggle-input" role="switch" />
+                        <span class="settings-toggle-slider" aria-hidden="true"></span>
+                        <span class="settings-toggle-state" id="dev-layer-sunlight-v2-state">Off</span>
+                      </label>
+                    </div>
+                    <div class="settings-toggle" id="dev-layer-towers-row">
+                      <div class="settings-toggle-text">
+                        <span class="settings-toggle-title">Towers</span>
+                        <span class="settings-toggle-description">Tower sprites, auras, delta command preview, and placement.</span>
+                      </div>
+                      <label class="settings-toggle-control" for="dev-layer-towers-toggle">
+                        <input type="checkbox" id="dev-layer-towers-toggle" class="settings-toggle-input" role="switch" checked />
+                        <span class="settings-toggle-slider" aria-hidden="true"></span>
+                        <span class="settings-toggle-state" id="dev-layer-towers-state">On</span>
+                      </label>
+                    </div>
+                    <div class="settings-toggle" id="dev-layer-enemies-row">
+                      <div class="settings-toggle-text">
+                        <span class="settings-toggle-title">Enemies</span>
+                        <span class="settings-toggle-description">Enemy sprites and death particles.</span>
+                      </div>
+                      <label class="settings-toggle-control" for="dev-layer-enemies-toggle">
+                        <input type="checkbox" id="dev-layer-enemies-toggle" class="settings-toggle-input" role="switch" checked />
+                        <span class="settings-toggle-slider" aria-hidden="true"></span>
+                        <span class="settings-toggle-state" id="dev-layer-enemies-state">On</span>
+                      </label>
+                    </div>
+                    <div class="settings-toggle" id="dev-layer-projectiles-row">
+                      <div class="settings-toggle-text">
+                        <span class="settings-toggle-title">Projectiles</span>
+                        <span class="settings-toggle-description">Projectiles and burst effects.</span>
+                      </div>
+                      <label class="settings-toggle-control" for="dev-layer-projectiles-toggle">
+                        <input type="checkbox" id="dev-layer-projectiles-toggle" class="settings-toggle-input" role="switch" checked />
+                        <span class="settings-toggle-slider" aria-hidden="true"></span>
+                        <span class="settings-toggle-state" id="dev-layer-projectiles-state">On</span>
+                      </label>
+                    </div>
+                    <div class="settings-toggle" id="dev-layer-ui-overlay-row">
+                      <div class="settings-toggle-text">
+                        <span class="settings-toggle-title">UI Overlay</span>
+                        <span class="settings-toggle-description">Damage numbers, feedback, wave tallies, tower menu.</span>
+                      </div>
+                      <label class="settings-toggle-control" for="dev-layer-ui-overlay-toggle">
+                        <input type="checkbox" id="dev-layer-ui-overlay-toggle" class="settings-toggle-input" role="switch" checked />
+                        <span class="settings-toggle-slider" aria-hidden="true"></span>
+                        <span class="settings-toggle-state" id="dev-layer-ui-overlay-state">On</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Combat stats panel sits below the battlefield so gameplay remains interactive. -->
+              <div class="playfield-combat-stats-container">
+                <section
+                  class="playfield-combat-stats"
+                  id="playfield-combat-stats"
+                  role="region"
+                  aria-label="Combat stats"
+                  hidden
+                  aria-hidden="true"
+                >
+                  <header class="playfield-combat-stats__header">Battle Analytics</header>
+                  <section
+                    class="playfield-combat-stats__section"
+                    aria-labelledby="playfield-combat-stats-current-title"
+                  >
+                    <h3
+                      class="playfield-combat-stats__section-title"
+                      id="playfield-combat-stats-current-title"
+                    >
+                      Current Wave
+                    </h3>
+                    <p
+                      class="playfield-combat-stats__note"
+                      id="playfield-combat-stats-current-empty"
+                    >
+                      Current wave details will appear once defenses commence.
+                    </p>
+                    <div
+                      class="playfield-combat-stats__wave"
+                      id="playfield-combat-stats-current-wave"
+                      role="list"
+                      aria-live="polite"
+                    ></div>
+                  </section>
+                  <section
+                    class="playfield-combat-stats__section"
+                    aria-labelledby="playfield-combat-stats-next-title"
+                  >
+                    <h3
+                      class="playfield-combat-stats__section-title"
+                      id="playfield-combat-stats-next-title"
+                    >
+                      Next Wave
+                    </h3>
+                    <p
+                      class="playfield-combat-stats__note"
+                      id="playfield-combat-stats-next-empty"
+                    >
+                      Future wave information appears after the current wave has been scouted.
+                    </p>
+                    <div
+                      class="playfield-combat-stats__wave"
+                      id="playfield-combat-stats-next-wave"
+                      role="list"
+                      aria-live="polite"
+                    ></div>
+                  </section>
+                  <section
+                    class="playfield-combat-stats__section"
+                    aria-labelledby="playfield-combat-stats-active-title"
+                  >
+                    <h3
+                      class="playfield-combat-stats__section-title"
+                      id="playfield-combat-stats-active-title"
+                    >
+                      On-Screen Enemies
+                    </h3>
+                    <p
+                      class="playfield-combat-stats__note"
+                      id="playfield-combat-stats-active-empty"
+                    >
+                      Enemies currently traversing the lattice will appear here.
+                    </p>
+                    <div
+                      class="playfield-combat-stats__active"
+                      id="playfield-combat-stats-active-enemies"
+                      role="list"
+                      aria-live="polite"
+                    ></div>
+                  </section>
+                  <section class="playfield-combat-stats__section" aria-labelledby="playfield-combat-stats-tower-title">
+                    <h3 class="playfield-combat-stats__section-title" id="playfield-combat-stats-tower-title">
+                      Tower Output
+                    </h3>
+                    <p class="playfield-combat-stats__note" id="playfield-combat-stats-tower-empty">
+                      Tower damage summaries appear once combat begins.
+                    </p>
+                    <div
+                      class="playfield-combat-stats__list"
+                      id="playfield-combat-stats-towers"
+                      role="list"
+                      aria-live="polite"
+                    ></div>
+                  </section>
+                  <section class="playfield-combat-stats__section" aria-labelledby="playfield-combat-stats-log-title">
+                    <h3 class="playfield-combat-stats__section-title" id="playfield-combat-stats-log-title">
+                      Attack Log
+                    </h3>
+                    <p class="playfield-combat-stats__note" id="playfield-combat-stats-log-empty">
+                      Recent attack summaries will gather here.
+                    </p>
+                    <div
+                      class="playfield-combat-stats__log"
+                      id="playfield-combat-stats-log"
+                      role="list"
+                      aria-live="polite"
+                    ></div>
+                  </section>
+                  <section class="playfield-combat-stats__section" aria-labelledby="playfield-combat-stats-enemy-title">
+                    <h3 class="playfield-combat-stats__section-title" id="playfield-combat-stats-enemy-title">
+                      Enemy History
+                    </h3>
+                    <p class="playfield-combat-stats__note" id="playfield-combat-stats-enemy-empty">
+                      Defeated enemies and their top damaging towers will appear once battles resolve.
+                    </p>
+                    <div
+                      class="playfield-combat-stats__enemies"
+                      id="playfield-combat-stats-enemies"
+                      role="list"
+                      aria-live="polite"
+                    ></div>
+                  </section>
+                </section>
+                <div
+                  class="playfield-combat-stats__dialog"
+                  id="playfield-combat-stats-dialog"
+                  role="dialog"
+                  aria-modal="false"
+                  hidden
+                  aria-hidden="true"
+                >
+                  <div class="playfield-combat-stats__dialog-content">
+                    <div class="playfield-combat-stats__dialog-header">
+                      <h4
+                        class="playfield-combat-stats__dialog-title"
+                        id="playfield-combat-stats-dialog-title"
+                      >
+                        Enemy Details
+                      </h4>
+                      <button
+                        class="playfield-combat-stats__dialog-close"
+                        type="button"
+                        id="playfield-combat-stats-dialog-close"
+                        aria-label="Close enemy details"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <dl
+                      class="playfield-combat-stats__dialog-list"
+                      id="playfield-combat-stats-dialog-list"
+                    ></dl>
+                  </div>
+                </div>
+              </div>
+              <section
+                class="overlay-editor"
+                id="overlay-level-editor"
+                hidden
+                aria-hidden="true"
+                role="region"
+                aria-labelledby="level-editor-title"
+              >
+                <header class="overlay-editor__header">
+                  <h3 class="overlay-editor__title" id="level-editor-title">Level Editor</h3>
+                  <button
+                    class="overlay-editor__toggle"
+                    type="button"
+                    id="level-editor-toggle"
+                    aria-pressed="false"
+                  >
+                    Enable Editing
+                  </button>
+                </header>
+                <p class="overlay-editor__note" id="level-editor-note">
+                  Click the battlefield to place anchors. Drag markers to adjust, or Shift-click to remove the nearest anchor.
+                  <span class="overlay-editor__count" id="level-editor-count">0 points</span>
+                </p>
+                <div class="overlay-editor__speed-controls">
+                  <label class="overlay-editor__tool-option-label">
+                    <span>Map Speed Multiplier</span>
+                    <input
+                      type="number"
+                      class="overlay-editor__tool-input"
+                      id="map-speed-multiplier-input"
+                      value="1"
+                      min="0.1"
+                      max="10"
+                      step="0.1"
+                      title="Global speed multiplier for all enemies on this map"
+                    />
+                  </label>
+                  <label class="overlay-editor__tool-option-label">
+                    <span>Point Speed Multiplier</span>
+                    <input
+                      type="number"
+                      class="overlay-editor__tool-input"
+                      id="point-speed-multiplier-input"
+                      value="1"
+                      min="0.1"
+                      max="10"
+                      step="0.1"
+                      disabled
+                      title="Speed multiplier for the selected path point"
+                    />
+                  </label>
+                  <button 
+                    class="overlay-editor__button" 
+                    type="button" 
+                    id="apply-point-speed-button"
+                    disabled
+                    title="Apply the speed multiplier to the selected point"
+                  >
+                    Apply to Point
+                  </button>
+                </div>
+                <div class="overlay-editor__actions">
+                  <button class="overlay-editor__button" type="button" id="level-editor-clear" disabled>
+                    Clear All
+                  </button>
+                  <button class="overlay-editor__button" type="button" id="level-editor-reset" disabled>
+                    Reset to Level Path
+                  </button>
+                  <button class="overlay-editor__button" type="button" id="level-editor-export" disabled>
+                    Copy Path JSON
+                  </button>
+                  <button class="overlay-editor__button overlay-editor__button--primary" type="button" id="level-editor-export-changes" disabled>
+                    Export Changes
+                  </button>
+                </div>
+                <!-- Developer map tools palette for selecting placement modes -->
+                <div class="overlay-editor__elements" id="developer-map-elements" hidden aria-hidden="true">
+                  <p class="overlay-editor__elements-title">Map Tools Palette</p>
+                  <div class="overlay-editor__palette">
+                    <button
+                      class="overlay-editor__palette-tool"
+                      type="button"
+                      id="palette-tool-path"
+                      data-tool="path"
+                      aria-pressed="true"
+                      title="Edit path anchors"
+                    >
+                      <span class="overlay-editor__palette-icon">⚓</span>
+                      <span class="overlay-editor__palette-label">Path</span>
+                    </button>
+                    <button
+                      class="overlay-editor__palette-tool"
+                      type="button"
+                      id="palette-tool-crystal"
+                      data-tool="crystal"
+                      aria-pressed="false"
+                      title="Place Thero crystal level elements"
+                    >
+                      <span class="overlay-editor__palette-icon">◇</span>
+                      <span class="overlay-editor__palette-label">Thero Crystal</span>
+                    </button>
+                    <button
+                      class="overlay-editor__palette-tool"
+                      type="button"
+                      id="palette-tool-tower"
+                      data-tool="tower"
+                      aria-pressed="false"
+                      title="Place pre-configured towers"
+                    >
+                      <span class="overlay-editor__palette-icon">⬡</span>
+                      <span class="overlay-editor__palette-label">Tower</span>
+                    </button>
+                    <button
+                      class="overlay-editor__palette-tool"
+                      type="button"
+                      id="palette-tool-erase"
+                      data-tool="erase"
+                      aria-pressed="false"
+                      title="Remove map elements"
+                    >
+                      <span class="overlay-editor__palette-icon">✕</span>
+                      <span class="overlay-editor__palette-label">Erase</span>
+                    </button>
+                  </div>
+                  <div class="overlay-editor__tool-options" id="tool-options-container">
+                    <!-- Crystal options -->
+                    <div class="overlay-editor__tool-option-group" id="tool-options-crystal" hidden>
+                      <label class="overlay-editor__tool-option-label">
+                        <span>Thero Crystal Integrity</span>
+                        <input
+                          type="number"
+                          class="overlay-editor__tool-input"
+                          id="crystal-integrity-input"
+                          value="900"
+                          min="10"
+                          max="100000"
+                          step="10"
+                        />
+                      </label>
+                      <label class="overlay-editor__tool-option-label">
+                        <span>Thero Reward</span>
+                        <input
+                          type="number"
+                          class="overlay-editor__tool-input"
+                          id="crystal-thero-input"
+                          value="0"
+                          min="0"
+                          max="1000000"
+                          step="10"
+                        />
+                      </label>
+                    </div>
+                    <!-- Tower options -->
+                    <div class="overlay-editor__tool-option-group" id="tool-options-tower" hidden>
+                      <label class="overlay-editor__tool-option-label">
+                        <span>Tower Type</span>
+                        <select class="overlay-editor__tool-select" id="tower-type-select">
+                          <option value="alpha">α - Alpha (Basic)</option>
+                          <option value="beta">β - Beta (Multiplier)</option>
+                          <option value="gamma">γ - Gamma (Exponent)</option>
+                          <option value="delta">δ - Delta (Command)</option>
+                          <option value="epsilon">ε - Epsilon (Factorial)</option>
+                        </select>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="overlay-editor__elements-actions">
+                    <button class="overlay-editor__button" type="button" id="developer-clear-crystals">
+                      Clear All Thero Crystals
+                    </button>
+                    <button class="overlay-editor__button" type="button" id="developer-clear-towers" hidden>
+                      Clear All Towers
+                    </button>
+                  </div>
+                  <p class="overlay-editor__elements-note" id="developer-map-elements-note" hidden></p>
+                </div>
+                <textarea
+                  class="overlay-editor__output"
+                  id="level-editor-output"
+                  rows="6"
+                  readonly
+                  placeholder="Enable editing to chart a new path."
+                ></textarea>
+                <p class="overlay-editor__status" id="level-editor-status" role="status" aria-live="polite" hidden></p>
+                <!-- Wave editor for configuring enemy waves in developer mode -->
+                <section class="overlay-editor__wave-editor" id="wave-editor-section" hidden aria-hidden="true">
+                  <h4 class="overlay-editor__subtitle">Wave Configuration</h4>
+                  <div class="overlay-editor__wave-controls">
+                    <button class="overlay-editor__button" type="button" id="wave-editor-add-wave">
+                      Add Wave
+                    </button>
+                    <button class="overlay-editor__button" type="button" id="wave-editor-clear">
+                      Clear All Waves
+                    </button>
+                  </div>
+                  <div class="overlay-editor__wave-list" id="wave-editor-list" aria-live="polite">
+                    <!-- Wave items populated dynamically -->
+                  </div>
+                  <div class="overlay-editor__wave-export">
+                    <button class="overlay-editor__button overlay-editor__button--primary" type="button" id="wave-editor-export">
+                      Export Compact Wave String
+                    </button>
+                    <button class="overlay-editor__button" type="button" id="wave-editor-import">
+                      Import Wave String
+                    </button>
+                  </div>
+                  <textarea
+                    class="overlay-editor__output"
+                    id="wave-editor-output"
+                    rows="3"
+                    readonly
+                    placeholder="Compact wave string will appear here..."
+                  ></textarea>
+                </section>
+              </section>
+            </div>
+          </section>
+          <section class="level-section" id="level-selection">
+            <!-- Leaderboard shortcut anchored in the upper corner of the Defense tab. -->
+            <button
+              class="defense-leaderboard-button"
+              type="button"
+              id="defense-leaderboard-button"
+              aria-label="View defense leaderboards"
+            >
+              <span aria-hidden="true">⚔</span>
+            </button>
+            <div
+              class="defense-leaderboard-notice"
+              id="defense-leaderboard-notice"
+              role="status"
+              aria-live="polite"
+              hidden
+            >Leaderboard Coming Soon...</div>
+            <header class="subsection-title subsection-title--level">Project: Thero</header>
+            <div class="level-grid" id="level-grid" aria-live="polite"></div>
+            <!-- Surface the live thero multiplier and starting equation beneath the level list. -->
+            <div class="level-thero-banner" id="level-thero-banner" aria-live="polite">
+              <div class="level-thero-row">
+                <span class="level-thero-label">Thero Multiplier</span>
+                <span class="level-thero-value" id="level-thero-multiplier">×0.00</span>
+              </div>
+            </div>
+          </section>
+          <!-- Developer mode toggle positioned at the very bottom of the Defense tab -->
+          <div class="stage-developer-toggle-wrapper" id="stage-developer-toggle-wrapper">
+            <label class="developer-mode-toggle stage-developer-mode-toggle" for="stage-developer-mode">
+              <input type="checkbox" id="stage-developer-mode" />
+              Developer Mode — unlock all towers, levels, and entries
+            </label>
+          </div>
+        </section>
+
+        <section
+          class="panel"
+          data-panel="towers"
+          id="panel-towers"
+          role="tabpanel"
+          aria-labelledby="tab-towers"
+          hidden
+        >
+          <!-- Present tower resource summaries near the top of the Towers tab. -->
+          <div class="tower-glyph-summary" id="tower-glyph-summary" aria-live="polite">
+            <!-- Only the surviving Tower of Inspiration glyph remains active. -->
+            <div class="tower-glyph-row tower-glyph-row--primary">
+              <div class="tower-glyph-item">
+                <span class="tower-glyph-label">Tower of Inspiration Glyphs:</span>
+                <span class="tower-glyph-value" id="tower-glyphs-aleph-total">0 ℵ</span>
+                <span class="tower-glyph-unallocated" id="tower-glyphs-aleph-unused"></span>
+              </div>
+            </div>
+          </div>
+          <div class="tower-panel-controls" id="tower-panel-controls">
+            <!-- Keep the utility buttons grouped on a single responsive row. -->
+            <div class="tower-panel-controls__row tower-panel-controls__row--primary">
+              <button
+                class="tower-panel-button tower-panel-button--variables"
+                type="button"
+                id="tower-variable-library"
+                aria-label="Open Variables"
+                aria-haspopup="dialog"
+                aria-controls="variable-library-overlay"
+                aria-expanded="false"
+              >
+                <span class="tower-panel-button-icon" aria-hidden="true">Var</span>
+                <span class="tower-panel-button-label">Variables</span>
+              </button>
+
+              <button
+                class="tower-panel-button tower-tree-map-button"
+                type="button"
+                id="tower-tree-map-toggle"
+                aria-label="Open Tower Tree"
+                aria-pressed="false"
+                aria-expanded="false"
+                aria-controls="tower-tree-map"
+                title="Open the Tower Tree"
+              >
+                <span class="tower-tree-map-icon" aria-hidden="true">
+                  <svg viewBox="0 0 80 80" focusable="false" aria-hidden="true">
+                    <g stroke="currentColor" stroke-width="2" fill="none">
+                      <path d="M18 18 L40 10 L62 18" />
+                      <path d="M18 62 L40 70 L62 62" />
+                      <path d="M18 18 L18 62" />
+                      <path d="M62 18 L62 62" />
+                      <path d="M40 10 L40 70" />
+                    </g>
+                    <g fill="currentColor" font-family="'Cormorant Garamond', serif" font-size="16" text-anchor="middle">
+                      <circle cx="18" cy="18" r="8" fill="rgba(255,255,255,0.15)" />
+                      <text x="18" y="22">α</text>
+                      <circle cx="40" cy="10" r="8" fill="rgba(255,255,255,0.15)" />
+                      <text x="40" y="14">β</text>
+                      <circle cx="62" cy="18" r="8" fill="rgba(255,255,255,0.15)" />
+                      <text x="62" y="22">γ</text>
+                      <circle cx="18" cy="62" r="8" fill="rgba(255,255,255,0.15)" />
+                      <text x="18" y="66">δ</text>
+                      <circle cx="62" cy="62" r="8" fill="rgba(255,255,255,0.15)" />
+                      <text x="62" y="66">ε</text>
+                    </g>
+                  </svg>
+                </span>
+                <span class="tower-tree-map-label tower-panel-button-label">Tower Tree</span>
+              </button>
+            </div>
+          </div>
+          <div
+            class="tower-tree-map"
+            id="tower-tree-map"
+            role="region"
+            aria-label="Tower Tree Map"
+            hidden
+            aria-hidden="true"
+          >
+            <svg class="tower-tree-map-links" aria-hidden="true" focusable="false"></svg>
+            <div class="tower-tree-map-nodes" data-tree-node-layer></div>
+            <p class="tower-tree-map-note">Only discovered towers appear in this constellation.</p>
+          </div>
+          <div class="panel-grid" id="tower-card-grid">
+            <article class="card card--mind-gate" data-tower-id="mind-gate" aria-hidden="false">
+              <header class="tower-header tower-header--gate">
+                <h3>
+                  <span class="tower-name-prefix tower-name-prefix--mind" aria-hidden="true">𝒢</span>
+                  <span class="tower-name-text">Mind Gate</span>
+                </h3>
+              </header>
+              <div class="tower-preview tower-preview--gate" aria-hidden="true">
+                <span class="mind-gate-symbol tower-preview-symbol" aria-hidden="true">
+                  <span class="gate-particle-ring gate-particle-ring--inner" aria-hidden="true"></span>
+                  <span class="gate-particle-ring gate-particle-ring--outer" aria-hidden="true"></span>
+                  <img src="assets/sprites/gates&amp;track/mindGate/mindGateSymbol.png" alt="" />
+                </span>
+              </div>
+              <div class="formula-block">
+                <p class="formula-line">\( \mathfrak{G} = \text{Life} \times \text{Regeneration} \)</p>
+                <ul class="formula-definition">
+                  <li>Life → \( 100^{\aleph_{1} / \aleph_{2}} \)</li>
+                  <li>Regeneration → \( \frac{100 \times \aleph_{2}}{\aleph_{1}} \)</li>
+                </ul>
+              </div>
+              <ul class="upgrade-list">
+                <li>Fortify \(\aleph_{1}\) to amplify Life's exponential reservoir.</li>
+                <li>Stabilize \(\aleph_{2}\) so Regeneration surges refill the gate between waves.</li>
+              </ul>
+              <footer class="card-footer">
+                The original tower—anchoring the lane's finale. When the Mind Gate collapses, inspiration runs dry.
+              </footer>
+            </article>
+            <article class="card card--shadow-gate" data-tower-id="shadow-gate" aria-hidden="false">
+              <header class="tower-header tower-header--gate">
+                <h3>
+                  <span class="tower-name-prefix tower-name-prefix--shadow" aria-hidden="true">𝒫</span>
+                  <span class="tower-name-text">Shadow Gate</span>
+                </h3>
+              </header>
+              <div class="tower-preview tower-preview--gate" aria-hidden="true">
+                <span class="shadow-gate-symbol tower-preview-symbol" aria-hidden="true">
+                  <span class="gate-particle-ring gate-particle-ring--inner shadow" aria-hidden="true"></span>
+                  <span class="gate-particle-ring gate-particle-ring--outer shadow" aria-hidden="true"></span>
+                  <img src="assets/sprites/gates&amp;track/enemyGate/enemyGateSymbol.png" alt="" />
+                </span>
+              </div>
+              <div class="formula-block">
+                <p class="formula-line">\( \wp = x \)</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Deepen \(\aleph_{1}\) to drag enemies through an ever-thickening void.</li>
+                <li>Sharpen \(\aleph_{2}\) so every strike lands heavier against the cursed horde.</li>
+              </ul>
+              <footer class="card-footer">
+                The enemy spawn nexus—a rift of shadow and violet flame where debilitating curses are forged.
+              </footer>
+            </article>
+            <article class="card" data-tower-id="alpha" aria-hidden="false">
+              <header class="tower-header">
+                <span class="tower-tier">Tier I</span>
+                <h3>α alpha</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \alpha = \text{Atk} \times \text{Spd} \)</p>
+                <ul class="formula-definition">
+                  <li>Atk → projectile force braided from \(\aleph_{1}\)</li>
+                  <li>Spd → oscillation cadence tuned by \(\aleph_{2}\)</li>
+                </ul>
+                <p class="formula-line result">\( \text{Atk} = 5 \times \aleph_{1} \)</p>
+                <p class="formula-line result">\( \text{Spd} = 0.5 \times \aleph_{2} \)</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Invest collected glyphs into \(\aleph_{1}\) to amplify Atk.</li>
+                <li>Stabilize \(\aleph_{2}\) to quicken Spd and sustain tempo.</li>
+              </ul>
+              <footer class="card-footer">Shoots a focused glyph-bullet at the nearest foe.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="alpha">
+                Equip α
+              </button>
+            </article>
+            <article class="card" data-tower-id="beta" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier II</span>
+                <h3>β beta</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \beta = \text{Atk} \times \text{Spd} \times \text{Rng} \)</p>
+                <ul class="formula-definition">
+                  <li>Atk → α's output amplified by \(\aleph_{1}\)</li>
+                  <li>Spd → cadence accelerated by neighbouring α lattices</li>
+                  <li>Rng → coverage stretched through linked α channels</li>
+                </ul>
+                <p class="formula-line result">\( \text{Atk} = \alpha \times \aleph_{1} \)</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Sharpen \(\aleph_{1}\) investments to raise inherited α power.</li>
+                <li>Stabilize linked α lattices to hold the beam's Spd steady.</li>
+                <li>Stretch the lattice web to guide α farther downlane.</li>
+              </ul>
+              <footer class="card-footer">
+                Emits a piercing beam amplified purely from α's output.
+              </footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="beta">
+                Equip β
+              </button>
+            </article>
+            <article class="card" data-tower-id="gamma" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier III</span>
+                <h3>γ gamma</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \gamma = \text{Atk} \times \text{Spd} \times \text{Rng} \times \text{Prc} \)</p>
+                <ul class="formula-definition">
+                  <li>Atk → β's surge braided with \(\aleph_{1}\)</li>
+                  <li>Spd → cadence tuned by α lattice links</li>
+                  <li>Rng → arc reach extended by β conductors</li>
+                  <li>Prc → bolt depth anchored to \(\aleph_{2}\)</li>
+                </ul>
+                <p class="formula-line result">\( \text{Atk} = \beta \times \aleph_{1} \)</p>
+                <p class="formula-line result">\( \text{Prc} = \aleph_{2} \)</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Channel β's beam into branching lightning arcs.</li>
+                <li>Stabilize β resonance to keep the bolts on target.</li>
+              </ul>
+              <footer class="card-footer">Distills β into a tempo-shifting conductor with homing bolts.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="gamma">
+                Equip γ
+              </button>
+            </article>
+            <article class="card" data-tower-id="delta" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier IV</span>
+                <h3>δ delta</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \delta = \gamma \cdot \ln(\gamma + 1) \)</p>
+                <ul class="formula-definition">
+                  <li>γ → conductor strength inherited from the gamma lattice</li>
+                  <li>Tot → total spectral soldiers δ can field concurrently</li>
+                </ul>
+                <p class="formula-line result">Commands spectral cohorts scaled purely by γ.</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Empower γ-bound soldiers with slowing sigils</li>
+                <li>Rally boosts: δ cohorts grant +γ% damage to nearby towers</li>
+              </ul>
+              <footer class="card-footer">Does not attack directly—commands spectral fighters to guard the lane.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="delta">
+                Equip δ
+              </button>
+            </article>
+            <article class="card" data-tower-id="epsilon" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier V</span>
+                <h3>ε epsilon</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \varepsilon = \delta^{2} \)</p>
+                <ul class="formula-definition">
+                  <li>δ → command strength squared into burst charges</li>
+                </ul>
+                <p class="formula-line result">Squares δ's cohorts into rapid-fire needle storms.</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Focus δ energy into tighter splash windows</li>
+                <li>Store δ pulses to release simultaneous volleys</li>
+              </ul>
+              <footer class="card-footer">Squares δ's momentum into rapid glyph needles.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="epsilon">
+                Equip ε
+              </button>
+            </article>
+            <article class="card" data-tower-id="zeta" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier VI</span>
+                <h3>ζ zeta</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \zeta = \sqrt{\varepsilon} \)</p>
+                <ul class="formula-definition">
+                  <li>ε → needle storm potential moderated into harmonic splash</li>
+                </ul>
+                <p class="formula-line result">Roots ε into controlled harmonic cascades.</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Focus ε residue into denser splash pools</li>
+                <li>Delay the release to stack ε charges before bursting</li>
+              </ul>
+              <footer class="card-footer">Turns ε's swell into rolling resonance detonations.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="zeta">
+                Equip ζ
+              </button>
+            </article>
+            <article class="card" data-tower-id="eta" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier VII</span>
+                <h3>η eta</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \eta = \ln(\zeta + 1) \)</p>
+                <ul class="formula-definition">
+                  <li>ζ → harmonic cascades condensed through a logarithmic focus</li>
+                </ul>
+                <p class="formula-line result">Condenses ζ into an armor-slicing resonance veil.</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Widen the ζ intake to stretch the resonance veil</li>
+                <li>Share η's focused field with δ soldiers to shatter shields</li>
+              </ul>
+              <footer class="card-footer">Extends ζ's song into a logarithmic debuff that strips defenses.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="eta">
+                Equip η
+              </button>
+            </article>
+            <article class="card" data-tower-id="theta" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier VIII</span>
+                <h3>θ theta</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \theta = \eta^{2} \)</p>
+                <ul class="formula-definition">
+                  <li>η → logarithmic veil squared into lane-warping force</li>
+                </ul>
+                <p class="formula-line result">Squares η to bend lanes and slow invaders.</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Amplify η before squaring to thicken slow fields</li>
+                <li>Modulate η pulses to reflect enemies along mirrored paths</li>
+              </ul>
+              <footer class="card-footer">Projects η's strength as modular fields that reshape the curve around your towers.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="theta">
+                Equip θ
+              </button>
+            </article>
+            <article class="card" data-tower-id="iota" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier IX</span>
+                <h3>ι iota</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \iota = \sqrt{\theta} \)</p>
+                <ul class="formula-definition">
+                  <li>θ → squared lane warp relaxed back into circulating beams</li>
+                </ul>
+                <p class="formula-line result">Loops θ into circulating glyph lasers that ride the curve.</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Stack additional loops to layer multiple θ-derived beams</li>
+                <li>Collapse the loop to detonate when enemies cross the path</li>
+              </ul>
+              <footer class="card-footer">Sweeps circular beams around waypoints using relaxed θ energy.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="iota">
+                Equip ι
+              </button>
+            </article>
+            <article class="card" data-tower-id="kappa" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier X</span>
+                <h3>κ kappa</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \kappa = \iota + \sin(\iota) \)</p>
+                <ul class="formula-definition">
+                  <li>ι → circulating beam intensity feeding the curvature</li>
+                  <li>sin(ι) → oscillation that sharpens focused bursts</li>
+                </ul>
+                <p class="formula-line result">Bends ι's loops into oscillating kill zones.</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Sharpen ι to intensify oscillating curvature strikes</li>
+                <li>Diffuse the sine rhythm to grant allies range along curved lanes</li>
+              </ul>
+              <footer class="card-footer">Focuses on choke points by warping ι's rhythm around tight corners.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="kappa">
+                Equip κ
+              </button>
+            </article>
+            <article class="card" data-tower-id="lambda" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier XI</span>
+                <h3>λ lambda</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \lambda = \kappa \times N_{\text{eff}} \)</p>
+                <ul class="formula-definition">
+                  <li>κ → inherited tripwire power pulled straight from Kappa</li>
+                  <li>N<sub>eff</sub> → live enemy count multiplied by Aleph₃ weighting</li>
+                </ul>
+                <p class="formula-line result">Fires a piercing beam whose damage, colour, and wavelength scale with battlefield density.</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Aleph₁ extends the laser by +0.5 metres per glyph, reaching distant lanes.</li>
+                <li>Aleph₂ accelerates the pulse, logarithmically approaching 0.5 shots each second.</li>
+                <li>Aleph₃ multiplies each enemy’s contribution, tightening wavelengths and driving the rainbow sweep.</li>
+              </ul>
+              <footer class="card-footer">The beam ignores the monochrome palette, cycling the visible spectrum before dissolving into a brightening sine wave.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="lambda">
+                Equip λ
+              </button>
+            </article>
+            <article class="card" data-tower-id="mu" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier XII</span>
+                <h3>μ mu</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \mu = X \)</p>
+                <ul class="formula-definition">
+                  <li>Not defined yet.</li>
+                </ul>
+                <p class="formula-line result">Not defined yet.</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Not defined yet.</li>
+              </ul>
+              <footer class="card-footer">Not defined yet.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="mu">
+                Equip μ
+              </button>
+            </article>
+            <article class="card" data-tower-id="nu" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier XIII</span>
+                <h3>ν nu</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \nu = \mu \times (\text{kills} + 1)^{\ln\left(\frac{\text{dmgtot}}{1000 / \text{Lamed}_{1}}\right)} \)</p>
+                <ul class="formula-definition">
+                  <li>μ → base attack from μ tower upgrades</li>
+                  <li>kills → total enemies finished by ν beams</li>
+                  <li>dmgtot → accumulated damage dealt (overkill included)</li>
+                  <li>Lamed₁ → π beam limit that normalizes damage accumulation in the exponent</li>
+                </ul>
+                <p class="formula-line result">Scales ν kill damage logarithmically using accumulated damage and μ attack.</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Not defined yet.</li>
+              </ul>
+              <footer class="card-footer">Logarithmic beam that scales with kill count and total damage dealt.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="nu">
+                Equip ν
+              </button>
+            </article>
+            <article class="card" data-tower-id="xi" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier XIV</span>
+                <h3>ξ xi</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \xi = \nu \times (\text{numChain}^{\text{numChnExp}}) \)</p>
+                <ul class="formula-definition">
+                  <li>ν → base damage per chain from ν tower</li>
+                  <li>numChain → active chain count (3 + ℵ₄)</li>
+                  <li>numChnExp → chain exponent (1 + 0.1 × ℵ₅)</li>
+                </ul>
+                <p class="formula-line result">Chains ν power through exponential jump sequences.</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Not defined yet.</li>
+              </ul>
+              <footer class="card-footer">Chains ν power exponentially across multiple enemies per strike.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="xi">
+                Equip ξ
+              </button>
+            </article>
+            <article class="card" data-tower-id="omicron" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier XV</span>
+                <h3>ο omicron</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( ο = X \)</p>
+                <ul class="formula-definition">
+                  <li>Not defined yet.</li>
+                </ul>
+                <p class="formula-line result">Not defined yet.</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Not defined yet.</li>
+              </ul>
+              <footer class="card-footer">Not defined yet.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="omicron">
+                Equip ο
+              </button>
+            </article>
+            <article class="card" data-tower-id="pi" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier XVI</span>
+                <h3>π pi</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \pi = X \)</p>
+                <ul class="formula-definition">
+                  <li>Not defined yet.</li>
+                </ul>
+                <p class="formula-line result">Not defined yet.</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Not defined yet.</li>
+              </ul>
+              <footer class="card-footer">Not defined yet.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="pi">
+                Equip π
+              </button>
+            </article>
+            <article class="card" data-tower-id="rho" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier XVII</span>
+                <h3>ρ rho</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \rho = X \)</p>
+                <ul class="formula-definition">
+                  <li>Not defined yet.</li>
+                </ul>
+                <p class="formula-line result">Not defined yet.</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Not defined yet.</li>
+              </ul>
+              <footer class="card-footer">Not defined yet.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="rho">
+                Equip ρ
+              </button>
+            </article>
+            <article class="card" data-tower-id="sigma" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier XVIII</span>
+                <h3>σ sigma</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \sigma = X \)</p>
+                <ul class="formula-definition">
+                  <li>Not defined yet.</li>
+                </ul>
+                <p class="formula-line result">Not defined yet.</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Not defined yet.</li>
+              </ul>
+              <footer class="card-footer">Not defined yet.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="sigma">
+                Equip σ
+              </button>
+            </article>
+            <article class="card" data-tower-id="tau" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier XIX</span>
+                <h3>τ tau</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \tau = X \)</p>
+                <ul class="formula-definition">
+                  <li>Not defined yet.</li>
+                </ul>
+                <p class="formula-line result">Not defined yet.</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Not defined yet.</li>
+              </ul>
+              <footer class="card-footer">Not defined yet.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="tau">
+                Equip τ
+              </button>
+            </article>
+            <article class="card" data-tower-id="upsilon" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier XX</span>
+                <h3>υ upsilon</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \upsilon = atk \times tot \times spd \)</p>
+                <ul class="formula-definition">
+                  <li>atk = micro-triangle laser power.</li>
+                  <li>tot = hangar capacity (ships on field).</li>
+                  <li>spd = ship fabrication per second.</li>
+                </ul>
+                <p class="formula-line result">Launches infinite-range micro-fighters that curve toward focus targets.</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>ℵ₁ raises ship laser attack.</li>
+                <li>ℵ₂ accelerates ship production speed.</li>
+                <li>ℵ₃ expands the maximum swarm size.</li>
+                <li>ℵ₄ increases ship flight speed and turning radius.</li>
+              </ul>
+              <footer class="card-footer">
+                Click any enemy to force υ to hunt it until it falls; otherwise prioritizes first/strongest/weakest.
+              </footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="upsilon">
+                Equip υ
+              </button>
+            </article>
+            <article class="card" data-tower-id="phi" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier XXI</span>
+                <h3>φ phi</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \varphi = X \)</p>
+                <ul class="formula-definition">
+                  <li>Not defined yet.</li>
+                </ul>
+                <p class="formula-line result">Not defined yet.</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Not defined yet.</li>
+              </ul>
+              <footer class="card-footer">Not defined yet.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="phi">
+                Equip φ
+              </button>
+            </article>
+            <article class="card" data-tower-id="chi" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier XXII</span>
+                <h3>χ chi</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \chi = X \)</p>
+                <ul class="formula-definition">
+                  <li>Not defined yet.</li>
+                </ul>
+                <p class="formula-line result">Not defined yet.</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Not defined yet.</li>
+              </ul>
+              <footer class="card-footer">Not defined yet.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="chi">
+                Equip χ
+              </button>
+            </article>
+            <article class="card" data-tower-id="psi" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier XXIII</span>
+                <h3>ψ psi</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \psi = X \)</p>
+                <ul class="formula-definition">
+                  <li>Not defined yet.</li>
+                </ul>
+                <p class="formula-line result">Not defined yet.</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Not defined yet.</li>
+              </ul>
+              <footer class="card-footer">Not defined yet.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="psi">
+                Equip ψ
+              </button>
+            </article>
+            <article class="card" data-tower-id="omega" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier XXIV</span>
+                <h3>Ω omega</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \Omega = X \)</p>
+                <ul class="formula-definition">
+                  <li>Not defined yet.</li>
+                </ul>
+                <p class="formula-line result">Not defined yet.</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Not defined yet.</li>
+              </ul>
+              <footer class="card-footer">Not defined yet.</footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="omega">
+                Equip Ω
+              </button>
+            </article>
+
+            <article class="card" data-tower-id="infinity" hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Tier XXV</span>
+                <h3>∞ infinity</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \infty = \text{Exp} \times \text{Rng} \)</p>
+                <ul class="formula-definition">
+                  <li>Exp → Natural logarithm of total tower count: \(\ln(n)\)</li>
+                  <li>Rng → Aura radius: \(2e\) meters (Euler's number)</li>
+                  <li>Mul → Exponential base for damage boost</li>
+                </ul>
+                <p class="formula-line result">\( \text{Exp} = \ln(n) \times \aleph_{1} \)</p>
+                <p class="formula-line result">\( \text{Rng} = 2e + 0.5(\aleph_{2} - 1) \)</p>
+                <p class="formula-line result">\( \text{Mul} = e + 0.1(\aleph_{3} - 1) \)</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>Upgrade \(\aleph_{1}\) to amplify the exponent bonus applied to nearby towers.</li>
+                <li>Expand \(\aleph_{2}\) to extend the infinity aura radius.</li>
+                <li>Enhance \(\aleph_{3}\) to increase the exponential damage multiplier base.</li>
+              </ul>
+              <footer class="card-footer">
+                Provides exponential damage boost to all towers within range. 
+                Bonus formula: \( \text{damage} \times \text{Mul}^{\text{Exp}} \).
+                Golden lines connect infinity tower to affected towers.
+              </footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="infinity">
+                Equip ∞
+              </button>
+            </article>
+            <article class="card" data-tower-id="t1" aria-hidden="false">
+              <header class="tower-header">
+                <span class="tower-tier">Test</span>
+                <h3>T₁ polar graph</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( r(\theta) = R \cdot |\sin(3\theta)| \)</p>
+                <ul class="formula-definition">
+                  <li>\(r\) → radial distance from the tower (max \(R = 8\) m)</li>
+                  <li>\(\theta\) → sweep angle advancing at \( 0.9 \) rad s⁻¹</li>
+                  <li>Curve bounded within 10 m in every direction</li>
+                </ul>
+              </div>
+              <ul class="upgrade-list">
+                <li>A glowing tracer head sweeps the 3-petal rose curve continuously.</li>
+                <li>The fading trail damages every enemy it touches on contact.</li>
+              </ul>
+              <footer class="card-footer">
+                Plots a polar rose graph; the luminous trail deals ongoing damage.
+                Cost: 1 \(\Theta\).
+              </footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="t1">
+                Equip T₁
+              </button>
+            </article>
+
+            <article class="card" data-tower-id="t2" aria-hidden="false">
+              <header class="tower-header">
+                <span class="tower-tier">Test</span>
+                <h3>T₂ parametric graph</h3>
+              </header>
+              <div class="formula-block">
+                <p class="formula-line">\( \vec{p}(t) = \bigl(\,x(t),\; y(t)\,\bigr) \cdot R \)</p>
+                <ul class="formula-definition">
+                  <li>\(x(t)\) — sum of enabled x-axis functions applied to \(t\)</li>
+                  <li>\(y(t)\) — sum of enabled y-axis functions applied to \(t\)</li>
+                  <li>Default \((cos\,t,\; sin\,t)\) traces a circle of radius \(R = 8\) m</li>
+                </ul>
+                <p class="formula-line result" id="t2-formula-display">x = cos(t) &nbsp;·&nbsp; y = sin(t)</p>
+              </div>
+
+              <!-- Parametric function toggles -->
+              <div class="t2-param-controls">
+                <div class="t2-param-row">
+                  <span class="t2-axis-label">x(t) =</span>
+                  <button class="t2-fn-toggle" type="button" data-t2-toggle="sinX">sin(t)</button>
+                  <button class="t2-fn-toggle active" type="button" data-t2-toggle="cosX">cos(t)</button>
+                  <button class="t2-fn-toggle" type="button" data-t2-toggle="tanX">tan(t)</button>
+                </div>
+                <div class="t2-param-row">
+                  <span class="t2-axis-label">y(t) =</span>
+                  <button class="t2-fn-toggle active" type="button" data-t2-toggle="sinY">sin(t)</button>
+                  <button class="t2-fn-toggle" type="button" data-t2-toggle="cosY">cos(t)</button>
+                  <button class="t2-fn-toggle" type="button" data-t2-toggle="tanY">tan(t)</button>
+                </div>
+              </div>
+
+              <ul class="upgrade-list">
+                <li>Toggle trig functions to reshape the tracer curve in real-time.</li>
+                <li>Multiple active functions on the same axis are <em>additive</em>.</li>
+                <li>tan(t) is clamped to ±1.5 to prevent the tracer leaving the arena.</li>
+              </ul>
+              <footer class="card-footer">
+                Plots a parametric curve; the luminous trail deals ongoing damage.
+                Cost: 1 \(\Theta\).
+              </footer>
+              <button class="tower-equip-button" type="button" data-tower-toggle="t2">
+                Equip T₂
+              </button>
+            </article>
+
+            <!-- Tease one undiscovered lattice without exposing its identity or mechanics. -->
+            <article class="card card--mystery-tower" data-mystery-tower hidden aria-hidden="true">
+              <header class="tower-header">
+                <span class="tower-tier">Undiscovered</span>
+                <h3>???</h3>
+              </header>
+              <div class="tower-preview tower-preview--mystery" aria-hidden="true">
+                <span class="mystery-tower-icon">?</span>
+              </div>
+              <div class="formula-block">
+                <p class="formula-line">???</p>
+                <p class="formula-line result">???</p>
+              </div>
+              <ul class="upgrade-list">
+                <li>???</li>
+              </ul>
+              <footer class="card-footer">???</footer>
+            </article>
+
+          
+          <!-- Developer mode toggle for tower card visibility -->
+          <div class="tower-visibility-controls" id="tower-visibility-controls">
+            <label class="tower-visibility-toggle" for="tower-visibility-developer-mode">
+              <input type="checkbox" id="tower-visibility-developer-mode" />
+              <span class="tower-visibility-label">Show all tower cards (developer mode)</span>
+            </label>
+            <p class="tower-visibility-note">
+              Enable to view all tower cards including locked ones. Useful for development and testing.
+            </p>
+            
+            <!-- Individual tower card visibility toggles for debugging -->
+            <details class="tower-individual-toggles" id="tower-individual-toggles">
+              <summary class="tower-individual-toggles__summary">Individual Tower Card Toggles (Debug)</summary>
+              <p class="tower-individual-toggles__note">
+                Toggle individual tower cards to identify which one is causing scrolling issues.
+              </p>
+              <div class="tower-individual-toggles__grid" id="tower-individual-toggles-grid">
+                <!-- Individual checkboxes will be populated by JavaScript -->
+              </div>
+            </details>
+            
+            <!-- Nu and Xi tower card element debugging controls -->
+            <details class="tower-element-debug" id="tower-element-debug">
+              <summary class="tower-element-debug__summary">Nu/Xi Card Element Debug (Scroll Issue)</summary>
+              <p class="tower-element-debug__note">
+                Toggle specific elements of Nu and Xi tower cards to identify which element is blocking scroll gestures.
+              </p>
+              <div class="tower-element-debug__grid">
+                <fieldset class="tower-element-debug__section">
+                  <legend>Nu Tower (ν) Elements</legend>
+                  <label class="tower-element-debug__toggle">
+                    <input type="checkbox" id="debug-nu-preview" checked />
+                    <span>Show Preview Icon</span>
+                  </label>
+                  <label class="tower-element-debug__toggle">
+                    <input type="checkbox" id="debug-nu-header" checked />
+                    <span>Show Header</span>
+                  </label>
+                  <label class="tower-element-debug__toggle">
+                    <input type="checkbox" id="debug-nu-formula" checked />
+                    <span>Show Formula Block</span>
+                  </label>
+                  <label class="tower-element-debug__toggle">
+                    <input type="checkbox" id="debug-nu-footer" checked />
+                    <span>Show Footer</span>
+                  </label>
+                  <label class="tower-element-debug__toggle">
+                    <input type="checkbox" id="debug-nu-button" checked />
+                    <span>Show Equip Button</span>
+                  </label>
+                  <label class="tower-element-debug__toggle tower-element-debug__toggle--master">
+                    <input type="checkbox" id="debug-nu-card" checked />
+                    <span><strong>Show Entire Card</strong></span>
+                  </label>
+                </fieldset>
+                
+                <fieldset class="tower-element-debug__section">
+                  <legend>Xi Tower (ξ) Elements</legend>
+                  <label class="tower-element-debug__toggle">
+                    <input type="checkbox" id="debug-xi-preview" checked />
+                    <span>Show Preview Icon</span>
+                  </label>
+                  <label class="tower-element-debug__toggle">
+                    <input type="checkbox" id="debug-xi-header" checked />
+                    <span>Show Header</span>
+                  </label>
+                  <label class="tower-element-debug__toggle">
+                    <input type="checkbox" id="debug-xi-formula" checked />
+                    <span>Show Formula Block</span>
+                  </label>
+                  <label class="tower-element-debug__toggle">
+                    <input type="checkbox" id="debug-xi-footer" checked />
+                    <span>Show Footer</span>
+                  </label>
+                  <label class="tower-element-debug__toggle">
+                    <input type="checkbox" id="debug-xi-button" checked />
+                    <span>Show Equip Button</span>
+                  </label>
+                  <label class="tower-element-debug__toggle tower-element-debug__toggle--master">
+                    <input type="checkbox" id="debug-xi-card" checked />
+                    <span><strong>Show Entire Card</strong></span>
+                  </label>
+                </fieldset>
+              </div>
+              <p class="tower-element-debug__instructions">
+                💡 <strong>Instructions:</strong> Uncheck elements one at a time to identify which one is preventing scrolling. 
+                If scrolling works after hiding an element, that element likely has <code>pointer-events</code> or <code>touch-action</code> CSS that's blocking the gesture.
+              </p>
+            </details>
+          </div>
+        </section>
+
+        <section
+          class="panel"
+          data-panel="powder"
+          id="panel-powder"
+          role="tabpanel"
+          aria-labelledby="tab-powder"
+          hidden
+        >
+          <section class="powder-stage" id="powder-stage" aria-label="Spire">
+            <article class="card powder-simulation" id="powder-simulation-card">
+              <div class="powder-basin" id="powder-basin">
+                <!-- Corner spire options popover for the Tower of Inspiration render. -->
+                <div class="spire-options-popover spire-options-popover--powder">
+                  <button
+                    class="action-button spire-options-trigger spire-options-trigger--icon spire-options-trigger--square spire-options-trigger--corner"
+                    type="button"
+                    id="powder-spire-options-toggle-button"
+                    aria-expanded="false"
+                    aria-controls="powder-options-menu"
+                    aria-label="Open Tower of Inspiration settings"
+                  >
+                    <span class="spire-options-icon" aria-hidden="true">⚙</span>
+                  </button>
+                  <div
+                    class="spire-options-menu spire-options-menu--popover"
+                    id="powder-options-menu"
+                    data-open="false"
+                    aria-hidden="true"
+                    hidden
+                  >
+                    <div class="settings-toggle" id="powder-mote-glow-toggle-row">
+                      <div class="settings-toggle-text">
+                        <span class="settings-toggle-title" id="powder-mote-glow-title">Luminous motes</span>
+                        <span
+                          class="settings-toggle-description"
+                          id="powder-mote-glow-description"
+                          >Soft glow on resting motes and a trailing shimmer while they fall.</span
+                        >
+                      </div>
+                      <label class="settings-toggle-control" for="powder-mote-glow-toggle">
+                        <input
+                          type="checkbox"
+                          id="powder-mote-glow-toggle"
+                          class="settings-toggle-input"
+                          role="switch"
+                          aria-labelledby="powder-mote-glow-title"
+                          aria-describedby="powder-mote-glow-description"
+                          aria-checked="true"
+                          checked
+                        />
+                        <span class="settings-toggle-slider" aria-hidden="true"></span>
+                        <span class="settings-toggle-state" id="powder-mote-glow-state">On</span>
+                      </label>
+                    </div>
+                    <div class="settings-toggle" id="powder-background-stars-toggle-row">
+                      <div class="settings-toggle-text">
+                        <span class="settings-toggle-title" id="powder-background-stars-title">Background stars</span>
+                        <span
+                          class="settings-toggle-description"
+                          id="powder-background-stars-description"
+                          >Twinkling white and gold stars that swim in the background.</span
+                        >
+                      </div>
+                      <label class="settings-toggle-control" for="powder-background-stars-toggle">
+                        <input
+                          type="checkbox"
+                          id="powder-background-stars-toggle"
+                          class="settings-toggle-input"
+                          role="switch"
+                          aria-labelledby="powder-background-stars-title"
+                          aria-describedby="powder-background-stars-description"
+                          aria-checked="true"
+                          checked
+                        />
+                        <span class="settings-toggle-slider" aria-hidden="true"></span>
+                        <span class="settings-toggle-state" id="powder-background-stars-state">On</span>
+                      </label>
+                    </div>
+                    <div class="settings-toggle" id="powder-mote-trails-toggle-row">
+                      <div class="settings-toggle-text">
+                        <span class="settings-toggle-title" id="powder-mote-trails-title">Mote falling trails</span>
+                        <span
+                          class="settings-toggle-description"
+                          id="powder-mote-trails-description"
+                          >Glowing trails behind falling motes for enhanced visual effect.</span
+                        >
+                      </div>
+                      <label class="settings-toggle-control" for="powder-mote-trails-toggle">
+                        <input
+                          type="checkbox"
+                          id="powder-mote-trails-toggle"
+                          class="settings-toggle-input"
+                          role="switch"
+                          aria-labelledby="powder-mote-trails-title"
+                          aria-describedby="powder-mote-trails-description"
+                          aria-checked="true"
+                          checked
+                        />
+                        <span class="settings-toggle-slider" aria-hidden="true"></span>
+                        <span class="settings-toggle-state" id="powder-mote-trails-state">On</span>
+                      </label>
+                    </div>
+                    <!-- Camera controls option for the Tower of Inspiration view. -->
+                    <div class="settings-toggle" id="powder-camera-controls-toggle-row">
+                      <div class="settings-toggle-text">
+                        <span class="settings-toggle-title" id="powder-camera-controls-title">Camera pan &amp; zoom</span>
+                        <span
+                          class="settings-toggle-description"
+                          id="powder-camera-controls-description"
+                          >Allow dragging and zooming the Tower of Inspiration view.</span
+                        >
+                      </div>
+                      <label class="settings-toggle-control" for="powder-camera-controls-toggle">
+                        <input
+                          type="checkbox"
+                          id="powder-camera-controls-toggle"
+                          class="settings-toggle-input"
+                          role="switch"
+                          aria-labelledby="powder-camera-controls-title"
+                          aria-describedby="powder-camera-controls-description"
+                          aria-checked="false"
+                        />
+                        <span class="settings-toggle-slider" aria-hidden="true"></span>
+                        <span class="settings-toggle-state" id="powder-camera-controls-state">Off</span>
+                      </label>
+                    </div>
+                    <!-- Render size option for Tower of Inspiration. -->
+                    <div class="settings-toggle" id="powder-render-overlap-row">
+                      <div class="settings-toggle-text">
+                        <span class="settings-toggle-title" id="powder-render-overlap-title">Render Size</span>
+                        <span
+                          class="settings-toggle-description"
+                          id="powder-render-overlap-description"
+                          >Adjust the Tower of Inspiration render size.</span
+                        >
+                      </div>
+                      <label class="settings-toggle-control" for="powder-render-overlap-select">
+                        <span class="screen-reader-only">Render size</span>
+                        <select
+                          id="powder-render-overlap-select"
+                          class="settings-select"
+                          aria-labelledby="powder-render-overlap-title"
+                          aria-describedby="powder-render-overlap-description"
+                        >
+                          <option value="0" selected>Small</option>
+                          <option value="1" data-developer-only-render-size-option>Medium</option>
+                          <option value="2" data-developer-only-render-size-option>Large</option>
+                        </select>
+                      </label>
+                    </div>
+                    <button class="action-button ghost spire-options-close" type="button">Close</button>
+                  </div>
+                </div>
+                <canvas
+                  id="powder-canvas"
+                  width="240"
+                  height="320"
+                  role="img"
+                  aria-label="Spire simulation"
+                ></canvas>
+                <div class="powder-viewport" id="powder-viewport">
+                  <div
+                    class="powder-wall-hitbox powder-wall-hitbox-left"
+                    id="powder-wall-hitbox-left"
+                    aria-hidden="true"
+                  ></div>
+                  <div class="powder-wall powder-wall-left" id="powder-wall-left" aria-hidden="true"></div>
+                  <div
+                    class="powder-wall-hitbox powder-wall-hitbox-right"
+                    id="powder-wall-hitbox-right"
+                    aria-hidden="true"
+                  ></div>
+                  <div class="powder-wall powder-wall-right" id="powder-wall-right" aria-hidden="true">
+                    <!-- Display the progress marker on the right wall so it no longer overlaps the crest label. -->
+                    <div class="powder-glyph-column" data-powder-glyph-column="right"></div>
+                  </div>
+                </div>
+                <button
+                  class="powder-tier-golden-aleph"
+                  id="powder-tier-golden-aleph"
+                  type="button"
+                  aria-label="Collect tier Aleph glyph"
+                  hidden
+                >
+                  <img
+                    class="powder-tier-golden-aleph__sprite"
+                    src="assets/sprites/spires/alephSpire/Gold_Aleph.webp"
+                    alt=""
+                    decoding="async"
+                  />
+                </button>
+              </div>
+            </article>
+          </section>
+          <section class="panel-grid powder-summary" aria-label="Tower of Inspiration reference">
+            <article class="card powder-overview">
+              <h3>Tower of Inspiration</h3>
+              <dl class="powder-metrics">
+                <div>
+                  <dt>Height to Next Glyph</dt>
+                  <dd id="powder-next-glyph-progress">—</dd>
+                </div>
+              </dl>
+            </article>
+          </section>
+          <section class="panel-grid spire-options-grid" aria-label="Tower of Inspiration options">
+            <article class="card spire-options-card">
+              <button
+                class="action-button spire-options-trigger spire-options-trigger--footer"
+                type="button"
+                id="powder-options-toggle-button"
+                aria-expanded="false"
+                aria-controls="powder-options-menu"
+              >
+                <span class="spire-options-glyph" aria-hidden="true">ℵ</span>
+                <span>Spire Options</span>
+              </button>
+            </article>
+          </section>
+        </section>
+
+        <section
+          class="panel"
+          data-panel="achievements"
+          id="panel-achievements"
+          role="tabpanel"
+          aria-labelledby="tab-achievements"
+          hidden
+        >
+          <header class="panel-header">Achievements</header>
+          <p class="achievement-note">Seal proofs to complete the achievement collection.</p>
+          <div class="achievement-grid" id="achievement-grid" role="list"></div>
+        </section>
+
+        <section
+          class="panel"
+          data-panel="options"
+          id="panel-options"
+          role="tabpanel"
+          aria-labelledby="tab-options"
+          hidden
+        >
+          <header class="panel-header">Options &amp; Codex</header>
+          <div class="panel-grid">
+            <!-- Prominent community invitation keeps the official Discord destination visible from Settings. -->
+            <article class="card discord-community-card">
+              <div class="discord-community-copy">
+                <span class="discord-community-eyebrow">Thero Community</span>
+                <h3>Join the Conversation</h3>
+                <p>Share strategies, follow development, and help shape the next proof.</p>
+              </div>
+              <a
+                class="action-button discord-community-button"
+                href="https://discord.gg/dSwR3Fj7du"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Join our Discord server (opens in a new tab)"
+              >
+                <svg class="discord-community-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                  <path
+                    d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"
+                  />
+                </svg>
+                <span>Join Our Discord</span>
+              </a>
+            </article>
+            <article class="card" id="sound-card">
+              <h3 id="sound-card-title">Sound</h3>
+              <p>Adjust harmonic resonance levels.</p>
+              <div class="slider-group" role="group" aria-labelledby="sound-card-title">
+                <div class="slider-row">
+                  <div class="slider-row-header">
+                    <label class="slider-label" for="music-volume">Music</label>
+                    <span class="slider-value" id="music-volume-value">100%</span>
+                  </div>
+                  <input
+                    class="slider-input"
+                    type="range"
+                    id="music-volume"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value="100"
+                    aria-label="Music volume"
+                  />
+                </div>
+                <div class="slider-row">
+                  <div class="slider-row-header">
+                    <label class="slider-label" for="sfx-volume">Sound Effects</label>
+                    <span class="slider-value" id="sfx-volume-value">100%</span>
+                  </div>
+                  <input
+                    class="slider-input"
+                    type="range"
+                    id="sfx-volume"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value="100"
+                    aria-label="Sound effects volume"
+                  />
+                </div>
+              </div>
+            </article>
+            <article class="card visual-settings-card">
+              <div class="visual-settings-copy">
+                <h3>Visual Settings</h3>
+                <p>Fine-tune palettes, notation, and battlefield overlays.</p>
+              </div>
+              <button
+                class="action-button visual-settings-trigger"
+                type="button"
+                id="visual-settings-menu-button"
+                aria-expanded="false"
+                aria-controls="visual-settings-menu"
+              >
+                Visual Settings
+              </button>
+              <div
+                class="visual-settings-menu"
+                id="visual-settings-menu"
+                data-open="false"
+                aria-hidden="true"
+                hidden
+              >
+                <button class="action-button ghost" type="button" id="color-scheme-button">
+                  Palette · Aurora
+                </button>
+                <div class="palette-gradient-preview" id="color-scheme-gradient-preview" aria-hidden="true"></div>
+                <button class="action-button ghost" type="button" id="track-graphics-button">
+                  Track · Gradient
+                </button>
+                <!-- Inline preview mirrors the active track render mode and tracer toggle. -->
+                <div class="track-render-preview" aria-hidden="true">
+                  <span class="track-render-preview-label">Track preview</span>
+                  <div class="track-render-preview-line" id="track-render-preview-line" data-mode="gradient">
+                    <span class="track-render-preview-tracer" id="track-render-preview-tracer"></span>
+                  </div>
+                </div>
+                <div class="settings-toggle" id="track-tracer-toggle-row">
+                  <div class="settings-toggle-text">
+                    <span class="settings-toggle-title" id="track-tracer-toggle-title">Track Tracer</span>
+                    <span class="settings-toggle-description" id="track-tracer-toggle-description"
+                      >Project a luminous tracer along the path; river tracks inherit accelerated sparks from it.</span
+                    >
+                  </div>
+                  <label class="settings-toggle-control" for="track-tracer-toggle">
+                    <input
+                      type="checkbox"
+                      id="track-tracer-toggle"
+                      class="settings-toggle-input"
+                      role="switch"
+                      aria-labelledby="track-tracer-toggle-title"
+                      aria-describedby="track-tracer-toggle-description"
+                      aria-checked="true"
+                      checked
+                    />
+                    <span class="settings-toggle-slider" aria-hidden="true"></span>
+                    <span class="settings-toggle-state" id="track-tracer-toggle-state">On</span>
+                  </label>
+                </div>
+                <button class="action-button ghost" type="button" id="notation-toggle-button">
+                  Notation · Letters
+                </button>
+                <!-- Preview how floating enemy damage values will render under the active notation. -->
+                <div class="notation-preview" id="notation-preview" aria-live="polite">
+                  <span class="notation-preview-label">Enemy damage sample</span>
+                  <span class="notation-preview-value" id="notation-preview-value">5.10 quadrillion dmg</span>
+                </div>
+                <!-- Toggle between low and high graphics fidelity. -->
+                <button class="action-button ghost" type="button" id="graphics-mode-button">
+                  Graphics · High
+                </button>
+                <!-- Toggle for automatic graphics quality switching based on frame rate. -->
+                <div class="settings-toggle" id="auto-graphics-toggle-row">
+                  <div class="settings-toggle-text">
+                    <span class="settings-toggle-title" id="auto-graphics-toggle-title">Auto Graphics</span>
+                    <span class="settings-toggle-description" id="auto-graphics-toggle-description"
+                      >Automatically lower graphics quality when frame rate drops, and restore it when performance stabilises.</span
+                    >
+                  </div>
+                  <label class="settings-toggle-control" for="auto-graphics-toggle">
+                    <input
+                      type="checkbox"
+                      id="auto-graphics-toggle"
+                      class="settings-toggle-input"
+                      role="switch"
+                      aria-labelledby="auto-graphics-toggle-title"
+                      aria-describedby="auto-graphics-toggle-description"
+                      aria-checked="false"
+                    />
+                    <span class="settings-toggle-slider" aria-hidden="true"></span>
+                    <span class="settings-toggle-state" id="auto-graphics-toggle-state">Off</span>
+                  </label>
+                </div>
+                <!-- Toggle between damage numbers and remaining life display. -->
+                <button class="action-button ghost" type="button" id="damage-number-mode-button">
+                  Damage Display · Damage Numbers
+                </button>
+                <!-- Toggle where spire option buttons appear (corner cog vs bottom button). -->
+                <button class="action-button ghost" type="button" id="spire-options-placement-button">
+                  Spire Options · Bottom
+                </button>
+                <!-- Toggle to reveal glyph equations inside tower upgrade cards. -->
+                <div class="settings-toggle" id="glyph-equation-toggle-row">
+                  <div class="settings-toggle-text">
+                    <span class="settings-toggle-title">Show Glyph Equations</span>
+                    <span class="settings-toggle-description"
+                      >Reveal Aleph glyph formulas within every tower detail.</span
+                    >
+                  </div>
+                  <label class="settings-toggle-control" for="glyph-equation-toggle">
+                    <input
+                      type="checkbox"
+                      id="glyph-equation-toggle"
+                      class="settings-toggle-input"
+                      role="switch"
+                      aria-checked="false"
+                    />
+                    <span class="settings-toggle-slider" aria-hidden="true"></span>
+                    <span class="settings-toggle-state" id="glyph-equation-toggle-state">Off</span>
+                  </label>
+                </div>
+                <div class="settings-toggle" id="damage-number-toggle-row">
+                  <div class="settings-toggle-text">
+                    <span class="settings-toggle-title">Floating Damage Numbers</span>
+                    <span class="settings-toggle-description"
+                      >Show colorful combat values drifting away from struck glyphs.</span
+                    >
+                  </div>
+                  <label class="settings-toggle-control" for="damage-number-toggle">
+                    <input
+                      type="checkbox"
+                      id="damage-number-toggle"
+                      class="settings-toggle-input"
+                      role="switch"
+                      aria-checked="true"
+                      checked
+                    />
+                    <span class="settings-toggle-slider" aria-hidden="true"></span>
+                    <span class="settings-toggle-state" id="damage-number-toggle-state">On</span>
+                  </label>
+                </div>
+                <div class="settings-toggle" id="wave-kill-tally-toggle-row">
+                  <div class="settings-toggle-text">
+                    <span class="settings-toggle-title" id="wave-kill-tally-title">Wave Kill Tallies</span>
+                    <span class="settings-toggle-description" id="wave-kill-tally-description"
+                      >Scribble each lattice's kill count above the tower when a wave ends.</span
+                    >
+                  </div>
+                  <label class="settings-toggle-control" for="wave-kill-tally-toggle">
+                    <input
+                      type="checkbox"
+                      id="wave-kill-tally-toggle"
+                      class="settings-toggle-input"
+                      role="switch"
+                      aria-labelledby="wave-kill-tally-title"
+                      aria-describedby="wave-kill-tally-description"
+                      aria-checked="true"
+                      checked
+                    />
+                    <span class="settings-toggle-slider" aria-hidden="true"></span>
+                    <span class="settings-toggle-state" id="wave-kill-tally-toggle-state">On</span>
+                  </label>
+                </div>
+                <div class="settings-toggle" id="wave-damage-tally-toggle-row">
+                  <div class="settings-toggle-text">
+                    <span class="settings-toggle-title" id="wave-damage-tally-title">Wave Damage Tallies</span>
+                    <span class="settings-toggle-description" id="wave-damage-tally-description"
+                      >Fade each tower's total damage beneath the lattice during the intermission.</span
+                    >
+                  </div>
+                  <label class="settings-toggle-control" for="wave-damage-tally-toggle">
+                    <input
+                      type="checkbox"
+                      id="wave-damage-tally-toggle"
+                      class="settings-toggle-input"
+                      role="switch"
+                      aria-labelledby="wave-damage-tally-title"
+                      aria-describedby="wave-damage-tally-description"
+                      aria-checked="true"
+                      checked
+                    />
+                    <span class="settings-toggle-slider" aria-hidden="true"></span>
+                    <span class="settings-toggle-state" id="wave-damage-tally-toggle-state">On</span>
+                  </label>
+                </div>
+                <!-- Frame rate limit slider for older devices. -->
+                <div class="slider-row visual-settings-slider-row" id="frame-rate-limit-row">
+                  <div class="slider-row-header">
+                    <label class="slider-label" for="frame-rate-limit" id="frame-rate-limit-label">Frame Rate Limit</label>
+                    <span class="slider-value" id="frame-rate-limit-value">60 fps</span>
+                  </div>
+                  <input
+                    class="slider-input"
+                    type="range"
+                    id="frame-rate-limit"
+                    min="30"
+                    max="120"
+                    step="5"
+                    value="60"
+                    aria-labelledby="frame-rate-limit-label"
+                    aria-describedby="frame-rate-limit-description"
+                  />
+                  <span class="slider-description" id="frame-rate-limit-description"
+                    >Lower values may improve performance on older devices.</span
+                  >
+                </div>
+                <!-- Toggle to show FPS counter in top-left corner. -->
+                <div class="settings-toggle" id="fps-counter-toggle-row">
+                  <div class="settings-toggle-text">
+                    <span class="settings-toggle-title" id="fps-counter-title">FPS Counter</span>
+                    <span class="settings-toggle-description" id="fps-counter-description"
+                      >Display current frames per second in the top-left corner.</span
+                    >
+                  </div>
+                  <label class="settings-toggle-control" for="fps-counter-toggle">
+                    <input
+                      type="checkbox"
+                      id="fps-counter-toggle"
+                      class="settings-toggle-input"
+                      role="switch"
+                      aria-labelledby="fps-counter-title"
+                      aria-describedby="fps-counter-description"
+                      aria-checked="false"
+                    />
+                    <span class="settings-toggle-slider" aria-hidden="true"></span>
+                    <span class="settings-toggle-state" id="fps-counter-toggle-state">Off</span>
+                  </label>
+                </div>
+              </div>
+            </article>
+            <article class="card visual-settings-card">
+              <div class="visual-settings-copy">
+                <h3>Control Settings</h3>
+                <p>Adjust input controls and interaction preferences.</p>
+              </div>
+              <button
+                class="action-button visual-settings-trigger"
+                type="button"
+                id="control-settings-menu-button"
+                aria-expanded="false"
+                aria-controls="control-settings-menu"
+              >
+                Control Settings
+              </button>
+              <div
+                class="visual-settings-menu"
+                id="control-settings-menu"
+                data-open="false"
+                aria-hidden="true"
+                hidden
+              >
+              </div>
+            </article>
+            <article class="card">
+              <h3>Field Notes</h3>
+              <p>Consult the archivist for a briefing on the current storyline.</p>
+              <button class="action-button ghost" type="button" id="open-codex-button">
+                Field Notes
+              </button>
+            </article>
+            <article class="card">
+              <h3>Enemy Codex</h3>
+              <p>Review encountered enemy types and their combat characteristics.</p>
+              <button class="action-button ghost" type="button" id="open-enemy-codex-button">
+                Enemy Codex
+              </button>
+            </article>
+          </div>
+          <section class="level-legend codex-roadmap" aria-labelledby="codex-proof-roadmap-title">
+            <header class="codex-header">
+              <span class="codex-label">Codex</span>
+              <h3 id="codex-proof-roadmap-title">Proof Roadmap</h3>
+            </header>
+            <ul class="set-timeline">
+              <li class="set-card active-set">
+                <h4>Conjecture Levels 1-5</h4>
+                <p>Speculative math under siege. Examples highlight famous unsolved ideas.</p>
+              </li>
+              <li class="set-card">
+                <h4>Corollary Levels 6-10</h4>
+                <p>Statements that immediately bloom from the conjecture victories.</p>
+              </li>
+              <li class="set-card">
+                <h4>Lemma Levels 11-15</h4>
+                <p>Utility proofs and support tactics that bolster the main argument.</p>
+              </li>
+              <li class="set-card">
+                <h4>Proposition Levels 16-20</h4>
+                <p>Solid but modest claims—expect compound paths and multi-route assaults.</p>
+              </li>
+              <li class="set-card">
+                <h4>Theorem Levels 21-25</h4>
+                <p>Major revelations guarded by elite enemy archetypes.</p>
+              </li>
+              <li class="set-card">
+                <h4>Axiom Levels 26-30</h4>
+                <p>Foundational truths; everything loops back to primal glyph geometry.</p>
+              </li>
+            </ul>
+          </section>
+          <article class="card powder-log-card codex-lab-chronicle">
+            <h3>Lab Chronicle</h3>
+            <p class="powder-footnote">Recent experiments echo here for quick review.</p>
+            <ul class="powder-log" id="powder-log" aria-live="polite" aria-label="Recent mote experiments"></ul>
+            <p class="powder-log-empty" id="powder-log-empty">No experiments recorded yet.</p>
+          </article>
+          <article class="card performance-log-card" id="performance-codex-card">
+            <div class="performance-log-header">
+              <h3>Spire Diagnostics</h3>
+              <p class="performance-log-updated" id="performance-log-updated">Awaiting diagnostics…</p>
+            </div>
+            <p class="performance-log-description">
+              Real-time samples measure the frame cost of the playfield, rendering, and the busiest spires.
+            </p>
+            <div class="performance-log-list" id="performance-log-list" hidden></div>
+            <p class="performance-log-empty" id="performance-log-empty">
+              Enter a battle to populate performance samples.
+            </p>
+          </article>
+          <section class="enemy-codex" id="enemy-codex-section" aria-live="polite" tabindex="-1" hidden>
+            <header class="subsection-title">Enemy Codex</header>
+            <div class="codex-controls">
+              <button class="action-button ghost" type="button" id="codex-options-button">
+                Open Options
+              </button>
+              <label class="developer-mode-toggle" for="codex-developer-mode">
+                <input type="checkbox" id="codex-developer-mode" />
+                Developer Mode — unlock all towers, levels, and entries
+              </label>
+              <button class="developer-reset-button" type="button" id="developer-reset-button">
+                Delete Player Data
+              </button>
+              <p class="developer-mode-note" id="codex-developer-note" hidden>
+                Developer mode active: all content is unlocked for rapid iteration.
+              </p>
+              <div class="developer-control-panel" id="developer-control-panel" hidden aria-hidden="true">
+                <div class="developer-control-field developer-control-field--checkbox">
+                  <label for="developer-infinite-thero">
+                    <input
+                      type="checkbox"
+                      id="developer-infinite-thero"
+                      data-developer-toggle="infiniteThero"
+                    />
+                    Infinite þ
+                  </label>
+                  <p class="developer-control-hint">
+                    Start every defense with limitless Thero for sandbox testing.
+                  </p>
+                </div>
+                <!-- Compact basin autosave removed per task 24 - it is now the only save method -->
+                <div class="developer-control-field">
+                  <label for="developer-start-thero">Base start þ</label>
+                  <input
+                    type="number"
+                    id="developer-start-thero"
+                    data-developer-field="startThero"
+                    min="0"
+                    step="1"
+                    inputmode="numeric"
+                  />
+                  <p class="developer-control-hint">Adjust starting Thero before multipliers.</p>
+                </div>
+                <div class="developer-control-field">
+                  <label for="developer-thero-multiplier">Thero multiplier</label>
+                  <input
+                    type="number"
+                    id="developer-thero-multiplier"
+                    data-developer-field="theroMultiplier"
+                    min="0"
+                    step="0.01"
+                    inputmode="decimal"
+                  />
+                  <p class="developer-control-hint">
+                    Override the starting Thero multiplier. Leave blank to follow progression.
+                  </p>
+                </div>
+                <div class="developer-control-field">
+                  <label for="developer-glyphs-aleph">Tower of Inspiration glyphs</label>
+                  <input
+                    type="number"
+                    id="developer-glyphs-aleph"
+                    data-developer-field="glyphsAleph"
+                    min="0"
+                    step="1"
+                    inputmode="numeric"
+                  />
+                  <p class="developer-control-hint">Override surviving Tower glyphs earned and currency.</p>
+                </div>
+                <section class="developer-balance-estimator" id="developer-balance-estimator" hidden>
+                  <h3>Balance Estimator</h3>
+                  <p class="developer-control-hint">Planning model: each glyph adds 12% compounded damage and 4% compounded attack speed. “Kill HP” is damage delivered during the engagement window; special mechanics are excluded.</p>
+                  <div class="developer-balance-inputs">
+                    <label>Level<select id="balance-estimator-level"></select></label>
+                    <label>Glyphs / tower<input id="balance-estimator-glyphs" type="number" min="0" step="1" value="0" /></label>
+                    <label>Engagement (s)<input id="balance-estimator-engagement" type="number" min="0.1" step="0.5" value="8" /></label>
+                    <label>Thero multiplier<input id="balance-estimator-multiplier" type="number" min="0" step="0.01" value="1" /></label>
+                  </div>
+                  <div class="developer-balance-summary" id="balance-estimator-summary"></div>
+                  <div class="developer-balance-table-wrap">
+                    <table class="developer-balance-table">
+                      <thead><tr><th>Tower</th><th>Cost</th><th>Hit</th><th>Rate</th><th>DPS</th><th>Kill HP</th><th>Affordable</th></tr></thead>
+                      <tbody id="balance-estimator-output"></tbody>
+                    </table>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </section>
+        </section>
+      </main>
+
+      <nav class="tab-bar" aria-label="Primary" role="tablist">
+        <button
+          class="tab-button active"
+          data-tab="tower"
+          id="tab-tower"
+          data-preserve-icon="true"
+          type="button"
+          role="tab"
+          aria-label="Defense"
+          aria-controls="panel-tower"
+          aria-selected="true"
+          aria-pressed="true"
+        >
+          <span class="tab-icon" aria-hidden="true">℘</span>
+          <span class="tab-label">Defense</span>
+        </button>
+        <button
+          class="tab-button"
+          data-tab="towers"
+          id="tab-towers"
+          type="button"
+          role="tab"
+          aria-label="Towers"
+          aria-controls="panel-towers"
+          aria-selected="false"
+          aria-pressed="false"
+        >
+          <span class="tab-icon" aria-hidden="true">α</span>
+          <span class="tab-label">Towers</span>
+          <span class="tab-icon-badge tab-icon-badge--glyphs" id="tab-glyph-badge" hidden>0</span>
+        </button>
+        <button
+          class="tab-button"
+          data-tab="powder"
+          id="tab-powder"
+          type="button"
+          role="tab"
+          aria-label="Tower of Inspiration"
+          aria-controls="panel-powder"
+          aria-selected="false"
+          aria-pressed="false"
+        >
+          <span class="tab-icon" aria-hidden="true">ℵ</span>
+          <span class="tab-label">Tower</span>
+        </button>
+        <button
+          class="tab-button"
+          data-tab="achievements"
+          id="tab-achievements"
+          type="button"
+          role="tab"
+          aria-label="Achievements"
+          aria-controls="panel-achievements"
+          aria-selected="false"
+          aria-pressed="false"
+        >
+          <span class="tab-icon">∮</span>
+          <span class="tab-label">Proofs</span>
+        </button>
+        <button
+          class="tab-button"
+          data-tab="options"
+          id="tab-options"
+          type="button"
+          role="tab"
+          aria-label="Options"
+          aria-controls="panel-options"
+          aria-selected="false"
+          aria-pressed="false"
+        >
+          <span class="tab-icon" aria-hidden="true">⧖</span>
+          <span class="tab-label">Codex</span>
+        </button>
+      </nav>
+    </div>
+    <div
+      class="level-overlay variable-library-overlay"
+      id="variable-library-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      hidden
+      aria-labelledby="variable-library-title"
+    >
+      <div class="overlay-panel">
+        <button
+          class="overlay-close"
+          type="button"
+          data-variable-library-close
+          aria-label="Close variable glossary"
+        >
+          &times;
+        </button>
+        <p class="overlay-label">Glyph Variables</p>
+        <h2 class="overlay-title" id="variable-library-title">Variable Glossary</h2>
+        <p class="overlay-example">
+          Review every symbol unlocked across your towers and spectral cohorts.
+        </p>
+        <ul class="variable-library-list" id="variable-library-list" role="list"></ul>
+        <p class="overlay-instruction">Tap outside or press Esc to close.</p>
+      </div>
+    </div>
+    <div
+      class="level-overlay upgrade-overlay"
+      id="upgrade-matrix-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      hidden
+      aria-labelledby="upgrade-matrix-title"
+    >
+      <div class="overlay-panel">
+        <button
+          class="overlay-close"
+          type="button"
+          data-overlay-close
+          aria-label="Close upgrade matrix"
+        >
+          &times;
+        </button>
+        <p class="overlay-label">Merge Reference</p>
+        <h2 class="overlay-title" id="upgrade-matrix-title">Upgrade Matrix</h2>
+        <p class="overlay-example">
+          Review how glyph towers ascend, their base lattice costs, and the form unlocked by each merge.
+        </p>
+        <div class="upgrade-matrix-grid" id="upgrade-matrix-grid" role="list"></div>
+        <p class="overlay-instruction">Tap outside or press Esc to close.</p>
+      </div>
+    </div>
+    <div
+      class="level-overlay tower-upgrade-overlay"
+      id="tower-upgrade-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      hidden
+      aria-labelledby="tower-upgrade-title"
+    >
+      <div class="overlay-panel tower-upgrade-panel">
+        <button
+          class="overlay-close"
+          type="button"
+          data-tower-upgrade-close
+          aria-label="Close tower upgrade menu"
+        >
+          &times;
+        </button>
+        <p class="overlay-label">Glyph Variable Lattice</p>
+        <div class="tower-upgrade-header">
+          <figure class="tower-upgrade-icon" id="tower-upgrade-icon" aria-hidden="true"></figure>
+          <div class="tower-upgrade-heading">
+            <h2 class="overlay-title" id="tower-upgrade-title">Tower Equation</h2>
+            <p class="tower-upgrade-tier" id="tower-upgrade-tier"></p>
+            <p class="tower-upgrade-glyphs" id="tower-upgrade-glyphs">Available Glyphs: 0</p>
+          </div>
+        </div>
+        <div class="tower-upgrade-equations">
+          <section class="tower-upgrade-equation" aria-labelledby="tower-upgrade-base-label">
+            <h3 class="tower-upgrade-equation-label" id="tower-upgrade-base-label">Master Equation</h3>
+            <p class="tower-upgrade-formula" id="tower-upgrade-base"></p>
+            <p class="tower-upgrade-formula tower-upgrade-formula--values" id="tower-upgrade-base-values"></p>
+          </section>
+        </div>
+        <div class="tower-upgrade-variables" id="tower-upgrade-variables" role="list"></div>
+        <p class="tower-upgrade-note" id="tower-upgrade-note"></p>
+        <p class="overlay-instruction">Tap outside or press Esc to close.</p>
+      </div>
+    </div>
+    <div
+      class="level-overlay field-notes-overlay"
+      id="field-notes-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      tabindex="-1"
+      hidden
+    >
+      <div class="overlay-panel field-notes-panel" role="document" aria-labelledby="field-notes-title">
+        <button class="overlay-close" type="button" id="field-notes-close" aria-label="Close field notes">×</button>
+        <button
+          class="field-notes-back"
+          type="button"
+          id="field-notes-back"
+          aria-label="Back to field notes list"
+          hidden
+        >
+          ←
+        </button>
+        <figure class="field-notes-figure">
+          <img
+            src="./assets/sprites/menu/glyphBook_glow.webp"
+            alt="A glowing glyph codex radiates swirling sigils."
+          />
+          <figcaption>Glowing Glyph Codex</figcaption>
+        </figure>
+        <p class="overlay-label">Field Notes Dispatch</p>
+        <h2 class="overlay-title" id="field-notes-title">Field Notes Archive</h2>
+        <div class="field-notes-views">
+          <div class="field-notes-copy field-notes-view field-notes-list-view" id="field-notes-list-view" aria-live="polite">
+            <p class="field-notes-empty" id="field-notes-empty">No story dispatches logged yet.</p>
+            <ul class="field-notes-entries" id="field-notes-list" role="list"></ul>
+          </div>
+          <div class="field-notes-copy field-notes-view" id="field-notes-copy" aria-live="polite">
+            <p class="field-notes-loading" aria-live="polite">Loading field notes…</p>
+          </div>
+        </div>
+        <div class="field-notes-pagination" id="field-notes-pagination">
+          <button class="field-notes-page-button" type="button" id="field-notes-prev" aria-label="Previous field notes page" disabled>
+            ‹
+          </button>
+          <span class="field-notes-page-indicator" id="field-notes-page-indicator">Page 1 of 5</span>
+          <button class="field-notes-page-button" type="button" id="field-notes-next" aria-label="Next field notes page">
+            ›
+          </button>
+        </div>
+      </div>
+    </div>
+    <div
+      class="level-overlay enemy-codex-overlay"
+      id="enemy-codex-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      tabindex="-1"
+      hidden
+    >
+      <div class="overlay-panel enemy-codex-panel" role="document" aria-labelledby="enemy-codex-overlay-title">
+        <button class="overlay-close" type="button" id="enemy-codex-overlay-close" aria-label="Close enemy codex">×</button>
+        <p class="overlay-label">Enemy Compendium</p>
+        <h2 class="overlay-title" id="enemy-codex-overlay-title">Enemy Codex</h2>
+        <p class="enemy-codex-overlay-intro" id="enemy-codex-overlay-intro">
+          Encountered enemy glyphs and their tactical signatures are cataloged below.
+        </p>
+        <div class="enemy-codex-overlay-list" id="enemy-codex-overlay-list" role="list">
+          <p class="enemy-codex-overlay-empty" id="enemy-codex-overlay-empty">
+            Encounter enemies in combat to unlock their entries.
+          </p>
+        </div>
+        <p class="overlay-instruction">Tap outside or press Esc to close.</p>
+      </div>
+    </div>
+
+    <div class="level-overlay" id="level-overlay" role="dialog" aria-modal="true" aria-hidden="true" hidden>
+      <div class="overlay-panel">
+        <p class="overlay-label" id="overlay-level"></p>
+        <h2 class="overlay-title" id="overlay-title"></h2>
+        <p class="overlay-example" id="overlay-example"></p>
+        <figure class="overlay-preview" id="overlay-preview" aria-hidden="true" hidden></figure>
+        <dl class="overlay-metrics">
+          <div>
+            <dt>Mode</dt>
+            <dd id="overlay-mode">—</dd>
+          </div>
+          <div>
+            <dt>Run Length</dt>
+            <dd id="overlay-duration">—</dd>
+          </div>
+          <div>
+            <dt>Starting Thero</dt>
+            <dd id="overlay-start-thero">—</dd>
+          </div>
+          <div>
+            <dt>Rewards</dt>
+            <dd id="overlay-rewards">—</dd>
+          </div>
+        </dl>
+        <p class="overlay-last" id="overlay-last">No attempts yet.</p>
+        <p class="overlay-instruction">Tap or click to enter</p>
+        <!-- Dedicated confirmation button so desktop players can enter levels without relying on overlay clicks. -->
+        <button type="button" class="overlay-confirm" id="overlay-confirm">Enter Level</button>
+      </div>
+    </div>
+    <script type="module" src="./assets/main.js"></script>
+  </body>
+</html>
