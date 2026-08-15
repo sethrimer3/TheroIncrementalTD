@@ -9057,14 +9057,9 @@ body.show-glyph-equations .tower-upgrade-variable-equations {
 }
 
 .tower-upgrade-variable-controls--attachment {
-  display: grid;
-  grid-template-columns: auto max-content;
+  display: flex;
   justify-content: end;
   margin-left: 0;
-}
-
-.tower-upgrade-variable-controls--attachment .tower-upgrade-variable-cost {
-  text-align: right;
 }
 
 .tower-upgrade-variable-glyph-control {
@@ -9121,14 +9116,38 @@ body.show-glyph-equations .tower-upgrade-variable-equations {
   text-transform: uppercase;
 }
 
+.tower-upgrade-variable-glyph-control--attachment {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(28px, auto));
+  align-items: end;
+  gap: 10px;
+}
+
+.tower-upgrade-variable-glyph-column {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+}
+
+.tower-upgrade-variable-glyph-amount {
+  min-height: 0.8rem;
+  color: rgba(255, 255, 255, 0.68);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
+.tower-upgrade-variable-glyph-column--allocated .tower-upgrade-variable-glyph-amount {
+  color: rgba(255, 255, 255, 0.92);
+}
+
 @media (max-width: 640px) {
   .tower-upgrade-variable-inline-attachment {
     grid-template-columns: 1fr;
   }
 
   .tower-upgrade-variable-controls--attachment {
-    grid-template-columns: auto 1fr;
-    justify-content: stretch;
+    justify-content: start;
   }
 }
 

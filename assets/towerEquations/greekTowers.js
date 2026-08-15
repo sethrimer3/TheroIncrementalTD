@@ -658,6 +658,7 @@ export const zeta = {
       if (variable.key === 'aleph5' || variable.key === 'aleph6') {
         return {
           ...variable,
+          name: variable.key === 'aleph5' ? 'Aleph 5 Upgrade' : 'Aleph 6 Upgrade',
           description: 'Sharpens critical contact from both graph projectile heads.',
           renderControlsInline: true,
         };
