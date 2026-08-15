@@ -41,6 +41,7 @@ const HAS_POINTER_EVENTS = typeof window !== 'undefined' && 'PointerEvent' in wi
 const EQUATION_TOOLTIP_MARGIN_PX = 12; // Maintain consistent spacing between the tooltip and the hovered variable.
 const EQUATION_TOOLTIP_ID = 'tower-upgrade-equation-tooltip'; // Stable id so aria-describedby wiring stays deterministic.
 const TOWER_CARD_SELECTOR = '.card[data-tower-id]'; // Limit tower card queries so loadout buttons stay compact.
+const MYSTERY_TOWER_CARD_SELECTOR = '.card[data-mystery-tower]'; // Keep the locked teaser outside the real-tower interaction and save systems.
 // Resolve the decorative tower-card animated WebP through the module URL so the browser receives the correct asset path in every runtime.
 const TOWER_CARD_BACKGROUND_IMG_URL = new URL('./animations/cardBackground_animation.webp', import.meta.url).href;
 
@@ -1719,6 +1720,18 @@ export function updateTowerCardVisibility() {
     }
 
   });
+
+  // Show one non-interactive teaser until every canonical tower in the progression chain is discovered.
+  const mysteryCard = document.querySelector(MYSTERY_TOWER_CARD_SELECTOR);
+  if (mysteryCard instanceof HTMLElement) {
+    const hasLockedCanonicalTower = CANONICAL_TOWER_IDS.some(
+      (towerId) => towerTabState.towerDefinitionMap.has(towerId) && !isTowerUnlocked(towerId),
+    );
+    mysteryCard.hidden = !hasLockedCanonicalTower;
+    mysteryCard.style.display = hasLockedCanonicalTower ? '' : 'none';
+    mysteryCard.setAttribute('aria-hidden', hasLockedCanonicalTower ? 'false' : 'true');
+    mysteryCard.setAttribute('tabindex', '-1');
+  }
 }
 
 export function injectTowerCardPreviews() {
@@ -1960,7 +1973,9 @@ export function annotateTowerCardsWithCost() {
  */
 export function stageTowerCardEntrance({ delayBetweenMs = 40, initialDelayMs = 0 } = {}) {
   // Collect only the cards that are actually visible (unlocked / dev-mode shown).
-  const allCards = Array.from(document.querySelectorAll(TOWER_CARD_SELECTOR));
+  const allCards = Array.from(
+    document.querySelectorAll(`${TOWER_CARD_SELECTOR}, ${MYSTERY_TOWER_CARD_SELECTOR}`),
+  );
   const visibleCards = allCards.filter((card) => {
     if (!(card instanceof HTMLElement)) return false;
     if (card.hidden) return false;
