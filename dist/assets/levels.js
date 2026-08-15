@@ -193,6 +193,12 @@ export function getCompletedInteractiveLevelCount() {
   return count;
 }
 
+// Formula: Tower of Inspiration glyph limit = 10 base glyphs + 5 glyphs per completed level.
+export function getTowerOfInspirationGlyphLimit(levelsBeaten = getCompletedInteractiveLevelCount()) {
+  const completedLevels = Number.isFinite(levelsBeaten) ? Math.max(0, Math.floor(levelsBeaten)) : 0;
+  return 10 + completedLevels * 5;
+}
+
 // Register the achievement ledger without coupling level progression to the achievements UI module.
 export function setEarnedAchievementCountProvider(provider) {
   earnedAchievementCountProvider = typeof provider === 'function' ? provider : () => 0;

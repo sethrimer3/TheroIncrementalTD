@@ -2,6 +2,7 @@
 import { getTowerDefinition, computeTowerVariableValue } from '../../../assets/towersTab.js';
 import { playTowerFireSound } from '../../../assets/audioSystem.js';
 import { metersToPixels } from '../../../assets/gameUnits.js';
+import { PROJECTILE_TRAIL_STYLES } from './shared/ProjectileTrails.js';
 
 export function ensureEpsilonState(playfield, tower) {
   if (!tower || tower.type !== 'epsilon') {
@@ -93,6 +94,7 @@ export function updateEpsilonTower(playfield, tower, delta) {
     // Pick a gradient position so the needle can be tinted with the active palette.
     paletteRatio: Math.random(),
     alpha: 1,
+    trailStyle: PROJECTILE_TRAIL_STYLES.epsilon,
   });
 
   if (playfield?.audio && state.soundCooldown <= 0) {

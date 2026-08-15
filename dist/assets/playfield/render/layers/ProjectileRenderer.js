@@ -366,6 +366,14 @@ export function drawProjectiles() {
       }
     }
 
+    // Every traveling projectile with a configured style receives the same tapered ribbon.
+    if (projectile.trailStyle && projectile.patternType !== 'omegaWave' && projectilePosition) {
+      const trailColor = projectile.trailColor
+        || projectile.color
+        || samplePaletteGradient(Number.isFinite(projectile.paletteRatio) ? projectile.paletteRatio : 0.5);
+      drawProjectileTrail(ctx, projectile, trailColor, projectile.trailStyle);
+    }
+
     if (projectile.patternType === 'supply') {
       const position = projectile.currentPosition || projectile.target || projectile.source;
       if (!position) {

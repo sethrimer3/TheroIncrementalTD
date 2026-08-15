@@ -543,7 +543,7 @@ export function drawUpsilonFleet(playfield, tower) {
   state.ships.forEach((ship) => {
     if (ship.trail?.length) {
       ctx.save();
-      ctx.strokeStyle = `rgba(${ship.color.r}, ${ship.color.g}, ${ship.color.b}, 0.35)`;
+      ctx.strokeStyle = `rgba(${ship.color.r}, ${ship.color.g}, ${ship.color.b}, 0.175)`;
       ctx.lineWidth = 1.2;
       ctx.beginPath();
       ship.trail.forEach((point, index) => {

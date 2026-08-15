@@ -326,7 +326,7 @@ export function drawT2Graph(playfield, tower) {
       continue;
     }
     ctx.beginPath();
-    ctx.strokeStyle = `rgba(${rgb}, ${alpha * 0.6})`;
+    ctx.strokeStyle = `rgba(${rgb}, ${alpha * 0.3})`;
     ctx.lineWidth = TRAIL_WIDTH;
     ctx.moveTo(prev.x, prev.y);
     ctx.lineTo(point.x, point.y);

@@ -23,6 +23,11 @@ import {
 } from '../../../assets/towersTab.js';
 import { metersToPixels } from '../../../assets/gameUnits.js';
 import { samplePaletteGradient } from '../../../assets/colorSchemeUtils.js';
+import {
+  PROJECTILE_TRAIL_STYLES,
+  drawProjectileTrail,
+  recordProjectileTrail,
+} from './shared/ProjectileTrails.js';
 
 // Base timing so spirals feel deliberate even at low upgrade counts.
 const BASE_LIFETIME_SECONDS = 3.5;
@@ -189,6 +194,7 @@ function createTauProjectile(playfield, tower, state, targetInfo) {
     particles: createInternalParticles(params.particleCount),
     hitCooldowns: new Map(),
     position: { x: tower.x, y: tower.y },
+    trailStyle: PROJECTILE_TRAIL_STYLES.tau,
   };
 }
 
@@ -204,6 +210,7 @@ function updateTauProjectile(playfield, tower, projectile, delta, parameters) {
   const y = tower.y + radius * Math.sin(theta);
 
   projectile.position = { x, y };
+  recordProjectileTrail(projectile, x, y, projectile.trailStyle);
 
   const enemies = Array.isArray(playfield?.enemies) ? playfield.enemies : [];
   enemies.forEach((enemy) => {
@@ -270,6 +277,7 @@ export function drawTauProjectiles(playfield, tower) {
 
   projectiles.forEach((projectile) => {
     const { position, color, hitsRemaining } = projectile;
+    drawProjectileTrail(ctx, projectile, color, projectile.trailStyle);
     const alpha = Math.max(0.35, hitsRemaining / Math.max(1, projectile.particles?.length || hitsRemaining));
     const gradient = ctx.createRadialGradient(position.x, position.y, 0, position.x, position.y, TAU_BULLET_RADIUS);
     gradient.addColorStop(0, `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`);

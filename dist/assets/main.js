@@ -290,6 +290,7 @@ import {
 import {
   pruneLevelState,
   getCompletedInteractiveLevelCount,
+  getTowerOfInspirationGlyphLimit,
   getBaseStartingTheroMultiplier,
   getStartingTheroMultiplier,
   setDeveloperTheroMultiplierOverride,
@@ -1650,23 +1651,29 @@ import { createSpireCameraController } from './spireCameraController.js';
       tierAdvanceAlephCount: powderConfig.alephTierAdvanceCount,
       minAlephWallTier: powderConfig.alephWallTierMin,
       maxAlephWallTier: powderConfig.alephWallTierMax,
+      // Completing levels expands the player's Tower of Inspiration capacity by five glyphs each.
+      glyphLimit: getTowerOfInspirationGlyphLimit(),
     });
 
     if (powderElements.nextGlyphProgress) {
       if (glyphMetrics) {
-        const clampedProgress = Math.min(1, Math.max(0, glyphMetrics.progressFraction));
-        // Show progress climbing toward the next glyph instead of counting down from 100%.
-        const progressPercent = formatDecimal(clampedProgress * 100, 1);
-        const remainingHeightMotes = Number.isFinite(glyphMetrics.remainingToNextMotes)
-          ? Math.max(0, glyphMetrics.remainingToNextMotes)
-          : Math.max(0, glyphMetrics.remainingToNext);
-        const remainingHeight = formatDecimal(remainingHeightMotes, 2);
-        const tier = Number.isFinite(glyphMetrics.tier) ? Math.max(1, Math.floor(glyphMetrics.tier)) : 1;
-        const alephInTier = Number.isFinite(glyphMetrics.alephInTier) ? Math.max(0, Math.floor(glyphMetrics.alephInTier)) : 0;
-        const tierAdvance = Number.isFinite(glyphMetrics.tierAdvanceAlephCount)
-          ? Math.max(1, Math.floor(glyphMetrics.tierAdvanceAlephCount))
-          : 30;
-        powderElements.nextGlyphProgress.textContent = `Tier ${tier} · ℵ ${alephInTier}/${tierAdvance} · ${progressPercent}% to next glyph · Δh ${remainingHeight}`;
+        if (glyphMetrics.limitReached) {
+          powderElements.nextGlyphProgress.textContent = `Glyph limit reached · ${formatWholeNumber(glyphMetrics.glyphLimit)} glyphs`;
+        } else {
+          const clampedProgress = Math.min(1, Math.max(0, glyphMetrics.progressFraction));
+          // Show progress climbing toward the next glyph instead of counting down from 100%.
+          const progressPercent = formatDecimal(clampedProgress * 100, 1);
+          const remainingHeightMotes = Number.isFinite(glyphMetrics.remainingToNextMotes)
+            ? Math.max(0, glyphMetrics.remainingToNextMotes)
+            : Math.max(0, glyphMetrics.remainingToNext);
+          const remainingHeight = formatDecimal(remainingHeightMotes, 2);
+          const tier = Number.isFinite(glyphMetrics.tier) ? Math.max(1, Math.floor(glyphMetrics.tier)) : 1;
+          const alephInTier = Number.isFinite(glyphMetrics.alephInTier) ? Math.max(0, Math.floor(glyphMetrics.alephInTier)) : 0;
+          const tierAdvance = Number.isFinite(glyphMetrics.tierAdvanceAlephCount)
+            ? Math.max(1, Math.floor(glyphMetrics.tierAdvanceAlephCount))
+            : 30;
+          powderElements.nextGlyphProgress.textContent = `Tier ${tier} · ℵ ${alephInTier}/${tierAdvance} · ${progressPercent}% to next glyph · Δh ${remainingHeight}`;
+        }
       } else {
         powderElements.nextGlyphProgress.textContent = '—';
       }
