@@ -108,15 +108,12 @@ function refreshOmicronParameters(playfield, tower, state) {
   // shdAtk = (1 + Aleph1)%
   const shieldDamagePercent = (1 + aleph1) / 100;
   
-  // Get delta tower's spawn rate
+  // Reuse Delta's global-variable-driven training interval.
   const deltaBlueprint = getTowerEquationBlueprint('delta');
-  const deltaAleph1 = Math.max(1, computeTowerVariableValue('delta', 'aleph1', deltaBlueprint) || 1);
-  
-  // Delta training time: 5^aleph1 seconds per unit
-  const rawDeltaTrainingSeconds = Math.pow(5, deltaAleph1);
-  const deltaTrainingSeconds = Number.isFinite(rawDeltaTrainingSeconds) 
-    ? Math.max(1, rawDeltaTrainingSeconds) 
-    : Number.MAX_SAFE_INTEGER;
+  const deltaTrainingSeconds = Math.max(
+    1,
+    computeTowerVariableValue('delta', 'training', deltaBlueprint) || 6,
+  );
   const deltaSpawnRate = deltaTrainingSeconds > 0 && Number.isFinite(deltaTrainingSeconds) 
     ? 1 / deltaTrainingSeconds 
     : 0;

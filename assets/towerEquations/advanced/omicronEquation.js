@@ -34,16 +34,12 @@ export const omicron = {
         const attack = Number.isFinite(attackRaw) ? attackRaw : 0;
 
         const deltaBlueprint = helpers.getTowerEquationBlueprint?.('delta');
-        const deltaAleph1 = Math.max(
+        const deltaTrainingSeconds = Math.max(
           1,
-          Number.isFinite(helpers.computeTowerVariableValue?.('delta', 'aleph1', deltaBlueprint))
-            ? helpers.computeTowerVariableValue('delta', 'aleph1', deltaBlueprint)
-            : 1,
+          Number.isFinite(helpers.computeTowerVariableValue?.('delta', 'training', deltaBlueprint))
+            ? helpers.computeTowerVariableValue('delta', 'training', deltaBlueprint)
+            : 6,
         );
-        const rawDeltaTrainingSeconds = Math.pow(5, deltaAleph1);
-        const deltaTrainingSeconds = Number.isFinite(rawDeltaTrainingSeconds)
-          ? Math.max(1, rawDeltaTrainingSeconds)
-          : Number.MAX_SAFE_INTEGER;
         const deltaSpawnRate = deltaTrainingSeconds > 0 && Number.isFinite(deltaTrainingSeconds)
           ? 1 / deltaTrainingSeconds
           : 0;
