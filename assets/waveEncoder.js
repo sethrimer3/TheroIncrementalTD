@@ -6,28 +6,29 @@ const SPEED_NORMALIZATION_FACTOR = 1000;
 
 // Enemy type mapping - each letter represents a specific enemy with predefined stats
 export const ENEMY_TYPES = {
-  'A': { id: 'etype', speed: 50, color: '#4a90e2', label: 'Epsilon Type' },
-  'B': { id: 'divisor', speed: 45, color: '#e24a4a', label: 'Divisor' },
-  'C': { id: 'prime', speed: 55, color: '#50c878', label: 'Prime' },
+  // Enemy HP is resolved as baseHp × the active level's difficultyMultiplier.
+  'A': { id: 'etype', baseHp: 5, speed: 50, color: '#4a90e2', label: 'Epsilon Type' },
+  'B': { id: 'divisor', baseHp: 8, speed: 45, color: '#e24a4a', label: 'Divisor' },
+  'C': { id: 'prime', baseHp: 12, speed: 55, color: '#50c878', label: 'Prime' },
   // D was 'reversal' — replaced by recursive-relay (recursive spawn mechanic)
-  'D': { id: 'recursive-relay', speed: 40, color: '#c39bd3', label: 'Recursive Relay' },
-  'E': { id: 'tunneler', speed: 60, color: '#f39c12', label: 'Tunneler' },
-  'F': { id: 'aleph-swarm', speed: 65, color: '#e91e63', label: 'Aleph Swarm' },
-  'G': { id: 'partial-wraith', speed: 48, color: '#34495e', label: 'Partial Wraith' },
-  'H': { id: 'gradient-sapper', speed: 52, color: '#16a085', label: 'Gradient Sapper', deprecated: true, fallbackType: 'A' },
-  'I': { id: 'weierstrass-prism', speed: 42, color: '#8e44ad', label: 'Weierstrass Prism' },
-  'J': { id: 'planck-shade', speed: 70, color: '#2c3e50', label: 'Planck Shade' },
-  'K': { id: 'null-husk', speed: 38, color: '#95a5a6', label: 'Null Husk' },
-  'L': { id: 'imaginary-strider', speed: 75, color: '#3498db', label: 'Imaginary Strider' },
-  'M': { id: 'combination-cohort', speed: 44, color: '#e67e22', label: 'Combination Cohort' },
-  'N': { id: 'polygon-splitter', speed: 58, color: '#00bfa5', label: 'Polygonal Splitter' },
-  'O': { id: 'derivative-shield', speed: 46, color: '#7f8c8d', label: 'Derivative Shield' },
-  'P': { id: 'decimal-swarm', speed: 35, color: '#ffffff', label: 'Decimal Swarm' },
-  'Q': { id: 'integral-accumulator', speed: 47, color: '#6c5ce7', label: 'Integral Accumulator' },
+  'D': { id: 'recursive-relay', baseHp: 15, speed: 40, color: '#c39bd3', label: 'Recursive Relay' },
+  'E': { id: 'tunneler', baseHp: 18, speed: 60, color: '#f39c12', label: 'Tunneler' },
+  'F': { id: 'aleph-swarm', baseHp: 6, speed: 65, color: '#e91e63', label: 'Aleph Swarm' },
+  'G': { id: 'partial-wraith', baseHp: 22, speed: 48, color: '#34495e', label: 'Partial Wraith' },
+  'H': { id: 'gradient-sapper', baseHp: 24, speed: 52, color: '#16a085', label: 'Gradient Sapper', deprecated: true, fallbackType: 'A' },
+  'I': { id: 'weierstrass-prism', baseHp: 28, speed: 42, color: '#8e44ad', label: 'Weierstrass Prism' },
+  'J': { id: 'planck-shade', baseHp: 20, speed: 70, color: '#2c3e50', label: 'Planck Shade' },
+  'K': { id: 'null-husk', baseHp: 35, speed: 38, color: '#95a5a6', label: 'Null Husk' },
+  'L': { id: 'imaginary-strider', baseHp: 26, speed: 75, color: '#3498db', label: 'Imaginary Strider' },
+  'M': { id: 'combination-cohort', baseHp: 40, speed: 44, color: '#e67e22', label: 'Combination Cohort' },
+  'N': { id: 'polygonal-splitter', baseHp: 45, speed: 58, color: '#00bfa5', label: 'Polygonal Splitter' },
+  'O': { id: 'derivative-shield', baseHp: 50, speed: 46, color: '#7f8c8d', label: 'Derivative Shield' },
+  'P': { id: 'decimal-swarm', baseHp: 10, speed: 35, color: '#ffffff', label: 'Decimal Swarm' },
+  'Q': { id: 'integral-accumulator', baseHp: 55, speed: 47, color: '#6c5ce7', label: 'Integral Accumulator' },
   // New enemy types
-  'R': { id: 'nullifier', speed: 42, color: '#1a1a2e', label: 'Nullifier' },
-  'S': { id: 'superposition', speed: 58, color: '#00d2ff', label: 'Superposition' },
-  'T': { id: 'quantum-tunneler', speed: 50, color: '#7fff00', label: 'Quantum Tunneler' },
+  'R': { id: 'nullifier', baseHp: 60, speed: 42, color: '#1a1a2e', label: 'Nullifier' },
+  'S': { id: 'superposition', baseHp: 48, speed: 58, color: '#00d2ff', label: 'Superposition' },
+  'T': { id: 'quantum-tunneler', baseHp: 65, speed: 50, color: '#7fff00', label: 'Quantum Tunneler' },
 };
 
 // Reverse mapping for encoding

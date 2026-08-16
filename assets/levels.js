@@ -23,6 +23,65 @@ const TOWER_LOADOUT_SLOT_MILESTONE_LEVEL_IDS = [
 const DEVELOPER_TEST_RANGE_ID = 'Developer - Test Range';
 const DEVELOPER_TEST_RANGE_BASE_HP = 10000;
 const DEVELOPER_TEST_RANGE_INTERVAL = 5;
+const DEFAULT_BOSS_HP_MULTIPLIER = 1.25;
+
+// Friendly campaign steps replace the former exponent ladder. The final level uses
+// ×200, making its 40-HP Combination Cohorts reach 8,000 HP and its boss 10,000 HP.
+const CAMPAIGN_DIFFICULTY_MULTIPLIERS = Object.freeze([
+  1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6, 8,
+  10, 12, 15, 18, 22, 28, 34, 42, 50, 60,
+  72, 86, 100, 115, 130, 145, 160, 175, 190, 200,
+]);
+
+/** Resolve a level-owned difficulty value when old level JSON has not declared one yet. */
+export function resolveLevelDifficultyMultiplier(level = {}) {
+  if (Number.isFinite(level.difficultyMultiplier) && level.difficultyMultiplier > 0) {
+    return level.difficultyMultiplier;
+  }
+  const id = String(level.id || '');
+  const campaignMatch = id.match(/level-(\d{2})-/i);
+  if (campaignMatch) {
+    const levelNumber = Number.parseInt(campaignMatch[1], 10);
+    if (levelNumber === 0) {
+      const prologueMatch = id.match(/prologue-(\d+)/i);
+      return [0.2, 0.35, 0.5][Math.max(0, Number(prologueMatch?.[1] || 1) - 1)] || 0.5;
+    }
+    return CAMPAIGN_DIFFICULTY_MULTIPLIERS[levelNumber - 1] || 1;
+  }
+  const trialMatch = id.match(/trial-(\d+)/i);
+  return trialMatch ? [2, 4, 8, 16, 32, 64, 128][Number(trialMatch[1]) - 1] || 1 : 1;
+}
+
+/**
+ * Formula: enemy HP = enemyType.baseHp × level.difficultyMultiplier.
+ * Bosses use the same formula with one additional, level-configurable boss multiplier.
+ */
+export function applyLevelDifficultyToWaves(waves, level) {
+  const difficultyMultiplier = resolveLevelDifficultyMultiplier(level);
+  const bossHpMultiplier = Number.isFinite(level.bossHpMultiplier) && level.bossHpMultiplier > 0
+    ? level.bossHpMultiplier
+    : DEFAULT_BOSS_HP_MULTIPLIER;
+  return cloneWaveArray(waves).map((wave) => {
+    const groups = Array.isArray(wave.enemyGroups) ? wave.enemyGroups : [];
+    const scaledGroups = groups.map((group) => {
+      const enemyType = ENEMY_TYPES[group.enemyType];
+      const hp = Math.max(1, Math.round((enemyType?.baseHp || 1) * difficultyMultiplier));
+      return { ...group, hp, reward: hp * 0.1 };
+    });
+    const primaryHp = scaledGroups[0]?.hp || Math.max(1, Math.round(difficultyMultiplier));
+    const scaledWave = {
+      ...wave,
+      hp: primaryHp,
+      reward: primaryHp * 0.1,
+      enemyGroups: scaledGroups,
+    };
+    if (wave.boss) {
+      const bossHp = Math.max(1, Math.round(primaryHp * bossHpMultiplier));
+      scaledWave.boss = { ...wave.boss, hp: bossHp, reward: bossHp * 0.15 };
+    }
+    return scaledWave;
+  });
+}
 
 // Canonical ambient-effect metadata keeps level data, editor controls, and rendering in sync.
 export const BACKGROUND_EFFECTS = Object.freeze([
@@ -163,7 +222,11 @@ export function setLevelConfigs(levels = []) {
       preplacedTowers: Array.isArray(level?.preplacedTowers)
         ? level.preplacedTowers.map((t) => ({ ...t }))
         : [],
-      waves: cloneWaveArray(waves),
+      difficultyMultiplier: resolveLevelDifficultyMultiplier(level),
+      bossHpMultiplier: Number.isFinite(level.bossHpMultiplier) && level.bossHpMultiplier > 0
+        ? level.bossHpMultiplier
+        : DEFAULT_BOSS_HP_MULTIPLIER,
+      waves: applyLevelDifficultyToWaves(waves, level),
       path: cloneVectorArray(level.path),
       autoAnchors: cloneVectorArray(level.autoAnchors),
     };
