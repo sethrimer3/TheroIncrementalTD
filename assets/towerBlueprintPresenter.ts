@@ -236,6 +236,8 @@ function isFiniteNumber(value: unknown): value is number {
 
 const authoredTowerBlueprints: Record<string, TowerEquationBlueprint> =
   TOWER_EQUATION_BLUEPRINTS;
+// Alpha–Zeta now consume global variables; their historical per-tower ranks are ignored and not reserialized.
+const GLOBAL_GREEK_PHASE_ONE_TOWERS = new Set(['alpha', 'beta', 'gamma', 'delta', 'epsilon', 'zeta']);
 
 /**
  * Factory responsible for managing tower equation blueprint access, glyph state,
@@ -352,6 +354,9 @@ export function createTowerBlueprintPresenter(
   function getTowerUpgradeStateSnapshot(): TowerUpgradeStateSnapshot {
     const snapshot: TowerUpgradeStateSnapshot = {};
     towerUpgradeState.forEach((state, towerId) => {
+      if (GLOBAL_GREEK_PHASE_ONE_TOWERS.has(towerId)) {
+        return;
+      }
       if (!state || !state.variables) {
         return;
       }
@@ -375,6 +380,9 @@ export function createTowerBlueprintPresenter(
       return;
     }
     Object.keys(snapshot).forEach((towerId) => {
+      if (GLOBAL_GREEK_PHASE_ONE_TOWERS.has(towerId)) {
+        return;
+      }
       const savedState = snapshot[towerId];
       if (!isObjectLike(savedState) || !isObjectLike(savedState.variables)) {
         return;

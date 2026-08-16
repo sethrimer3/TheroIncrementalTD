@@ -1,403 +1,45 @@
-/**
- * Basic Tower Blueprints
- * 
- * Foundational towers that form the core progression: alpha, beta, gamma.
- * These towers introduce players to the basic mechanics and upgrade systems.
- */
+/** Phase-one foundational tower blueprints driven by player-owned Greek variables. */
+import { formatDecimal, formatGameNumber, formatWholeNumber } from '../../scripts/core/formatting.js';
+import { getVariableValue } from '../greekVariableProgression.js';
 
-import {
-  formatWholeNumber,
-  formatDecimal,
-  formatGameNumber,
-} from '../../scripts/core/formatting.js';
-import { blueprintContext } from './blueprintContext.js';
-
-// Helper function accessors for cleaner code
-const ctx = () => blueprintContext;
-
-// Render Bet₁ with a dagesh and an enforced left-to-right order so the subscript stays on the right.
-const BET1_GLYPH = '\u2066\u05D1\u05BC\u2081\u2069';
+const v = (id) => getVariableValue(id);
+const lines = (expression, current) => [
+  { expression },
+  { values: String.raw`\( \text{Current} = ${current} \)`, variant: 'values' },
+];
 
 export const alpha = {
-  mathSymbol: String.raw`\alpha`,
-  baseEquation: 'α = Atk × Spd',
+  mathSymbol: String.raw`\alpha`, baseEquation: 'α Tower = Atk × Spd', variablesUsed: ['alpha', 'beta'],
   variables: [
-    {
-      key: 'atk',
-      symbol: 'Atk',
-      equationSymbol: 'Atk',
-      glyphLabel: 'ℵ₁',
-      name: 'Atk',
-      description: 'Projectile damage carried by each glyph bullet.',
-      baseValue: 5,
-      step: 5,
-      upgradable: true,
-      format: (value) => `${formatWholeNumber(value)} Atk`,
-      cost: (level) => Math.max(1, 1 + level),
-      getSubEquations({ level, value }) {
-        const glyphRank = ctx().deriveGlyphRankFromLevel(level, 1);
-        const attackValue = Number.isFinite(value) ? value : 0;
-        return [
-          {
-            expression: String.raw`\( \text{Atk} = 5 \times \aleph_{1} \)`,
-            values: String.raw`\( ${formatWholeNumber(attackValue)} = 5 \times ${formatWholeNumber(glyphRank)} \)`,
-          },
-        ];
-      },
-    },
-    {
-      key: 'speed',
-      symbol: 'Spd',
-      equationSymbol: 'Spd',
-      glyphLabel: 'ℵ₂',
-      name: 'Spd',
-      description: 'Oscillation cadence braided from the second glyph conduit.',
-      baseValue: 0.5,
-      step: 0.5,
-      upgradable: true,
-      format: (value) => `${formatDecimal(value, 2)} Spd`,
-      getSubEquations({ level, value }) {
-        const glyphRank = ctx().deriveGlyphRankFromLevel(level, 1);
-        const speedValue = Number.isFinite(value) ? value : glyphRank * 0.5;
-        return [
-          {
-            expression: String.raw`\( \text{Spd} = 0.5 \times \aleph_{2} \)`,
-            values: String.raw`\( ${formatDecimal(speedValue, 2)} = 0.5 \times ${formatDecimal(glyphRank, 2)} \)`,
-          },
-        ];
-      },
-    },
+    { key: 'atk', symbol: 'Atk', equationSymbol: 'Atk', name: 'Damage', description: 'Fundamental glyph-bullet damage shared by every Alpha tower.', upgradable: false, variablesUsed: ['alpha'], computeValue: () => 5 * v('alpha'), format: (x) => `${formatGameNumber(x)} Atk`, getSubEquations: ({ value }) => lines(String.raw`\( \text{Atk} = 5\alpha \)`, formatGameNumber(value)) },
+    { key: 'speed', symbol: 'Spd', equationSymbol: 'Spd', name: 'Attack Speed', description: 'Beta propagates Alpha shots more rapidly.', upgradable: false, variablesUsed: ['beta'], computeValue: () => 0.5 + 0.1 * v('beta'), format: (x) => `${formatDecimal(x, 2)} Spd`, getSubEquations: ({ value }) => lines(String.raw`\( \text{Spd} = 0.5 + 0.1\beta \)`, formatDecimal(value, 2)) },
   ],
-  computeResult(values) {
-    const attack = Number.isFinite(values.atk) ? values.atk : 0;
-    const speed = Number.isFinite(values.speed) ? values.speed : 0;
-    return attack * speed;
-  },
-  formatBaseEquationValues({ values, result, formatComponent }) {
-    const attack = Number.isFinite(values.atk) ? values.atk : 0;
-    const speed = Number.isFinite(values.speed) ? values.speed : 0;
-    return `${formatComponent(result)} = ${formatComponent(attack)} × ${formatComponent(speed)}`;
-  },
+  computeResult: (values) => (values.atk || 0) * (values.speed || 0),
+  formatBaseEquationValues: ({ values, result, formatComponent }) => `${formatComponent(result)} = ${formatComponent(values.atk || 0)} × ${formatComponent(values.speed || 0)}`,
 };
 
 export const beta = {
-  mathSymbol: String.raw`\beta`,
-  baseEquation: 'β = Atk × Spd × Rng × Slw',
+  mathSymbol: String.raw`\beta`, baseEquation: 'β Tower = Atk × Spd × Rng × Slw', variablesUsed: ['alpha', 'beta', 'gamma', 'delta'],
   variables: [
-    {
-      key: 'attack',
-      symbol: 'Atk',
-      equationSymbol: 'Atk',
-      glyphLabel: 'ℵ₁',
-      name: 'Atk',
-      description: 'Direct strike power mirrored from α.',
-      upgradable: true,
-      format: (value) => `${formatGameNumber(value)} Atk`,
-      computeValue({ blueprint, towerId }) {
-        const effectiveBlueprint = blueprint || ctx().getTowerEquationBlueprint(towerId);
-        const state = ctx().ensureTowerUpgradeState(towerId, effectiveBlueprint);
-        const level = state.variables?.attack?.level || 0;
-        const glyphRank = ctx().deriveGlyphRankFromLevel(level, 1);
-        const alphaValue = ctx().calculateTowerEquationResult('alpha');
-        return alphaValue * glyphRank;
-      },
-      getSubEquations({ level }) {
-        const glyphRank = ctx().deriveGlyphRankFromLevel(level, 1);
-        const alphaValue = ctx().calculateTowerEquationResult('alpha');
-        const attackValue = alphaValue * glyphRank;
-        return [
-          {
-            expression: String.raw`\( \text{Atk} = \alpha \times \aleph_{1} \)`,
-            values: String.raw`\( ${formatDecimal(attackValue, 2)} = ${formatDecimal(alphaValue, 2)} \times ${formatWholeNumber(glyphRank)} \)`,
-          },
-        ];
-      },
-    },
-    {
-      key: 'speed',
-      symbol: 'Spd',
-      equationSymbol: 'Spd',
-      name: 'Spd',
-      description: 'Cadence accelerated by neighbouring α lattices.',
-      upgradable: false,
-      lockedNote: 'Connect α lattices to accelerate β cadence.',
-      computeValue() {
-        const alphaConnections = ctx().getDynamicConnectionCount('alpha');
-        return 0.5 + 1.5 * alphaConnections;
-      },
-      format: (value) => `${formatDecimal(value, 2)} Spd`,
-      getSubEquations() {
-        const alphaConnections = ctx().getDynamicConnectionCount('alpha');
-        const speedValue = 0.5 + 1.5 * alphaConnections;
-        return [
-          {
-            expression: String.raw`\( \text{Spd} = 0.5 + 1.5 \left( \alpha_{\beta} \right) \)`,
-            values: String.raw`\( ${formatDecimal(speedValue, 2)} = 0.5 + 1.5 \left( ${formatWholeNumber(alphaConnections)} \right) \)`,
-          },
-        ];
-      },
-    },
-    {
-      key: 'range',
-      symbol: 'Rng',
-      equationSymbol: 'Rng',
-      name: 'Rng',
-      description: 'Coverage extended by α lattice entanglement.',
-      upgradable: false,
-      lockedNote: 'Entangle α lattices to extend β reach.',
-      computeValue() {
-        return 1 + ctx().getDynamicConnectionCount('alpha');
-      },
-      format: (value) => `${formatDecimal(value, 2)} Rng`,
-      getSubEquations() {
-        const alphaConnections = ctx().getDynamicConnectionCount('alpha');
-        const rangeValue = 1 + alphaConnections;
-        return [
-          {
-            expression: String.raw`\( \text{Rng} = 1 + \left( \alpha_{\beta} \right) \)`,
-            values: String.raw`\( ${formatDecimal(rangeValue, 2)} = 1 + \left( ${formatWholeNumber(alphaConnections)} \right) \)`,
-          },
-        ];
-      },
-    },
-    // Tower glyph sink that fuels beta's slowing field potency.
-    {
-      key: 'betSlow',
-      symbol: BET1_GLYPH,
-      equationSymbol: 'Bet₁',
-      glyphLabel: BET1_GLYPH,
-      name: 'Bet₁ Slow Weave',
-      description: 'Invest Bet glyphs to deepen β’s slowing field.',
-      baseValue: 0,
-      step: 1,
-      upgradable: true,
-      glyphCurrency: 'aleph',
-      attachedToVariable: 'slw',
-      format: (value) => formatWholeNumber(Math.max(0, value)),
-      cost: (level) => Math.max(1, 1 + Math.max(0, Math.floor(Number.isFinite(level) ? level : 0))),
-      renderControlsInline: true,
-    },
-    // Derived slow percentage surfaced as its own sub-equation box for clarity.
-    {
-      key: 'slw',
-      symbol: 'Slw%',
-      equationSymbol: 'Slw%',
-      masterEquationSymbol: 'Slw',
-      name: 'Slow Field',
-      description: 'Percentage of enemy speed β shears away within its conduit.',
-      upgradable: false,
-      format: (value) => `${formatDecimal(Math.max(0, value), 2)}% slow`,
-      computeValue({ blueprint, towerId }) {
-        const effectiveBlueprint = blueprint || ctx().getTowerEquationBlueprint(towerId);
-        const bet1 = Math.max(0, ctx().computeTowerVariableValue(towerId, 'betSlow', effectiveBlueprint));
-        const slowPercent = 20 + 2 * bet1;
-        return Math.min(60, Math.max(0, slowPercent));
-      },
-      getSubEquations({ blueprint, towerId }) {
-        const effectiveBlueprint = blueprint || ctx().getTowerEquationBlueprint(towerId);
-        const bet1 = Math.max(0, ctx().computeTowerVariableValue(towerId, 'betSlow', effectiveBlueprint));
-        const slowPercent = Math.min(60, Math.max(0, 20 + 2 * bet1));
-        return [
-          {
-            expression: String.raw`\( \text{Slw\%} = 20 + 2\,\text{Bet}_{1} \)`,
-            values: String.raw`\( ${formatDecimal(slowPercent, 2)}\% = 20 + 2 \times ${formatWholeNumber(bet1)} \)`,
-          },
-          {
-            expression: String.raw`\( \text{Slw\%} \leq 60 \)`,
-            glyphEquation: true,
-          },
-        ];
-      },
-    },
-    {
-      key: 'slwTime',
-      symbol: 'SlwTime',
-      equationSymbol: 'SlwTime',
-      masterEquationSymbol: 'SlwTime',
-      name: 'Slow Duration',
-      description: 'Length of β’s slowing tether after it sticks to a target.',
-      attachedToVariable: 'slw',
-      includeInMasterEquation: false,
-      baseValue: 0.5,
-      step: 0.1,
-      upgradable: true,
-      cost: (level) => Math.max(1, Math.pow(2, Math.max(0, level))),
-      format: (value) => `${formatDecimal(Math.max(0, value), 2)} s`,
-      getSubEquations({ level, value }) {
-        const glyphRank = ctx().deriveGlyphRankFromLevel(level, 0);
-        const durationSeconds = Number.isFinite(value) ? Math.max(0, value) : 0.5 + 0.1 * glyphRank;
-        return [
-          {
-            expression: String.raw`\( \text{SlwTime} = 0.5 + 0.1\,\aleph \)`,
-            values: String.raw`\( ${formatDecimal(durationSeconds, 2)} = 0.5 + 0.1 \times ${formatWholeNumber(
-              glyphRank,
-            )} \)`,
-          },
-        ];
-      },
-    },
+    { key: 'attack', symbol: 'Atk', equationSymbol: 'Atk', name: 'Damage', description: 'Alpha supplies each triangular burst.', upgradable: false, variablesUsed: ['alpha'], computeValue: () => 4 * v('alpha'), format: (x) => `${formatGameNumber(x)} Atk`, getSubEquations: ({ value }) => lines(String.raw`\( \text{Atk} = 4\alpha \)`, formatGameNumber(value)) },
+    { key: 'speed', symbol: 'Spd', equationSymbol: 'Spd', name: 'Attack Speed', description: 'Beta controls its own propagation cadence.', upgradable: false, variablesUsed: ['beta'], computeValue: () => 0.5 + 0.15 * v('beta'), format: (x) => `${formatDecimal(x, 2)} Spd`, getSubEquations: ({ value }) => lines(String.raw`\( \text{Spd} = 0.5 + 0.15\beta \)`, formatDecimal(value, 2)) },
+    { key: 'range', symbol: 'Rng', equationSymbol: 'Rng', name: 'Range', description: 'Beta extends the tower conduit.', upgradable: false, variablesUsed: ['beta'], computeValue: () => 4 + 0.5 * v('beta'), format: (x) => `${formatDecimal(x, 2)} m`, getSubEquations: ({ value }) => lines(String.raw`\( \text{Rng} = 4 + 0.5\beta \)`, formatDecimal(value, 2)) },
+    { key: 'slw', symbol: 'Slw%', equationSymbol: 'Slw\%', masterEquationSymbol: 'Slw', name: 'Slow Field', description: 'Gamma deepens the movement reduction.', upgradable: false, variablesUsed: ['gamma'], computeValue: () => Math.min(60, 15 + 5 * v('gamma')), format: (x) => `${formatDecimal(x, 1)}% slow`, getSubEquations: ({ value }) => lines(String.raw`\( \text{Slw\%} = \min(60, 15 + 5\gamma) \)`, `${formatDecimal(value, 1)}\%`) },
+    { key: 'slwTime', symbol: 'SlwTime', equationSymbol: 'SlwTime', name: 'Slow Duration', description: 'Delta makes the tether persist.', includeInMasterEquation: false, upgradable: false, variablesUsed: ['delta'], computeValue: () => 1 + 0.25 * v('delta'), format: (x) => `${formatDecimal(x, 2)} s`, getSubEquations: ({ value }) => lines(String.raw`\( \text{SlwTime} = 1 + 0.25\delta \)`, `${formatDecimal(value, 2)}\text{s}`) },
   ],
-  computeResult(values) {
-    const attack = Number.isFinite(values.attack) ? values.attack : 0;
-    const speed = Number.isFinite(values.speed) ? values.speed : 0;
-    const range = Number.isFinite(values.range) ? values.range : 0;
-    const slowPercent = Number.isFinite(values.slw) ? Math.max(0, values.slw) : 0;
-    const slowFactor = slowPercent / 100;
-    return attack * speed * range * slowFactor;
-  },
-  formatBaseEquationValues({ values, result, formatComponent }) {
-    const attack = Number.isFinite(values.attack) ? values.attack : 0;
-    const speed = Number.isFinite(values.speed) ? values.speed : 0;
-    const range = Number.isFinite(values.range) ? values.range : 0;
-    const slowPercent = Number.isFinite(values.slw) ? Math.max(0, values.slw) : 0;
-    const slowText = `${formatComponent(slowPercent)}%`;
-    return `${formatComponent(result)} = ${formatComponent(attack)} × ${formatComponent(speed)} × ${formatComponent(range)} × ${slowText}`;
-  },
+  computeResult: (values) => (values.attack || 0) * (values.speed || 0) * (values.range || 0) * ((values.slw || 0) / 100),
+  formatBaseEquationValues: ({ values, result, formatComponent }) => `${formatComponent(result)} = ${formatComponent(values.attack || 0)} × ${formatComponent(values.speed || 0)} × ${formatComponent(values.range || 0)} × ${formatComponent(values.slw || 0)}%`,
 };
 
 export const gamma = {
-  mathSymbol: String.raw`\gamma`,
-  baseEquation: 'γ = Atk × Spd × Rng × Prc × Brst',
+  mathSymbol: String.raw`\gamma`, baseEquation: 'γ Tower = Atk × Spd × Rng × Prc × Brst', variablesUsed: ['alpha', 'beta', 'gamma', 'delta'],
   variables: [
-    {
-      key: 'attack',
-      symbol: 'Atk',
-      equationSymbol: 'Atk',
-      glyphLabel: 'ℵ₁',
-      name: 'Atk',
-      description: 'Strike intensity carried forward from β.',
-      upgradable: true,
-      format: (value) => `${formatGameNumber(value)} Atk`,
-      computeValue({ blueprint, towerId }) {
-        const effectiveBlueprint = blueprint || ctx().getTowerEquationBlueprint(towerId);
-        const state = ctx().ensureTowerUpgradeState(towerId, effectiveBlueprint);
-        const level = state.variables?.attack?.level || 0;
-        const glyphRank = ctx().deriveGlyphRankFromLevel(level, 1);
-        const betaValue = ctx().calculateTowerEquationResult('beta');
-        return betaValue * glyphRank;
-      },
-      getSubEquations({ level }) {
-        const glyphRank = ctx().deriveGlyphRankFromLevel(level, 1);
-        const betaValue = ctx().calculateTowerEquationResult('beta');
-        const attackValue = betaValue * glyphRank;
-        return [
-          {
-            expression: String.raw`\( \text{Atk} = \beta \times \aleph_{1} \)`,
-            values: String.raw`\( ${formatDecimal(attackValue, 2)} = ${formatDecimal(betaValue, 2)} \times ${formatWholeNumber(glyphRank)} \)`,
-          },
-        ];
-      },
-    },
-    {
-      key: 'speed',
-      symbol: 'Spd',
-      equationSymbol: 'Spd',
-      name: 'Spd',
-      description: 'Cadence tuned by neighbouring α lattices.',
-      upgradable: false,
-      lockedNote: 'Link α lattices to accelerate γ cadence.',
-      computeValue() {
-        const alphaConnections = ctx().getDynamicConnectionCount('alpha');
-        return 0.5 + 0.25 * alphaConnections;
-      },
-      format: (value) => `${formatDecimal(value, 2)} Spd`,
-      getSubEquations() {
-        const alphaConnections = ctx().getDynamicConnectionCount('alpha');
-        const speedValue = 0.5 + 0.25 * alphaConnections;
-        return [
-          {
-            expression: String.raw`\( \text{Spd} = 0.5 + 0.25 \left( \alpha_{\gamma} \right) \)`,
-            values: String.raw`\( ${formatDecimal(speedValue, 2)} = 0.5 + 0.25 \left( ${formatWholeNumber(alphaConnections)} \right) \)`,
-          },
-        ];
-      },
-    },
-    {
-      key: 'range',
-      symbol: 'Rng',
-      equationSymbol: 'Rng',
-      name: 'Rng',
-      description: 'Arc reach extended by neighbouring β conductors.',
-      upgradable: false,
-      lockedNote: 'Bind β lattices to extend γ reach.',
-      computeValue() {
-        const betaConnections = ctx().getDynamicConnectionCount('beta');
-        return 1 + 2 * betaConnections;
-      },
-      format: (value) => `${formatDecimal(value, 2)} Rng`,
-      getSubEquations() {
-        const betaConnections = ctx().getDynamicConnectionCount('beta');
-        const rangeValue = 1 + 2 * betaConnections;
-        return [
-          {
-            expression: String.raw`\( \text{Rng} = 1 + 2 \left( \beta_{\gamma} \right) \)`,
-            values: String.raw`\( ${formatDecimal(rangeValue, 2)} = 1 + 2 \left( ${formatWholeNumber(betaConnections)} \right) \)`,
-          },
-        ];
-      },
-    },
-    {
-      key: 'pierce',
-      symbol: 'Prc',
-      equationSymbol: 'Prc',
-      glyphLabel: 'ℵ₂',
-      name: 'Prc',
-      description: 'Piercing depth braided from the second glyph conduit.',
-      baseValue: 1,
-      step: 1,
-      upgradable: true,
-      format: (value) => `${formatWholeNumber(value)} Prc`,
-      getSubEquations({ level, value }) {
-        const glyphRank = ctx().deriveGlyphRankFromLevel(level, 1);
-        const pierceValue = Number.isFinite(value) ? value : glyphRank;
-        return [
-          {
-            expression: String.raw`\( \text{Prc} = \aleph_{2} \)`,
-            values: String.raw`\( ${formatWholeNumber(pierceValue)} = ${formatWholeNumber(glyphRank)} \)`,
-          },
-        ];
-      },
-    },
-    {
-      key: 'brst',
-      symbol: 'Brst',
-      equationSymbol: 'Brst',
-      masterEquationSymbol: 'Brst',
-      glyphLabel: 'ℵ',
-      name: 'Brst',
-      description: 'Time γ keeps orbiting a target with star-tracing hits.',
-      baseValue: 5,
-      step: 5,
-      upgradable: true,
-      cost: (level) => Math.max(1, 5 * Math.pow(5, Math.max(0, level))),
-      format: (value) => `${formatDecimal(Math.max(0, value), 2)} s`,
-      getSubEquations({ level, value }) {
-        const glyphRank = ctx().deriveGlyphRankFromLevel(level, 0);
-        const burstSeconds = Number.isFinite(value) ? Math.max(0, value) : 5 * (1 + glyphRank);
-        return [
-          {
-            expression: String.raw`\( \text{Brst} = 5 \times (1 + \aleph) \)`,
-            values: String.raw`\( ${formatDecimal(burstSeconds, 2)} = 5 \times (1 + ${formatWholeNumber(glyphRank)}) \)`,
-          },
-        ];
-      },
-    },
+    { key: 'attack', symbol: 'Atk', equationSymbol: 'Atk', name: 'Damage', description: 'Alpha power is multiplied by Gamma penetration energy.', upgradable: false, variablesUsed: ['alpha', 'gamma'], computeValue: () => 6 * v('alpha') * v('gamma'), format: (x) => `${formatGameNumber(x)} Atk`, getSubEquations: ({ value }) => lines(String.raw`\( \text{Atk} = 6\alpha\gamma \)`, formatGameNumber(value)) },
+    { key: 'speed', symbol: 'Spd', equationSymbol: 'Spd', name: 'Attack Speed', description: 'Beta controls piercing burst cadence.', upgradable: false, variablesUsed: ['beta'], computeValue: () => 0.4 + 0.1 * v('beta'), format: (x) => `${formatDecimal(x, 2)} Spd`, getSubEquations: ({ value }) => lines(String.raw`\( \text{Spd} = 0.4 + 0.1\beta \)`, formatDecimal(value, 2)) },
+    { key: 'range', symbol: 'Rng', equationSymbol: 'Rng', name: 'Range', description: 'Beta propagation extends Gamma reach.', upgradable: false, variablesUsed: ['beta'], computeValue: () => 5 + 0.5 * v('beta'), format: (x) => `${formatDecimal(x, 2)} m`, getSubEquations: ({ value }) => lines(String.raw`\( \text{Rng} = 5 + 0.5\beta \)`, formatDecimal(value, 2)) },
+    { key: 'pierce', symbol: 'Prc', equationSymbol: 'Prc', name: 'Pierce', description: 'Gamma directly sets penetration count.', upgradable: false, variablesUsed: ['gamma'], globalVariable: 'gamma', format: (x) => `${formatWholeNumber(x)} Prc`, getSubEquations: ({ value }) => lines(String.raw`\( \text{Prc} = \gamma \)`, formatWholeNumber(value)) },
+    { key: 'brst', symbol: 'Brst', equationSymbol: 'Brst', name: 'Burst Duration', description: 'Delta sustains the star-tracing burst.', upgradable: false, variablesUsed: ['delta'], computeValue: () => 2 + 0.5 * v('delta'), format: (x) => `${formatDecimal(x, 2)} s`, getSubEquations: ({ value }) => lines(String.raw`\( \text{Brst} = 2 + 0.5\delta \)`, `${formatDecimal(value, 2)}\text{s}`) },
   ],
-  computeResult(values) {
-    const attack = Number.isFinite(values.attack) ? values.attack : 0;
-    const speed = Number.isFinite(values.speed) ? values.speed : 0;
-    const range = Number.isFinite(values.range) ? values.range : 0;
-    const pierce = Number.isFinite(values.pierce) ? values.pierce : 0;
-    const burst = Number.isFinite(values.brst) ? values.brst : 0;
-    return attack * speed * range * pierce * burst;
-  },
-  formatBaseEquationValues({ values, result, formatComponent }) {
-    const attack = Number.isFinite(values.attack) ? values.attack : 0;
-    const speed = Number.isFinite(values.speed) ? values.speed : 0;
-    const range = Number.isFinite(values.range) ? values.range : 0;
-    const pierce = Number.isFinite(values.pierce) ? values.pierce : 0;
-    const burst = Number.isFinite(values.brst) ? values.brst : 0;
-    const burstText = `${formatComponent(burst)}s`;
-    return `${formatComponent(result)} = ${formatComponent(attack)} × ${formatComponent(speed)} × ${formatComponent(range)} × ${formatComponent(pierce)} × ${burstText}`;
-  },
+  computeResult: (values) => (values.attack || 0) * (values.speed || 0) * (values.range || 0) * (values.pierce || 0) * (values.brst || 0),
+  formatBaseEquationValues: ({ values, result, formatComponent }) => `${formatComponent(result)} = ${formatComponent(values.attack || 0)} × ${formatComponent(values.speed || 0)} × ${formatComponent(values.range || 0)} × ${formatComponent(values.pierce || 0)} × ${formatComponent(values.brst || 0)}s`,
 };

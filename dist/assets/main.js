@@ -136,6 +136,11 @@ import {
   getAlgebraicUpgradeStateSnapshot,
   applyAlgebraicUpgradeStateSnapshot,
 } from './algebraicUpgrades.js';
+import {
+  configureGreekVariableProgression,
+  getGreekVariableStateSnapshot,
+  applyGreekVariableStateSnapshot,
+} from './greekVariableProgression.js';
 import { createLevelCombatController } from './levelCombatController.js';
 // Alpha tower sprite tint cache builder for palette-synced shot particles.
 import { refreshAlphaShotSpritePaletteCache } from '../scripts/features/towers/alphaTower.js';
@@ -240,6 +245,7 @@ import {
   initializeZetaGraphControls,
   applyTowerUpgradeStateSnapshot,
   clearTowerUpgradeState,
+  invalidateTowerEquationCache,
   configureTowersTabCallbacks,
   refreshTowerIconPalettes,
   closeLoadoutWheel,
@@ -749,6 +755,8 @@ import { createSpireCameraController } from './spireCameraController.js';
     getPlayfield: () => playfield,
     getAlgebraicUpgradeStateSnapshot,
     applyAlgebraicUpgradeStateSnapshot,
+    getGreekVariableStateSnapshot,
+    applyGreekVariableStateSnapshot,
   });
 
   // Ensure compact autosave remains the active basin persistence strategy.
@@ -1325,6 +1333,18 @@ import { createSpireCameraController } from './spireCameraController.js';
     }),
     getSpireResourceStateSnapshot,
     applySpireResourceStateSnapshot,
+  });
+
+  // Global Greek-variable purchases reuse the existing Tower Glyph balance and autosave transaction.
+  configureGreekVariableProgression({
+    getGlyphCurrency,
+    spendGlyphCurrency: (amount) => setGlyphCurrency(getGlyphCurrency() - amount),
+    onChange: () => {
+      invalidateTowerEquationCache();
+      commitAutoSave();
+      const activeTowerId = getActiveTowerUpgradeId();
+      if (activeTowerId) renderTowerUpgradeOverlay(activeTowerId);
+    },
   });
 
   levelOverlayController = createLevelOverlayController({

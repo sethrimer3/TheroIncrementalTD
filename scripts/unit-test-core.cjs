@@ -106,10 +106,12 @@ function importTowerBlueprintPresenterModule() {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'thero-unit-test-tower-presenter-'));
   fs.writeFileSync(path.join(tmpDir, 'package.json'), JSON.stringify({ type: 'module' }));
   const presenterDest = path.join(tmpDir, 'assets', 'towerBlueprintPresenter.js');
+  const greekProgressionDest = path.join(tmpDir, 'assets', 'greekVariableProgression.js');
   const registryDest = path.join(tmpDir, 'assets', 'towerEquations', 'index.js');
   fs.mkdirSync(path.dirname(presenterDest), { recursive: true });
   fs.mkdirSync(path.dirname(registryDest), { recursive: true });
   fs.copyFileSync(path.join(rootDir, 'assets', 'towerBlueprintPresenter.js'), presenterDest);
+  fs.copyFileSync(path.join(rootDir, 'assets', 'greekVariableProgression.js'), greekProgressionDest);
   fs.writeFileSync(
     registryDest,
     `export const TOWER_EQUATION_BLUEPRINTS = {
@@ -333,7 +335,8 @@ async function importTowerEquationIndexModule() {
     'mindGate.js': ['mindGate'],
     'shadowGate.js': ['shadowGate'],
     'basicTowers.js': ['alpha', 'beta', 'gamma'],
-    'greekTowers.js': ['delta', 'epsilon', 'zeta', 'zetaOld', 'eta', 'theta', 'iota'],
+    'greekTowers.js': ['zetaOld', 'eta', 'theta', 'iota'],
+    'phaseOneGreekTowers.js': ['delta', 'epsilon', 'zeta'],
     'advancedTowers.js': [
       'kappa', 'lambda', 'mu', 'nu', 'xi', 'omicron', 'pi', 'rho', 'sigma',
       'tau', 'upsilon', 'phi', 'chi', 'psi', 'omega',
@@ -3416,6 +3419,7 @@ async function run() {
       ...harness.baseTowerSnapshot,
       alephChainUpgrades: harness.alephSnapshot,
       algebraicUpgrades: {},
+      greekVariables: { alpha: 1, beta: 1, gamma: 1, delta: 1, epsilon: 1, zeta: 1 },
     });
     assert.equal(snapshot.alpha, harness.baseTowerSnapshot.alpha);
     assert.equal(snapshot.alephChainUpgrades, harness.alephSnapshot);

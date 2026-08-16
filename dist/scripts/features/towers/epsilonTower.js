@@ -9,19 +9,12 @@ export function ensureEpsilonState(playfield, tower) {
     return null;
   }
   const _def = tower.definition || getTowerDefinition('epsilon') || {};
-  // Aleph variables controlled by glyph upgrades
-  const aleph1 = Math.max(0, computeTowerVariableValue('epsilon', 'aleph1'));
-  const aleph2 = Math.max(0, computeTowerVariableValue('epsilon', 'aleph2'));
-  const aleph3 = Math.max(1e-6, computeTowerVariableValue('epsilon', 'aleph3'));
-
-  // Spd = 10 · log(aleph1 + 1) shots per second
-  const rate = Math.max(0.2, 10 * Math.log(aleph1 + 1));
+  // Every placed Epsilon reads the same player-owned Greek-variable results.
+  const rate = Math.max(0.2, computeTowerVariableValue('epsilon', 'spd'));
   const minDim = Math.min(playfield.renderWidth || 0, playfield.renderHeight || 0) || 1;
-  // Rng = 5 · log(aleph2 + 2) meters
-  const rangeMeters = 5 * Math.log(aleph2 + 2);
+  const rangeMeters = Math.max(0, computeTowerVariableValue('epsilon', 'rng'));
   const rangePixels = metersToPixels(rangeMeters, minDim);
-  // Spr = 2(10 - aleph3 * log(aleph3)) in degrees
-  const spreadDegrees = 2 * (10 - aleph3 * Math.log(aleph3));
+  const spreadDegrees = Math.max(0, computeTowerVariableValue('epsilon', 'spr'));
 
   if (!tower.epsilonState) {
     tower.epsilonState = {

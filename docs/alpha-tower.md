@@ -1,22 +1,17 @@
 # Alpha (α) Tower
 
-Alpha is the tier-one foundation tower. It fires homing glyph-bullet bursts whose particles oscillate around the tower, converge, and dash toward a target. Its equation introduces the two basic combat quantities used throughout the tower chain: damage per hit and attack cadence.
+Alpha is the foundational homing projectile tower. It reads the same player-owned variables as every other tower; placed Alpha towers do not own upgrade ranks.
 
-**Master equation:** `α = Atk × Spd`
+**Master equation:** `Alpha Tower = Atk × Spd`
 
-## Sub-equations
-
-| Term | Equation | Function |
+| Stat | Equation | Purpose |
 |---|---|---|
-| `Atk` | `Atk = 5 × ℵ₁` | Damage carried by each glyph bullet. |
-| `Spd` | `Spd = 0.5 × ℵ₂` | Attacks per second. |
+| `Atk` | `5α` | Fundamental damage per glyph bullet. |
+| `Spd` | `0.5 + 0.1β` | Beta propagation raises attacks per second. |
+| Range | `0.24` normalized playfield units | Constant tower identity from its data definition. |
 
-`ℵ₁` and `ℵ₂` are the ranks of Alpha's first and second upgradeable glyph slots. Both begin at rank 1, so the initial documented equation values are `Atk = 5` and `Spd = 0.5`.
+At the default `α = β = 1`, `Atk = 5`, `Spd = 0.6`, and the equation result is `3`.
 
-**Example:** At `ℵ₁ = 3` and `ℵ₂ = 2`, `Atk = 15`, `Spd = 1`, and `α = 15 × 1 = 15`.
+**Global dependencies:** `α`, `β`.
 
-## Battlefield function
-
-Alpha is a direct-damage generalist and the first building block in the dependency chain. Raising `ℵ₁` improves every hit, while raising `ℵ₂` delivers those hits more often. Alpha connections also increase Beta's speed and range and Gamma's speed, so placing and improving Alpha towers can strengthen later towers as well as Alpha itself.
-
-**Implementation:** `assets/towerEquations/basicTowers.js`, `scripts/features/towers/alphaTower.js`, and `assets/data/towers/alpha.js`.
+**Implementation:** `assets/towerEquations/basicTowers.js` and `scripts/features/towers/alphaTower.js`.

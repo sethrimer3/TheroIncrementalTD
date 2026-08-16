@@ -3416,6 +3416,7 @@ async function run() {
       ...harness.baseTowerSnapshot,
       alephChainUpgrades: harness.alephSnapshot,
       algebraicUpgrades: {},
+      greekVariables: { alpha: 1, beta: 1, gamma: 1, delta: 1, epsilon: 1, zeta: 1 },
     });
     assert.equal(snapshot.alpha, harness.baseTowerSnapshot.alpha);
     assert.equal(snapshot.alephChainUpgrades, harness.alephSnapshot);

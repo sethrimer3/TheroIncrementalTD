@@ -1,24 +1,18 @@
 # Epsilon (ε) Tower
 
-Epsilon is the tier-five precision tower. It fires a rapid stream of homing needles and records consecutive hits separately for each enemy. Damage ramps quadratically as more needles land on the same target.
+Epsilon fires homing needles and accumulates a separate consecutive-hit count for each enemy. Its attack remains stateful rather than being reduced to a static master-product score.
 
-**Attack equation:** `Atk = NumHits²`
+**Attack equation:** `Atk = NumHits^(1 + 0.25ε)`
 
-Epsilon intentionally does not reduce its behavior to a multiplicative master-equation total; its blueprint returns zero for that aggregate to avoid presenting a misleading score.
-
-## Sub-equations
-
-| Quantity | Equation | Function |
+| Stat | Equation | Purpose |
 |---|---|---|
-| `Atk` | `Atk = NumHits²` | Damage determined by the consecutive-hit count stored for the current enemy. |
-| `Spd` | `Spd = max(0.2, 10 × ln(ℵ₁ + 1))` shots/s | Needle cadence. The `0.2` floor is applied by combat code. |
-| `Rng` | `Rng = 5 × ln(ℵ₂ + 2)` meters | Homing acquisition range. |
-| `Spr` | `Spr = 2 × (10 - ℵ₃ × ln(ℵ₃))` degrees | Symmetric angular spread applied around the aim direction. Combat code clamps `ℵ₃` to a small positive value before taking the logarithm. |
+| `Exp` | `1 + 0.25ε` | Exponent applied to the target's hit count. |
+| `Spd` | `2 + 0.5β` shots/s | Beta accelerates stack building. |
+| `Rng` | `4 + 0.25β` meters | Beta extends needle acquisition range. |
+| `Spr` | `max(2, 18 - ε)` degrees | Epsilon tightens spread toward a 2° floor. |
 
-**Example:** After five consecutive hits on one enemy, the attack value is `5² = 25`. At `ℵ₁ = 1`, cadence is `10 × ln(2) ≈ 6.93 shots/s`; at `ℵ₂ = 1`, range is `5 × ln(3) ≈ 5.49 m`; and at `ℵ₃ = 2`, spread is approximately `17.23°`.
+At `β = ε = 1`, `Exp = 1.25`, `Spd = 2.5`, `Rng = 4.25 m`, and `Spr = 17°`. The fifth consecutive hit deals `5^1.25 ≈ 7.48` damage.
 
-## Battlefield function
+**Global dependencies:** `β`, `ε`.
 
-Epsilon specializes in sustained focus fire. Each enemy has its own hit counter, so staying on one durable target produces much more damage than repeatedly changing targets. Its needles home after launch, and range influences projectile speed within the combat system's limits. Speed accelerates stack building; range makes it easier to preserve a stack; spread changes how tightly the volley follows its intended line.
-
-**Implementation:** `assets/towerEquations/greekTowers.js`, `scripts/features/towers/epsilonTower.js`, and `assets/data/towers/epsilon.js`.
+**Implementation:** `assets/towerEquations/phaseOneGreekTowers.js`, `scripts/features/towers/epsilonTower.js`, and `assets/playfield/systems/ProjectileUpdateSystem.js`.

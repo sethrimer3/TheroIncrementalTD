@@ -15373,3 +15373,21 @@ body[data-spire-options-placement='footer'] .spire-options-trigger--corner {
   margin-top: calc(-1 * var(--shin-size-top, 0px));
 }
 */
+.tower-upgrade-global-variables {
+  display: grid;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+}
+
+.tower-upgrade-global-variable {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.tower-upgrade-global-variable .tower-upgrade-variable-glyph-button {
+  min-height: 44px;
+  width: auto;
+  padding-inline: 0.8rem;
+}

@@ -15,7 +15,7 @@ This file serves four functions:
 
 ## Current Migration Dashboard
 
-<!-- migration-roadmap-counts: ts=67 generated=67 active_js=170 candidates=45 -->
+<!-- migration-roadmap-counts: ts=68 generated=68 active_js=171 candidates=45 -->
 <!-- migration-roadmap-authorization: phase=23 -->
 
 | Item | Current state |
@@ -24,8 +24,8 @@ This file serves four functions:
 | Completed migration history | Phases 0-22 remain complete; historical phase identities are preserved |
 | Next authorized implementation | **Phase 23 only:** Omicron, Pi, Chi, Psi, and Omega terminal equations |
 | Delivery branch | Work directly on `main`; create or switch to another branch only when the user explicitly requests it |
-| Active authored modules | 237 total: 67 TypeScript and 170 JavaScript |
-| Compatibility output | 67 generated `.js` siblings; they are runtime output, not backlog |
+| Active authored modules | 239 total: 68 TypeScript and 171 JavaScript |
+| Compatibility output | 68 generated `.js` siblings; they are runtime output, not backlog |
 | Decision candidates | 45 unreachable authored `.js` files requiring retirement, integration, or archival decisions |
 | Long-range sequence | Phases 22-55; Phase 54 is an extraction gate and assigns no backlog module |
 | Mechanical check | `npm run check:migration-roadmap` validates reachability, classifications, duplicate assignments, totals, and per-phase counts |
@@ -114,10 +114,10 @@ Inventory was originally recalculated from the live tree on **2026-07-16**, star
 
 - **69 authored `.ts` modules** (excluding `.d.ts`; none exist).
 - **69 build-generated `.js` siblings** of those TypeScript modules. These are runtime output, not backlog.
-- **170 active authored `.js` modules**, verified reachable through static local imports from `assets/main.js`.
+- **171 active authored `.js` modules**, verified reachable through static local imports from `assets/main.js`.
 - **0 intentionally preserved legacy `.js` modules** with current repository evidence. The previously documented 19-file disabled Terrarium tree was deleted by `64ebc5e`.
 - **45 ambiguous or retirement/deletion-candidate `.js` modules**, all currently unreachable from the browser entry graph. They are excluded from the active backlog pending a separate decision.
-- **237 active authored modules** in total, so active module-count conversion is **28.3%** (`67 / 237`). The raw authored-language tree is 282 modules when the 45 decision candidates are included.
+- **239 active authored modules** in total, so active module-count conversion is **28.5%** (`68 / 239`). The raw authored-language tree is 284 modules when the 45 decision candidates are included.
 - Supplemental authored-line snapshot: **8,309 TypeScript lines** and **81,526 active JavaScript lines**. Line counts do not represent migration difficulty.
 
 Method: recursively enumerate `assets/` and `scripts/`; exclude `node_modules/`, `dist/`, `build/`, generated output, dependencies, fixtures, and non-source material; remove each `.js` file with a same-path `.ts` sibling; parse static relative `import`/`export ... from` edges; traverse from `assets/main.js`; and audit unreachable files against tests, retirement documentation, HTML harnesses, and recent commits. The full classification, dependency evidence, 168-module coverage map, and 45-file retirement list are in [`docs/TypeScriptMigrationRoadmapInventory.md`](docs/TypeScriptMigrationRoadmapInventory.md). Run `npm run check:migration-roadmap` to verify that classification against the current checkout.
@@ -267,7 +267,7 @@ Exact file lists and per-module risk notes are in the linked coverage appendix. 
 | 22 | **COMPLETE** | Kappa -> Lambda -> Mu -> Nu -> Xi equation chain; 5 modules | 21; shared blueprint variable/result/context contracts | Advanced barrel/registry and Towers tab equation consumers; one canonical `lockedNote` field added to the presenter-owned variable contract | Nineteen deterministic tests cover metadata, every cost curve, helper/state/dynamic fallbacks and order, sub-equations, results, formatting, and inherited coercion edges. |
 | 23 | **AUTHORIZED NEXT** | Omicron/Pi/Chi/Psi/Omega equations; 5 modules | 22 | Terminal equation entity/count/HP context shapes owned by presenter/context | Same barrel/registry; compatibility limited to type-only imports and proven presenter additions | Formula, fallback, callback-order, `NaN`/Infinity, and lookup tests; exclude simulations. |
 | 24 | **TENTATIVE NEAR-TERM** | Basic and Infinity grouped equations; 2 modules | 23 | Foundational tower equation and Infinity term contracts | Registry and all dependent equations/Towers tab | Registry identity/order plus per-tower golden cases; risk is broad foundational fan-out; exclude Greek monolith. |
-| 25 | **TENTATIVE NEAR-TERM** | Greek grouped equation monolith; 1 module | 24 | Per-tower variable/result types reusing the shared owner contract | Completes authored equation definitions consumed by registry/Towers tab | Characterize each tower independently before conversion; manual all-equation overlay pass; do not redesign/split formulas during migration. |
+| 25 | **TENTATIVE NEAR-TERM** | Greek equation registries; 2 modules | 24 | Per-tower variable/result types reusing the shared owner contract | Completes authored equation definitions consumed by registry/Towers tab | Characterize each tower independently before conversion; manual all-equation overlay pass; preserve the phase-one split during migration. |
 | 26 | **TENTATIVE NEAR-TERM** | Pure tokens, units, geometry, wave codec, playfield facades, build data, Aleph registry; 11 modules | 25 | `Wave`, `EnemyGroup`, points, units, token spans, numeric helpers, Aleph ids | 31 importers for units, 13 for playfield formatting, level/editor and tower consumers | Edge/malformed/round-trip/property tests; no browser except wave-editor smoke; risk is preserving coercive legacy codec behavior. |
 | 27 | **TENTATIVE NEAR-TERM** | Gameplay config loaders, levels, configuration, enemies; 4 modules | 26 and Phase 4 tower data | Runtime-validated config/level/wave/enemy schemas | Main, playfield, managers, and achievements; compatibility adapters for untyped callers | Fetch/global/dynamic-import fallback tests, malformed JSON/config fixtures, seeded enemy helpers; browser config load; exclude balance changes. |
 | 28 | **TENTATIVE NEAR-TERM** | Tutorial and Powder state/queue/log/persistence; 5 modules | 26-27 and existing save owners | Tutorial/Powder snapshots and legacy validators | Autosave, main, Towers tab, and Powder UI | Round-trip plus malformed/old saves, queue ordering, event log retention; manual reload; never trust or rename saved keys. |
@@ -299,7 +299,7 @@ Exact file lists and per-module risk notes are in the linked coverage appendix. 
 | 54 | **TENTATIVE LATER** | Main responsibility-extraction gate; 0 backlog conversions | All active modules except `main.js` typed | Extract only still-owned cohesive responsibilities into new typed owners; define composition contract | Compatibility edits inside `assets/main.js` are expected, but it remains `.js` | Characterize startup order and globals before extraction; browser/Electron; completion means residual main is composition-only. No extension conversion yet. |
 | 55 | **TENTATIVE LATER** | Final `assets/main.js` → `assets/main.ts`; 1 module | 54 and every prior active-module phase | Typed application composition/startup/window API | `index.html` keeps loading generated `assets/main.js` | Startup order/global/API tests, browser portrait/desktop, save reload, full level, audio, and Electron. Complete only with no broad assertions and no owned feature logic left. |
 
-Phases 23-55 cover all 170 active authored JavaScript modules. Across Phases 21-55 there are **35 roadmap phases**: two completed conversion phases, one authorized conversion phase, 31 tentative conversion phases, and one tentative zero-module extraction gate (Phase 54). The remaining 32 conversion phases assign the active backlog and the gate prepares the final root without double-counting it. No active module is assigned twice.
+Phases 23-55 cover all 171 active authored JavaScript modules. Across Phases 21-55 there are **35 roadmap phases**: two completed conversion phases, one authorized conversion phase, 31 tentative conversion phases, and one tentative zero-module extraction gate (Phase 54). The remaining 32 conversion phases assign the active backlog and the gate prepares the final root without double-counting it. No active module is assigned twice.
 
 ### Critical path
 

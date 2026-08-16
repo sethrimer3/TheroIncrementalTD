@@ -1,23 +1,19 @@
 # Gamma (γ) Tower
 
-Gamma is the tier-three piercing tower. Its projectiles dash to a target, trace a compact star on impact, and continue through the target as a piercing ray. Gamma inherits attack power from Beta and adds explicit pierce and burst-duration terms.
+Gamma fires star-tracing bursts that continue through targets. Global Gamma controls both damage multiplicity and penetration, while Beta and Delta shape delivery.
 
-**Master equation:** `γ = Atk × Spd × Rng × Prc × Brst`
+**Master equation:** `Gamma Tower = Atk × Spd × Rng × Prc × Brst`
 
-## Sub-equations
-
-| Term | Equation | Function |
+| Stat | Equation | Purpose |
 |---|---|---|
-| `Atk` | `Atk = β × ℵ₁` | Strike intensity inherited from Beta and multiplied by Gamma's first glyph rank. |
-| `Spd` | `Spd = 0.5 + 0.25αᵧ` | Attack cadence; `αᵧ` is Gamma's number of connected Alpha towers. |
-| `Rng` | `Rng = 1 + 2βᵧ` | Effective reach; `βᵧ` is Gamma's number of connected Beta towers. |
-| `Prc` | `Prc = ℵ₂` | Number of targets or layers the attack can penetrate. |
-| `Brst` | `Brst = 5 × (1 + ℵ)` seconds | Duration of Gamma's orbiting, star-tracing burst. |
+| `Atk` | `6αγ` | Alpha base power multiplied by Gamma energy. |
+| `Spd` | `0.4 + 0.1β` | Beta raises burst cadence. |
+| `Rng` | `5 + 0.5β` meters | Beta extends reach. |
+| `Prc` | `γ` | Global Gamma directly sets penetration count. |
+| `Brst` | `2 + 0.5δ` seconds | Delta sustains the impact-star burst. |
 
-**Example:** If `β = 24`, `ℵ₁ = 2`, `αᵧ = 2`, `βᵧ = 1`, `ℵ₂ = 2`, and the unindexed burst glyph rank is `ℵ = 1`, then `Atk = 48`, `Spd = 1`, `Rng = 3`, `Prc = 2`, and `Brst = 10`. Thus `γ = 48 × 1 × 3 × 2 × 10 = 2,880`.
+At `α = β = γ = δ = 1`, the values are `Atk = 6`, `Spd = 0.5`, `Rng = 5.5`, `Prc = 1`, and `Brst = 2.5 s`.
 
-## Battlefield function
+**Global dependencies:** `α`, `β`, `γ`, `δ`.
 
-Gamma rewards a mixed early-game lattice: Alpha connections raise its cadence, Beta connections extend its reach, and Beta's total equation supplies its base attack. Pierce lets a single firing line affect multiple enemies, while burst duration controls how long its impact pattern remains active. Gamma's result is later consumed by Delta and Zeta, so improvements propagate forward through the tower chain.
-
-**Implementation:** `assets/towerEquations/basicTowers.js`, `scripts/features/towers/gammaTower.js`, and `assets/data/towers/gamma.js`.
+**Implementation:** `assets/towerEquations/basicTowers.js`, `scripts/features/towers/gammaTower.js`, and `assets/playfield/systems/ProjectileSpawnSystem.js`.
