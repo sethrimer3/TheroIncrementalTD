@@ -8893,6 +8893,8 @@ body.show-glyph-equations .tower-upgrade-variable-equations {
   min-width: 44px;
   padding: 0 8px;
   border-radius: 999px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.9rem;
 }
 
 .tower-upgrade-variable-glyph-column {

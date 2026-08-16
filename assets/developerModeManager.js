@@ -7,6 +7,7 @@ const DEVELOPER_RESET_CONFIRM_LABEL = 'Are you sure?';
 const DEVELOPER_RESET_CONFIRM_WINDOW_MS = 5000;
 const DEVELOPER_RESET_RELOAD_DELAY_MS = 900;
 const DEVELOPER_MODE_STORAGE_KEY = 'glyph-defense-idle:developer-mode';
+const DEVELOPER_GLYPH_BALANCE = 500;
 
 export function createDeveloperModeManager(options = {}) {
   const {
@@ -21,6 +22,8 @@ export function createDeveloperModeManager(options = {}) {
     setMergingLogicUnlocked,
     powderState,
     setDeveloperInfiniteTheroEnabled,
+    getGlyphCurrency,
+    setGlyphCurrency,
     getPowderSimulation,
     setPowderSimulation,
     setSandSimulation,
@@ -136,6 +139,12 @@ export function createDeveloperModeManager(options = {}) {
     setDeveloperModeUnlockOverride?.(true);
     // Unlock all tabs by treating the tutorial as complete in developer mode.
     updateTabLockStates?.(true);
+    // Keep developer mode immediately useful without reducing a larger saved glyph balance.
+    const currentGlyphCurrency = Number(getGlyphCurrency?.());
+    setGlyphCurrency?.(Math.max(
+      DEVELOPER_GLYPH_BALANCE,
+      Number.isFinite(currentGlyphCurrency) ? currentGlyphCurrency : 0,
+    ));
 
     const towers = typeof getTowerDefinitions === 'function' ? getTowerDefinitions() : [];
     towers.forEach((definition) => {

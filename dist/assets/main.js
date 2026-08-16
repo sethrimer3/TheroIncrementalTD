@@ -1031,6 +1031,8 @@ import { createSpireCameraController } from './spireCameraController.js';
     powderState,
     spireResourceState,
     setDeveloperInfiniteTheroEnabled,
+    getGlyphCurrency,
+    setGlyphCurrency,
     getPowderSimulation: () => powderSimulation,
     setPowderSimulation: (value) => {
       powderSimulation = value;
