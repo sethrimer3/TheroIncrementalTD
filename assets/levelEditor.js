@@ -12,6 +12,11 @@ import {
   loadWavesIntoEditor,
   exportWavesFromEditor,
 } from './waveEditorUI.js';
+import {
+  BACKGROUND_EFFECTS,
+  resolveBackgroundEffects,
+  sanitizeBackgroundEffects,
+} from './levels.js';
 
 /**
  * Factory for the developer level editor and battlefield map tools.
@@ -73,6 +78,7 @@ export function createLevelEditorController({
     mapSpeedInput: null,
     pointSpeedInput: null,
     applyPointSpeedButton: null,
+    backgroundEffects: null,
   };
 
   const levelEditorState = {
@@ -87,6 +93,7 @@ export function createLevelEditorController({
     listenerOptions: false,
     statusTimeout: null,
     mapSpeedMultiplier: 1,
+    backgroundEffects: [],
   };
 
   const developerMapElements = {
@@ -361,6 +368,17 @@ export function createLevelEditorController({
     updateLevelEditorOutput();
   }
 
+  // Update the active level immediately so effect selections can be previewed before export.
+  function applyBackgroundEffects() {
+    const effects = sanitizeBackgroundEffects(levelEditorState.backgroundEffects);
+    levelEditorState.backgroundEffects = effects;
+    const targetPlayfield = levelEditorSurface.playfield;
+    if (targetPlayfield?.levelConfig) {
+      targetPlayfield.levelConfig.backgroundEffects = [...effects];
+      if (typeof targetPlayfield.draw === 'function') targetPlayfield.draw();
+    }
+  }
+
   function refreshLevelEditorMarkers(options = {}) {
     const targetPlayfield = levelEditorSurface.playfield;
     if (!targetPlayfield) {
@@ -517,6 +535,13 @@ export function createLevelEditorController({
     levelEditorState.mapSpeedMultiplier = Number.isFinite(config?.mapSpeedMultiplier) 
       ? config.mapSpeedMultiplier 
       : 1;
+    const chapterTheme = levelEditorSurface.playfield?.container?.dataset?.chapterTheme || 'default';
+    levelEditorState.backgroundEffects = resolveBackgroundEffects(config, chapterTheme);
+    if (levelEditorElements.backgroundEffects) {
+      levelEditorElements.backgroundEffects.querySelectorAll('input[data-background-effect]').forEach((input) => {
+        input.checked = levelEditorState.backgroundEffects.includes(input.dataset.backgroundEffect);
+      });
+    }
     if (levelEditorElements.mapSpeedInput) {
       levelEditorElements.mapSpeedInput.value = levelEditorState.mapSpeedMultiplier.toFixed(2);
     }
@@ -603,7 +628,7 @@ export function createLevelEditorController({
     }
 
     if (levelEditorState.levelId !== overlayPreviewLevel.id) {
-      configureLevelEditorForLevel(overlayPreviewLevel, { path: basePath }, { orientation, basePath });
+      configureLevelEditorForLevel(overlayPreviewLevel, targetPlayfield.levelConfig, { orientation, basePath });
       return;
     }
 
@@ -714,6 +739,7 @@ export function createLevelEditorController({
       mapSpeedMultiplier: Number.isFinite(levelEditorState.mapSpeedMultiplier)
         ? Number(levelEditorState.mapSpeedMultiplier.toFixed(2))
         : 1,
+      backgroundEffects: sanitizeBackgroundEffects(levelEditorState.backgroundEffects),
     };
 
     levelEditorElements.exportChangesButton.disabled = true;
@@ -1206,6 +1232,21 @@ export function createLevelEditorController({
     levelEditorElements.mapSpeedInput = document.getElementById('map-speed-multiplier-input');
     levelEditorElements.pointSpeedInput = document.getElementById('point-speed-multiplier-input');
     levelEditorElements.applyPointSpeedButton = document.getElementById('apply-point-speed-button');
+    levelEditorElements.backgroundEffects = document.getElementById('level-editor-background-effects');
+
+    if (levelEditorElements.backgroundEffects) {
+      levelEditorElements.backgroundEffects.innerHTML = BACKGROUND_EFFECTS.map((effect) => (
+        `<label class="overlay-editor__effect-option"><input type="checkbox" data-background-effect="${effect.id}"><span>${effect.label}</span></label>`
+      )).join('');
+      levelEditorElements.backgroundEffects.addEventListener('change', () => {
+        levelEditorState.backgroundEffects = Array.from(
+          levelEditorElements.backgroundEffects.querySelectorAll('input[data-background-effect]:checked'),
+          (input) => input.dataset.backgroundEffect,
+        );
+        applyBackgroundEffects();
+        setLevelEditorStatus('Background effects updated for this level.', { duration: 2000 });
+      });
+    }
 
     // Initialize map speed multiplier input
     if (levelEditorElements.mapSpeedInput) {
@@ -1310,7 +1351,7 @@ export function createLevelEditorController({
     developerMapToolsActive = true;
     overlayPreviewLevel = level;
 
-    configureLevelEditorForLevel(level, { path: basePath }, { orientation, basePath });
+    configureLevelEditorForLevel(level, playfield.levelConfig, { orientation, basePath });
     setLevelEditorEditing(true);
     setLevelEditorStatus('Editing active—drag anchors or Shift-click to remove.', { duration: 2600 });
     updateDeveloperMapElementsVisibility();

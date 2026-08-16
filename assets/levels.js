@@ -24,6 +24,42 @@ const DEVELOPER_TEST_RANGE_ID = 'Developer - Test Range';
 const DEVELOPER_TEST_RANGE_BASE_HP = 10000;
 const DEVELOPER_TEST_RANGE_INTERVAL = 5;
 
+// Canonical ambient-effect metadata keeps level data, editor controls, and rendering in sync.
+export const BACKGROUND_EFFECTS = Object.freeze([
+  { id: 'vermiculate', label: 'Vermiculate' },
+  { id: 'gravity-grid', label: 'Gravity Grid' },
+  { id: 'euler-fluid', label: 'Euler Fluid' },
+  { id: 'tetris-blocks', label: 'Tetris Blocks' },
+  { id: 'substrate', label: 'Substrate' },
+]);
+
+const BACKGROUND_EFFECT_IDS = new Set(BACKGROUND_EFFECTS.map((effect) => effect.id));
+const CHAPTER_DEFAULT_EFFECTS = Object.freeze({
+  prologue: ['gravity-grid'],
+  'chapter-1': ['vermiculate'],
+  'chapter-2': ['gravity-grid'],
+  'chapter-3': ['euler-fluid'],
+  'chapter-5': ['tetris-blocks'],
+  'chapter-6': ['substrate'],
+});
+
+export function sanitizeBackgroundEffects(effects) {
+  if (!Array.isArray(effects)) return [];
+  return [...new Set(effects.filter((effect) => BACKGROUND_EFFECT_IDS.has(effect)))];
+}
+
+// Keep historical chapter visuals when a level has not yet saved an explicit selection.
+export function resolveBackgroundEffects(levelConfig, chapterTheme = 'default') {
+  if (Array.isArray(levelConfig?.backgroundEffects)) {
+    return sanitizeBackgroundEffects(levelConfig.backgroundEffects);
+  }
+  return [...(CHAPTER_DEFAULT_EFFECTS[chapterTheme] || [])];
+}
+
+export function isBackgroundEffectEnabled(levelConfig, chapterTheme, effectId) {
+  return resolveBackgroundEffects(levelConfig, chapterTheme).includes(effectId);
+}
+
 // Build the developer sandbox wave ladder from the canonical enemy registry so new enemy archetypes
 // automatically appear in the endless test rotation without hand-editing the JSON every time.
 function createDeveloperTestRangeWaves() {

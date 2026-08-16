@@ -6,7 +6,7 @@ import { defineConfig } from 'vite';
 const EXPORT_PATH = '/__thero-editor/export-level';
 const PROJECT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 const LEVEL_DIRECTORY = path.resolve(PROJECT_DIRECTORY, 'assets/data/levels');
-const EDITABLE_FIELDS = new Set(['path', 'waves', 'crystals', 'autoAnchors', 'mapSpeedMultiplier']);
+const EDITABLE_FIELDS = new Set(['path', 'waves', 'crystals', 'autoAnchors', 'mapSpeedMultiplier', 'backgroundEffects']);
 
 // Read a small JSON request body without adding a production server dependency.
 function readJsonBody(request) {

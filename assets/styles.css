@@ -9221,6 +9221,32 @@ body.show-glyph-equations .tower-upgrade-variable-equations {
   gap: 10px;
 }
 
+/* Compact checkbox grid lets a level combine ambient effects without crowding mobile tools. */
+.overlay-editor__effects {
+  margin: 0.75rem 0;
+  padding: 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.overlay-editor__effect-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.5rem;
+}
+
+.overlay-editor__effect-option {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.overlay-editor__effect-option input {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
 .overlay-editor__button {
   border: 1px solid rgba(139, 247, 255, 0.3);
   border-radius: 12px;

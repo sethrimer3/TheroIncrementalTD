@@ -817,7 +817,11 @@ export function createTowerUpgradeOverlayController({
 
       const symbol = document.createElement('span');
       symbol.className = 'tower-upgrade-variable-symbol';
-      symbol.textContent = variable.symbol || variable.key.toUpperCase();
+      // Render authored TeX-like labels as structured text so card headers never expose raw commands.
+      appendEquationVariable(
+        symbol,
+        variable.equationSymbol || variable.symbol || variable.key.toUpperCase(),
+      );
       header.append(symbol);
 
       const summary = document.createElement('div');
@@ -973,7 +977,11 @@ export function createTowerUpgradeOverlayController({
 
         const attachmentSymbol = document.createElement('span');
         attachmentSymbol.className = 'tower-upgrade-variable-symbol';
-        attachmentSymbol.textContent = attachment.symbol || attachment.key.toUpperCase();
+        // Attachments share the same label syntax and must preserve their authored scripts too.
+        appendEquationVariable(
+          attachmentSymbol,
+          attachment.equationSymbol || attachment.symbol || attachment.key.toUpperCase(),
+        );
         attachmentHeader.append(attachmentSymbol);
 
         const attachmentSummary = document.createElement('div');

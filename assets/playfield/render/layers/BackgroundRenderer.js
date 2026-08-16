@@ -27,6 +27,7 @@ import { createVermiculateEffect } from '../VermiculateEffect.js';
 import { createSubstrateEffect } from '../SubstrateEffect.js';
 import { createGravityGridEffect } from '../GravityGridEffect.js';
 import { createEulerFluidEffect } from '../EulerFluidEffect.js';
+import { isBackgroundEffectEnabled } from '../../../levels.js';
 
 // Pre-calculated constants shared across background rendering functions
 const TWO_PI = Math.PI * 2;
@@ -549,9 +550,8 @@ export function drawChapter5TetrisBlocks() {
     return;
   }
 
-  // Only active while inside Chapter 5 (the red chapter).
   const chapterTheme = this.container?.dataset?.chapterTheme;
-  if (chapterTheme !== 'chapter-5') {
+  if (!isBackgroundEffectEnabled(this.levelConfig, chapterTheme, 'tetris-blocks')) {
     // Reset the effect when leaving chapter 5 so it feels fresh on re-entry.
     if (_tetrisLastChapterTheme === 'chapter-5' && _tetrisBlockEffect) {
       _tetrisBlockEffect.reset();
@@ -613,9 +613,8 @@ export function drawChapter1Vermiculate() {
     return;
   }
 
-  // Only active inside Chapter 1.
   const chapterTheme = this.container?.dataset?.chapterTheme;
-  if (chapterTheme !== 'chapter-1') {
+  if (!isBackgroundEffectEnabled(this.levelConfig, chapterTheme, 'vermiculate')) {
     // Reset the effect when leaving so it feels fresh on re-entry.
     if (_vermiculateLastChapterTheme === 'chapter-1' && _vermiculateEffect) {
       _vermiculateEffect.reset();
@@ -678,9 +677,8 @@ export function drawChapter6Substrate() {
     return;
   }
 
-  // Only active inside Chapter 6.
   const chapterTheme = this.container?.dataset?.chapterTheme;
-  if (chapterTheme !== 'chapter-6') {
+  if (!isBackgroundEffectEnabled(this.levelConfig, chapterTheme, 'substrate')) {
     // Reset the effect when leaving so it feels fresh on re-entry.
     if (_substrateLastChapterTheme === 'chapter-6' && _substrateEffect) {
       _substrateEffect.reset();
@@ -744,16 +742,12 @@ export function drawGravityGrid() {
     return;
   }
 
-  // Only active inside the Prologue or Chapter 2.
   const chapterTheme = this.container?.dataset?.chapterTheme;
-  const isActive = chapterTheme === 'prologue' || chapterTheme === 'chapter-2';
+  const isActive = isBackgroundEffectEnabled(this.levelConfig, chapterTheme, 'gravity-grid');
 
   if (!isActive) {
     // Reset the effect when leaving so it feels fresh on re-entry.
-    if (
-      (_gravityGridLastTheme === 'prologue' || _gravityGridLastTheme === 'chapter-2') &&
-      _gravityGridEffect
-    ) {
+    if (_gravityGridLastTheme && _gravityGridEffect) {
       _gravityGridEffect.reset();
     }
     _gravityGridLastTheme = chapterTheme || null;
@@ -851,9 +845,8 @@ export function drawChapter3Fluid() {
     return;
   }
 
-  // Only active inside Chapter 3.
   const chapterTheme = this.container?.dataset?.chapterTheme;
-  if (chapterTheme !== 'chapter-3') {
+  if (!isBackgroundEffectEnabled(this.levelConfig, chapterTheme, 'euler-fluid')) {
     // Reset the effect when leaving chapter 3 so it feels fresh on re-entry.
     if (_eulerFluidLastChapterTheme === 'chapter-3' && _eulerFluidEffect) {
       _eulerFluidEffect.reset();
