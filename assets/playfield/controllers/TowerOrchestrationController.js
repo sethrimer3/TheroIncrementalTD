@@ -287,6 +287,8 @@ export function createTowerOrchestrationController(config) {
       ringRotationPhase: (towerIdCounter % 12) * (Math.PI / 6),
     };
 
+    // Every newly anchored lattice starts at contribution level 1 with a ready burst budget.
+    playfield.primeTowerContributionBudget(tower);
     playfield.applyTowerBehaviorDefaults(tower);
     towers.push(tower);
     towerById.set(tower.id, tower);

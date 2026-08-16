@@ -16,6 +16,93 @@
  */
 
 import { colorToRgbaString } from '../../../../scripts/features/towers/powderTower.js';
+import {
+  ensureTowerContributionState,
+  getTowerContributionProgress,
+} from '../../systems/TowerContributionSystem.js';
+
+const CONTRIBUTION_UI_FADE_IN_MS = 140;
+const CONTRIBUTION_UI_FADE_OUT_MS = 240;
+const CONTRIBUTION_UI_WIDTH = 108;
+const CONTRIBUTION_UI_HEIGHT = 31;
+const CONTRIBUTION_UI_BAR_HEIGHT = 5;
+
+function resolveContributionUiAlpha(tower, visible, now) {
+  const target = visible ? 1 : 0;
+  let state = tower.contributionUiState;
+  if (!state) {
+    state = { alpha: 0, fromAlpha: 0, target: 0, changedAt: now };
+    tower.contributionUiState = state;
+  }
+  if (state.target !== target) {
+    state.fromAlpha = state.alpha;
+    state.target = target;
+    state.changedAt = now;
+  }
+  const duration = target > state.fromAlpha ? CONTRIBUTION_UI_FADE_IN_MS : CONTRIBUTION_UI_FADE_OUT_MS;
+  const progress = Math.min(1, Math.max(0, (now - state.changedAt) / duration));
+  const eased = progress * progress * (3 - 2 * progress);
+  state.alpha = state.fromAlpha + (target - state.fromAlpha) * eased;
+  return state.alpha;
+}
+
+/**
+ * Draw hover/selection contribution labels in screen-sized canvas coordinates above each tower.
+ */
+export function drawTowerContributionMeters() {
+  if (!this.ctx || !Array.isArray(this.towers) || !this.towers.length) {
+    return;
+  }
+  const ctx = this.ctx;
+  const now = this._frameCache?.timestamp ?? (typeof performance !== 'undefined' ? performance.now() : Date.now());
+  const hoveredTowerId = this.hoverPlacement?.target?.id || null;
+  const selectedTowerId = this.activeTowerMenu?.towerId || null;
+  const inverseViewScale = 1 / Math.max(0.01, this.viewScale || 1);
+  const bodyRadius = Math.max(12, Math.min(this.renderWidth, this.renderHeight) * 0.03);
+
+  this.towers.forEach((tower) => {
+    if (!tower) {
+      return;
+    }
+    const visible = tower.id === hoveredTowerId || tower.id === selectedTowerId;
+    const alpha = resolveContributionUiAlpha(tower, visible, now);
+    if (alpha <= 0.01) {
+      return;
+    }
+    ensureTowerContributionState(tower);
+    const progress = getTowerContributionProgress(tower);
+    const label = `Lv. ${tower.level} (${Math.round(tower.xp)} XP)`;
+    const anchorY = tower.y - bodyRadius * 3.55;
+
+    ctx.save();
+    ctx.translate(tower.x, anchorY);
+    // Counter-scale the overlay so zoom changes its position with the tower without blurring or enlarging the UI.
+    ctx.scale(inverseViewScale, inverseViewScale);
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = 'rgba(8, 12, 22, 0.84)';
+    ctx.strokeStyle = 'rgba(220, 232, 245, 0.32)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(-CONTRIBUTION_UI_WIDTH / 2, -CONTRIBUTION_UI_HEIGHT, CONTRIBUTION_UI_WIDTH, CONTRIBUTION_UI_HEIGHT, 6);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '600 13px "Cormorant Garamond", serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'rgba(245, 247, 250, 0.96)';
+    ctx.fillText(label, 0, -19);
+
+    const barX = -CONTRIBUTION_UI_WIDTH / 2 + 7;
+    const barY = -9;
+    const barWidth = CONTRIBUTION_UI_WIDTH - 14;
+    ctx.fillStyle = 'rgba(220, 232, 245, 0.16)';
+    ctx.fillRect(barX, barY, barWidth, CONTRIBUTION_UI_BAR_HEIGHT);
+    ctx.fillStyle = 'rgba(139, 247, 255, 0.9)';
+    ctx.fillRect(barX, barY, barWidth * progress, CONTRIBUTION_UI_BAR_HEIGHT);
+    ctx.restore();
+  });
+}
 import { easeInCubic, easeOutCubic } from '../../utils/math.js';
 
 // ─── Constants ────────────────────────────────────────────────────────────────

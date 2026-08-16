@@ -375,6 +375,11 @@ function tradeThrallWithEnemy(playfield, thrall, enemy) {
   const tower = resolveSourceTower(playfield, thrall.towerId);
   if (tower && appliedDamage > 0) {
     playfield.recordDamageEvent?.({ tower, enemy, damage: appliedDamage });
+    // Thrall exchanges are summoned-unit damage attributed to the originating χ lattice.
+    playfield.addTowerContribution?.(tower, 'damage', appliedDamage, {
+      enemy,
+      expectedOutput: damageToEnemy,
+    });
   }
   if (enemy.hp <= 0) {
     playfield.processEnemyDefeat?.(enemy);

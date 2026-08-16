@@ -313,8 +313,12 @@ export function restoreTowersFromCheckpoint(towerSnapshots = []) {
       rate: Number.isFinite(snapshot.rate) ? snapshot.rate : fallbackRate,
       range: Number.isFinite(snapshot.range) ? snapshot.range : fallbackRange,
       cooldown: Number.isFinite(snapshot.cooldown) ? snapshot.cooldown : 0,
+      // Old checkpoints omit these fields and safely resume at Level 1 with zero XP.
+      level: Number.isFinite(snapshot.level) ? snapshot.level : 1,
+      xp: Number.isFinite(snapshot.xp) ? snapshot.xp : 0,
       slot: null,
     };
+    this.primeTowerContributionBudget(tower);
     tower.linkTargetId = null;
     tower.linkSources = new Set();
     tower.storedAlphaShots = 0;

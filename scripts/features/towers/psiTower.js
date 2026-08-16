@@ -290,6 +290,8 @@ function performMerge(playfield, tower, selectedEnemies, state) {
     // Store AoE parameters for death handling
     psiAoeRadiusMultiplier: state.aoeRadiusMultiplier,
     psiAoeDamageMultiplier: state.aoeDamageMultiplier,
+    // Retain ownership so the cluster's eventual AoE contributes to the creating ψ lattice.
+    psiSourceTowerId: tower.id,
   };
 
   playfield.enemies.push(cluster);
@@ -391,6 +393,12 @@ export function triggerPsiClusterAoE(playfield, cluster, deathPosition) {
     if (distance <= aoeRadiusPixels) {
       // Apply damage
       const beforeHp = enemy.hp;
+      const sourceTower = playfield.getTowerById?.(cluster.psiSourceTowerId) || null;
+      playfield.addTowerContribution?.(sourceTower, 'damage', Math.min(beforeHp, aoeDamage), {
+        enemy,
+        // ψ has no direct DPS stat, so one full-strength cluster blast is its expected event output.
+        expectedOutput: aoeDamage,
+      });
       enemy.hp = Math.max(0, enemy.hp - aoeDamage);
 
       // Track damage for stats

@@ -712,6 +712,8 @@ function updateDeltaSoldier(playfield, tower, soldier, delta, state) {
       if (separation <= contactRadius) {
         const enemyHp = Number.isFinite(target.hp) ? Math.max(0, target.hp) : 0;
         const inflicted = Math.min(soldier.health, enemyHp);
+        // Summoned soldier rams contribute through their owning tower using effective collision damage.
+        playfield.addTowerContribution?.(tower, 'damage', inflicted, { enemy: target });
         target.hp = Math.max(0, enemyHp - inflicted);
         const loss = Math.max(0, inflicted - (state.defense || 0));
         soldier.health = Math.max(0, soldier.health - loss);
