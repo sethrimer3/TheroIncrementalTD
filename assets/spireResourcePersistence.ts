@@ -9,6 +9,7 @@ import type {
   TowerUpgradeStateSnapshotInput,
 } from './towerBlueprintPresenter.js';
 import type { AlgebraicUpgradeStateSnapshot } from './algebraicUpgrades.js';
+import type { GreekVariableSnapshot } from './greekVariableProgression.js';
 
 /** Mutable story flag owned by the surviving Tower and Achievements state branches. */
 export interface MutableStoryState {
@@ -65,9 +66,10 @@ export type SpireResourceStateSnapshotInput =
 
 /** Exact persistence-owned wrapper emitted after adding Aleph state to base tower entries. */
 export interface TowerUpgradeSnapshotWithAleph {
-  [towerId: string]: SerializedTowerUpgradeState | AlephChainUpgradeSnapshot | AlgebraicUpgradeStateSnapshot;
+  [towerId: string]: SerializedTowerUpgradeState | AlephChainUpgradeSnapshot | AlgebraicUpgradeStateSnapshot | GreekVariableSnapshot;
   alephChainUpgrades: AlephChainUpgradeSnapshot;
   algebraicUpgrades: AlgebraicUpgradeStateSnapshot;
+  greekVariables: GreekVariableSnapshot;
 }
 
 /** Autosave tower-upgrade input, including historical snapshots without Aleph data. */
@@ -86,6 +88,8 @@ export interface SpireResourcePersistenceDependencies {
   getPlayfield: () => AlephChainUpgradePlayfield | null;
   getAlgebraicUpgradeStateSnapshot?: () => AlgebraicUpgradeStateSnapshot;
   applyAlgebraicUpgradeStateSnapshot?: (snapshot: unknown) => void;
+  getGreekVariableStateSnapshot?: () => GreekVariableSnapshot;
+  applyGreekVariableStateSnapshot?: (snapshot: unknown) => GreekVariableSnapshot;
 }
 
 /** Public controller returned to the bootstrap and then wired into autosave. */
@@ -119,6 +123,8 @@ export function createSpireResourcePersistence({
   getPlayfield,
   getAlgebraicUpgradeStateSnapshot = () => ({}),
   applyAlgebraicUpgradeStateSnapshot = () => {},
+  getGreekVariableStateSnapshot = () => ({ alpha: 1, beta: 1, gamma: 1, delta: 1, epsilon: 1, zeta: 1 }),
+  applyGreekVariableStateSnapshot = () => ({ alpha: 1, beta: 1, gamma: 1, delta: 1, epsilon: 1, zeta: 1 }),
 }: SpireResourcePersistenceDependencies): SpireResourcePersistenceController {
   /** Preserve the base tower snapshot while adding the Aleph-chain and algebraic-upgrade branches. */
   function getTowerUpgradeStateSnapshotWithAleph(): TowerUpgradeSnapshotWithAleph {
@@ -126,6 +132,7 @@ export function createSpireResourcePersistence({
       ...getTowerUpgradeStateSnapshot(),
       alephChainUpgrades: getAlephChainUpgrades(),
       algebraicUpgrades: getAlgebraicUpgradeStateSnapshot(),
+      greekVariables: getGreekVariableStateSnapshot(),
     };
   }
 
@@ -141,6 +148,8 @@ export function createSpireResourcePersistence({
     if (algebraicUpgrades && isObjectRecord(algebraicUpgrades)) {
       applyAlgebraicUpgradeStateSnapshot(algebraicUpgrades);
     }
+    // Missing phase-one state is deliberately passed as undefined so old saves reset all variables to 1.
+    applyGreekVariableStateSnapshot(snapshot.greekVariables);
   }
 
   /** Serialize the surviving story state. */

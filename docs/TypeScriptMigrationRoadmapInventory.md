@@ -2,7 +2,7 @@
 
 This appendix is the mechanically checked coverage record for the long-range roadmap in [`../JavaToTypeScriptConversionPlan.md`](../JavaToTypeScriptConversionPlan.md). It records the live source classification and assigns every active authored JavaScript module to one implementation phase. The phase order after Phase 21 is tentative.
 
-<!-- migration-roadmap-counts: ts=67 generated=67 active_js=170 candidates=45 -->
+<!-- migration-roadmap-counts: ts=68 generated=68 active_js=171 candidates=45 -->
 <!-- migration-roadmap-authorization: phase=23 -->
 
 ## Verified inventory
@@ -17,21 +17,21 @@ This appendix is the mechanically checked coverage record for the long-range roa
 
 | Classification | Count | Treatment |
 |---|---:|---|
-| Authored TypeScript source | 67 | Converted; `.d.ts` files would be excluded, but none are present. |
-| Build-generated `.js` siblings of authored `.ts` | 67 | Runtime compatibility output; never count as backlog. |
-| Active authored JavaScript | 170 | Reachable from `assets/main.js` through static local imports; all assigned below. |
+| Authored TypeScript source | 68 | Converted; `.d.ts` files would be excluded, but none are present. |
+| Build-generated `.js` siblings of authored `.ts` | 68 | Runtime compatibility output; never count as backlog. |
+| Active authored JavaScript | 171 | Reachable from `assets/main.js` through static local imports; all assigned below. |
 | Intentionally preserved legacy JavaScript | 0 | The previously documented 19-file Terrarium legacy tree was deleted by `64ebc5e`; no surviving file has evidence strong enough for this category. |
 | Retirement/deletion candidates or ambiguous authored JavaScript | 45 | Not reachable from the browser entry graph; excluded pending a separate retirement audit. |
 | Generated/vendor/dependency/distribution material | Not counted | `node_modules/`, `dist/`, `build/`, source maps, dependencies, assets, fixtures, and non-source artifacts. |
 
-The repository therefore has 237 active authored JS/TS modules: 67 TypeScript plus 170 active JavaScript. The raw authored-language tree has 282 modules when the 45 decision candidates are included. Active conversion is 28.3% by module count (`67 / 237`). The supplemental line snapshot is historical; line counts are informative, not scheduling weights.
+The repository therefore has 239 active authored JS/TS modules: 68 TypeScript plus 171 active JavaScript. The raw authored-language tree has 284 modules when the 45 decision candidates are included. Active conversion is 28.5% by module count (`68 / 239`). The supplemental line snapshot is historical; line counts are informative, not scheduling weights.
 
 ## Method and limits
 
 1. Enumerated `assets/**/*.ts`, `scripts/**/*.ts`, `assets/**/*.js`, and `scripts/**/*.js`, excluding `node_modules/`, `dist/`, and `build/`.
 2. Removed every `.js` file with a same-path `.ts` sibling from the backlog.
 3. Parsed static relative `import`, side-effect `import`, and `export ... from` specifiers and traversed from `assets/main.js`.
-4. Verified all resolved edges exist. The traversal found 234 reachable runtime `.js` modules: 64 generated siblings plus 170 authored JavaScript modules. The remaining generated siblings include type-only output that is correctly not imported at runtime.
+4. Verified all resolved edges exist. The traversal found 236 reachable runtime `.js` modules: 65 generated siblings plus 171 authored JavaScript modules. The remaining generated siblings include type-only output that is correctly not imported at runtime.
 5. Searched the 45 unreachable files in tests, retirement documentation, configuration, HTML harnesses, and recent retirement commits. Static reachability cannot prove runtime intent, so those files remain decision candidates rather than being deleted or migrated.
 6. Read representative owners at every risk tier, including equation definitions, core utilities, config loading, save boundaries, tower modules, powder simulation, playfield systems/managers/renderers, `assets/playfield.js`, and `assets/main.js`.
 7. Added `npm run check:migration-roadmap`, which repeats the source enumeration and static traversal; compares active and candidate paths to these tables; rejects duplicate assignments; verifies machine markers and visible count statements; checks decision-group subtotals, the total assigned backlog, and every remaining module count; and enforces the shared marker-named phase as the sole authorization.
@@ -63,7 +63,7 @@ Risk labels are relative migration risk: Low (pure/static), Medium (state or nar
 |---:|---|---|---|---|---|
 | 23 | `assets/towerEquations/advanced/omicronEquation.js`<br>`assets/towerEquations/advanced/piEquation.js`<br>`assets/towerEquations/advanced/chiEquation.js`<br>`assets/towerEquations/advanced/psiEquation.js`<br>`assets/towerEquations/advanced/omegaEquation.js` | Advanced terminal equations | Medium | 22 | Characterize coercion, cross-tower lookup, cost curves, and formatter order. |
 | 24 | `assets/towerEquations/basicTowers.js`<br>`assets/towerEquations/infinityTower.js` | Foundational equation registries | Medium | 23 | Shared presenter/context contracts; broad registry consumer impact. |
-| 25 | `assets/towerEquations/greekTowers.js` | Greek equation registry | High | 24 | 1,684-line multi-owner file; characterize by tower and split tests even if migrated as one source module. |
+| 25 | `assets/towerEquations/greekTowers.js`<br>`assets/towerEquations/phaseOneGreekTowers.js` | Greek equation registries | High | 24 | The phase-one file isolates global-variable consumers while the legacy multi-owner file retains later towers. |
 | 26 | `assets/buildInfo.js`<br>`assets/formatHelpers.js`<br>`assets/gameUnits.js`<br>`assets/geometryHelpers.js`<br>`assets/waveEncoder.js`<br>`assets/playfield/constants.js`<br>`assets/playfield/utils/formatting.js`<br>`assets/playfield/utils/math.js`<br>`scripts/core/mathTokens.js`<br>`scripts/core/mathUtils.js`<br>`scripts/features/towers/alephChain.js` | Pure utilities, tokens, units, wave schema | Low-Medium | 25 | Establish `Wave`, `EnemyGroup`, unit, token, point, and Aleph registry contracts. |
 | 27 | `assets/gameplayConfigLoaders.js`<br>`assets/levels.js`<br>`assets/configuration.js`<br>`assets/enemies.js` | Configuration, levels, enemies | Medium-High | 26, Phase 4 tower types | Validate JSON/global inputs; define owner types for levels, waves, enemies, gems, and gameplay config. |
 | 28 | `assets/tutorialState.js`<br>`assets/powder/powderState.js`<br>`assets/powderDropQueue.js`<br>`assets/powderEventLog.js`<br>`assets/powderPersistence.js` | Small state and persistence owners | Medium | 26-27, existing save types | Treat local storage and legacy snapshots as untrusted; retain key compatibility. |
@@ -111,10 +111,10 @@ Totals reconcile as 17 + 12 + 10 + 6 = 45.
 
 ## Mechanical reconciliation rules
 
-- Each of the 170 active authored `.js` paths appears in exactly one coverage row.
+- Each of the 171 active authored `.js` paths appears in exactly one coverage row.
 - No path with a same-path authored `.ts` sibling appears in the active coverage table.
 - The 45 decision candidates appear only in the retirement section and are excluded from phase totals.
-- Assigned phase counts sum to 170; Phase 54 adds no module and Phase 55 assigns only `assets/main.js`.
+- Assigned phase counts sum to 171; Phase 54 adds no module and Phase 55 assigns only `assets/main.js`.
 - No phase prerequisite cycle is intended: numeric prerequisites point backward; historical phases are already complete.
 - All implementation phases preserve `.js` import specifiers and the generated-sibling build architecture.
 - `npm run check:migration-roadmap` enforces these path and count invariants against the current checkout; a failing check is a replan trigger, not a reason to weaken the checker.

@@ -3,6 +3,7 @@
 
 // Import helper function for epsilon tower hit stacking
 import { applyEpsilonHit as applyEpsilonHitHelper } from '../../../scripts/features/towers/epsilonTower.js';
+import { computeTowerVariableValue } from '../../towersTab.js';
 // Shared interception constants from the decimal swarm system.
 import {
   PARTICLE_HIT_RADIUS as DECIMAL_SWARM_PARTICLE_HIT_RADIUS,
@@ -615,8 +616,9 @@ function updateProjectiles(delta) {
         if (tower) {
           stacks = applyEpsilonHitHelper(this, tower, enemy.id) || 0;
         }
-        // Atk = (NumHits)^2, where stacks is NumHits after applying this hit
-        const totalDamage = Math.max(0, stacks * stacks);
+        // Atk = NumHits^(1 + 0.25ε); every Epsilon instance reads the same global exponent.
+        const epsilonExponent = Math.max(1, Number(computeTowerVariableValue('epsilon', 'exponent')) || 1);
+        const totalDamage = Math.max(0, stacks ** epsilonExponent);
         this.applyDamageToEnemy(enemy, totalDamage, { sourceTower: tower || null });
         const enemyStillActive = !!this.getEnemyById(enemy.id);
         if (!enemyStillActive) {

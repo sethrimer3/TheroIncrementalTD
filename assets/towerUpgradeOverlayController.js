@@ -1,5 +1,12 @@
 import { generateMasterEquationText } from './towerEquations/masterEquationUtils.js';
 import { parseEquationLabel } from '../scripts/core/mathTokens.js';
+import {
+  GREEK_VARIABLE_DEFINITIONS,
+  getVariableValue,
+  getVariableUpgradeCost,
+  canUpgradeVariable,
+  upgradeVariable,
+} from './greekVariableProgression.js';
 
 /**
  * Tower upgrade overlay controller responsible for rendering the equation panel,
@@ -762,6 +769,45 @@ export function createTowerUpgradeOverlayController({
     container.innerHTML = '';
     const blueprintVariables = blueprint?.variables || [];
     const state = ensureTowerUpgradeState(towerId, blueprint);
+
+    // Phase-one towers expose the same player-owned variables instead of tower-local Aleph slots.
+    if (['alpha', 'beta', 'gamma', 'delta', 'epsilon', 'zeta'].includes(towerId)) {
+      const panel = document.createElement('section');
+      panel.className = 'tower-upgrade-global-variables';
+      const heading = document.createElement('h3');
+      heading.className = 'tower-upgrade-variable-name';
+      heading.textContent = 'Global Greek Variables';
+      panel.append(heading);
+      GREEK_VARIABLE_DEFINITIONS.forEach((definition) => {
+        const row = document.createElement('div');
+        row.className = 'tower-upgrade-variable tower-upgrade-global-variable';
+        row.dataset.globalVariable = definition.id;
+        const summary = document.createElement('span');
+        summary.className = 'tower-upgrade-variable-description';
+        summary.textContent = `${definition.symbol} = ${formatWholeNumber(getVariableValue(definition.id))}`;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'tower-upgrade-variable-glyph-button tower-upgrade-variable-glyph-button--increase';
+        const cost = getVariableUpgradeCost(definition.id);
+        button.textContent = `Upgrade — ${formatWholeNumber(cost)} ${cost === 1 ? 'Glyph' : 'Glyphs'}`;
+        button.disabled = !canUpgradeVariable(definition.id);
+        button.setAttribute('aria-label', `Upgrade global ${definition.label} for ${cost} Glyphs`);
+        button.addEventListener('click', () => {
+          const result = upgradeVariable(definition.id);
+          if (!result.success) {
+            setTowerUpgradeNote('Not enough Tower Glyphs for this global variable.', 'warning');
+            towerTabState.audioManager?.playSfx?.('error');
+            renderTowerUpgradeOverlay(towerId, { blueprint });
+            return;
+          }
+          setTowerUpgradeNote(`Raised global ${definition.symbol} to ${formatWholeNumber(result.value)}.`, 'success');
+          towerTabState.audioManager?.playSfx?.('upgrade');
+        });
+        row.append(summary, button);
+        panel.append(row);
+      });
+      container.append(panel);
+    }
 
     if (!blueprintVariables.length) {
       const empty = document.createElement('p');

@@ -3,7 +3,8 @@ import type { TowerEquationBlueprint } from '../towerBlueprintPresenter.js';
 import { mindGate } from './mindGate.js';
 import { shadowGate } from './shadowGate.js';
 import { alpha, beta, gamma } from './basicTowers.js';
-import { delta, epsilon, zeta, zetaOld, eta, theta, iota } from './greekTowers.js';
+import { zetaOld, eta, theta, iota } from './greekTowers.js';
+import { delta, epsilon, zeta } from './phaseOneGreekTowers.js';
 import {
   kappa,
   lambda,

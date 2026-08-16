@@ -1,4 +1,5 @@
 import { TOWER_EQUATION_BLUEPRINTS } from './towerEquations/index.js';
+import { getVariableValue } from './greekVariableProgression.js';
 
 /** Minimal enriched tower definition surface read by equation presentation. */
 export interface TowerEquationDefinition {
@@ -130,6 +131,10 @@ export interface TowerEquationVariable {
   step?: number;
   /** Highest purchasable level; the overlay disables further purchases once reached. */
   maxLevel?: number;
+  /** Explicit global dependencies support UI discovery without parsing equation text. */
+  variablesUsed?: readonly string[];
+  /** Direct read of one player-owned global Greek variable. */
+  globalVariable?: string;
 }
 
 /** Golden-equation formatting helpers supplied by the Towers-tab UI. */
@@ -145,6 +150,8 @@ export interface TowerEquationBlueprint {
   masterEquationLatex?: unknown;
   baseEquation?: string;
   variables?: readonly TowerEquationVariable[];
+  /** Union of global Greek variables consumed anywhere in this tower equation. */
+  variablesUsed?: readonly string[];
   computeResult?: (
     values: TowerEquationValueMap,
     context: TowerResultComputationContext,
@@ -274,6 +281,7 @@ export function createTowerBlueprintPresenter(
       return fallbackTowerBlueprints.get(towerId);
     }
     const definition = resolveTowerDefinition(towerId);
+
     if (!definition) {
       return null;
     }
@@ -450,6 +458,10 @@ export function createTowerBlueprintPresenter(
       (effectiveBlueprint?.variables || []).find((entry) => entry.key === variableKey) || null;
     if (!variable) {
       return 0;
+    }
+
+    if (variable.globalVariable) {
+      return getVariableValue(variable.globalVariable);
     }
 
     if (variable.reference) {

@@ -10,13 +10,14 @@ function readLegacyProperty(value, key) {
  * Persist the surviving Tower of Inspiration story state and tower upgrades.
  * Legacy snapshots may contain retired spire branches; those branches are intentionally ignored.
  */
-export function createSpireResourcePersistence({ spireResourceState, getTowerUpgradeStateSnapshot, applyTowerUpgradeStateSnapshot, getAlephChainUpgrades, applyAlephChainUpgradeSnapshot, getPlayfield, getAlgebraicUpgradeStateSnapshot = () => ({}), applyAlgebraicUpgradeStateSnapshot = () => { }, }) {
+export function createSpireResourcePersistence({ spireResourceState, getTowerUpgradeStateSnapshot, applyTowerUpgradeStateSnapshot, getAlephChainUpgrades, applyAlephChainUpgradeSnapshot, getPlayfield, getAlgebraicUpgradeStateSnapshot = () => ({}), applyAlgebraicUpgradeStateSnapshot = () => { }, getGreekVariableStateSnapshot = () => ({ alpha: 1, beta: 1, gamma: 1, delta: 1, epsilon: 1, zeta: 1 }), applyGreekVariableStateSnapshot = () => ({ alpha: 1, beta: 1, gamma: 1, delta: 1, epsilon: 1, zeta: 1 }), }) {
     /** Preserve the base tower snapshot while adding the Aleph-chain and algebraic-upgrade branches. */
     function getTowerUpgradeStateSnapshotWithAleph() {
         return {
             ...getTowerUpgradeStateSnapshot(),
             alephChainUpgrades: getAlephChainUpgrades(),
             algebraicUpgrades: getAlgebraicUpgradeStateSnapshot(),
+            greekVariables: getGreekVariableStateSnapshot(),
         };
     }
     /** Restore base tower upgrades first, then restore the Aleph-chain and algebraic-upgrade branches. */
@@ -32,6 +33,8 @@ export function createSpireResourcePersistence({ spireResourceState, getTowerUpg
         if (algebraicUpgrades && isObjectRecord(algebraicUpgrades)) {
             applyAlgebraicUpgradeStateSnapshot(algebraicUpgrades);
         }
+        // Missing phase-one state is deliberately passed as undefined so old saves reset all variables to 1.
+        applyGreekVariableStateSnapshot(snapshot.greekVariables);
     }
     /** Serialize the surviving story state. */
     function getSpireResourceStateSnapshot() {

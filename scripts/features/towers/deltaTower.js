@@ -1,9 +1,7 @@
 // Δ tower helper module centralizes cohort AI, visuals, and math away from the playfield.
 import {
-  getTowerDefinition,
   getTowerEquationBlueprint,
   computeTowerVariableValue,
-  calculateTowerEquationResult,
 } from '../../../assets/towersTab.js';
 import { samplePaletteGradient } from '../../../assets/colorSchemeUtils.js';
 import { formatGameNumber } from '../../core/formatting.js';
@@ -176,46 +174,22 @@ export function ensureDeltaState(playfield, tower) {
   if (!tower || tower.type !== 'delta') {
     return null;
   }
-  const gammaDefinition = getTowerDefinition('gamma') || {};
-  const alphaDefinition = getTowerDefinition('alpha') || {};
   const blueprint = getTowerEquationBlueprint('delta');
-  const alephValue = computeTowerVariableValue('delta', 'aleph1', blueprint);
-  const alephRank = Number.isFinite(alephValue) ? Math.max(1, Math.round(alephValue)) : 1;
-
-  const gammaEquation = calculateTowerEquationResult('gamma');
-  const fallbackGamma = Number.isFinite(gammaDefinition.damage)
-    ? Math.max(1, gammaDefinition.damage)
-    : Math.max(1, tower.baseDamage || 1);
-  const gammaPower = Number.isFinite(gammaEquation) && gammaEquation > 0 ? gammaEquation : fallbackGamma;
-
-  const rawHealth = gammaPower ** alephRank;
-  const maxHealth = Number.isFinite(rawHealth) ? Math.max(1, rawHealth) : Number.MAX_SAFE_INTEGER;
-
-  const rawTrainingSeconds = 5 ** alephRank;
-  const trainingSeconds = Number.isFinite(rawTrainingSeconds)
-    ? Math.max(1, rawTrainingSeconds)
-    : Number.MAX_SAFE_INTEGER;
+  // Phase one reads every cohort stat from the shared Greek-variable blueprint.
+  const maxHealth = Math.max(1, Number(computeTowerVariableValue('delta', 'health', blueprint)) || 1);
+  const soldierAttack = Math.max(1, Number(computeTowerVariableValue('delta', 'soldierAttack', blueprint)) || 1);
+  const trainingSeconds = Math.max(1, Number(computeTowerVariableValue('delta', 'training', blueprint)) || 1);
   const spawnRate = trainingSeconds > 0 && Number.isFinite(trainingSeconds) ? 1 / trainingSeconds : 0;
-  const regenPerSecond = Number.isFinite(maxHealth) ? maxHealth / 20 : Number.MAX_SAFE_INTEGER;
-
-  const totalSoldiers = 3 + alephRank;
-  const maxSoldiers = Number.isFinite(totalSoldiers)
-    ? Math.max(1, Math.round(totalSoldiers))
-    : 1;
-
-  const rawDefense = Number.isFinite(tower.definition?.def)
-    ? tower.definition.def
-    : Number.isFinite(alphaDefinition.damage)
-    ? alphaDefinition.damage
-    : 0;
-  const defense = Math.max(0, rawDefense);
+  const regenPerSecond = Math.max(0, Number(computeTowerVariableValue('delta', 'regen', blueprint)) || 0);
+  const maxSoldiers = Math.max(1, Math.round(Number(computeTowerVariableValue('delta', 'total', blueprint)) || 1));
+  const defense = Math.max(0, Number(tower.definition?.def) || 0);
 
   const deltaProduct =
-    maxHealth * Math.max(regenPerSecond, 0.0001) * maxSoldiers * Math.max(defense, 1);
+    soldierAttack * maxHealth * maxSoldiers;
 
   if (!tower.deltaState) {
     tower.deltaState = {
-      alephRank,
+      soldierAttack,
       maxHealth,
       regenPerSecond,
       maxSoldiers,
@@ -236,7 +210,7 @@ export function ensureDeltaState(playfield, tower) {
     };
   } else {
     const previousMaxHealth = tower.deltaState.maxHealth;
-    tower.deltaState.alephRank = alephRank;
+    tower.deltaState.soldierAttack = soldierAttack;
     tower.deltaState.maxHealth = maxHealth;
     tower.deltaState.regenPerSecond = regenPerSecond;
     tower.deltaState.maxSoldiers = maxSoldiers;
@@ -711,7 +685,7 @@ function updateDeltaSoldier(playfield, tower, soldier, delta, state) {
       const separation = Math.hypot(soldier.x - targetPosition.x, soldier.y - targetPosition.y);
       if (separation <= contactRadius) {
         const enemyHp = Number.isFinite(target.hp) ? Math.max(0, target.hp) : 0;
-        const inflicted = Math.min(soldier.health, enemyHp);
+        const inflicted = Math.min(state.soldierAttack, enemyHp);
         // Summoned soldier rams contribute through their owning tower using effective collision damage.
         playfield.addTowerContribution?.(tower, 'damage', inflicted, { enemy: target });
         target.hp = Math.max(0, enemyHp - inflicted);
@@ -725,10 +699,8 @@ function updateDeltaSoldier(playfield, tower, soldier, delta, state) {
         if (soldier.health <= 0) {
           // Apply delta shift knockback when soldier dies ramming into enemy
           const blueprint = getTowerEquationBlueprint('delta');
-          const aleph2Value = computeTowerVariableValue('delta', 'aleph2', blueprint);
-          const aleph2Rank = Number.isFinite(aleph2Value) ? Math.max(0, Math.round(aleph2Value)) : 0;
-          if (aleph2Rank > 0 && target.hp > 0) {
-            const shiftMeters = aleph2Rank * 0.5;
+          const shiftMeters = Math.max(0, Number(computeTowerVariableValue('delta', 'shift', blueprint)) || 0);
+          if (shiftMeters > 0 && target.hp > 0) {
             const minDim = Math.min(playfield.renderWidth || 0, playfield.renderHeight || 0) || 1;
             const shiftPixels = metersToPixels(shiftMeters, minDim);
             const pathLength = Number.isFinite(playfield.pathLength) && playfield.pathLength > 0

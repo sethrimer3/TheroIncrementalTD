@@ -1,4 +1,5 @@
 import { TOWER_EQUATION_BLUEPRINTS } from './towerEquations/index.js';
+import { getVariableValue } from './greekVariableProgression.js';
 /** Preserve the original function-only dependency validation while narrowing unknown input. */
 function isTowerDefinitionResolver(value) {
     return typeof value === 'function';
@@ -212,6 +213,9 @@ export function createTowerBlueprintPresenter({ getTowerDefinition, getDynamicCo
         const variable = (effectiveBlueprint?.variables || []).find((entry) => entry.key === variableKey) || null;
         if (!variable) {
             return 0;
+        }
+        if (variable.globalVariable) {
+            return getVariableValue(variable.globalVariable);
         }
         if (variable.reference) {
             const referencedValue = calculateTowerEquationResult(variable.reference, visited);
