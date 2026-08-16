@@ -16,6 +16,7 @@
  */
 
 import { colorToRgbaString } from '../../../../scripts/features/towers/powderTower.js';
+import { ALPHA_BASE_RADIUS_FACTOR } from '../../../gameUnits.js';
 import {
   ensureTowerContributionState,
   getTowerContributionProgress,
@@ -58,7 +59,10 @@ export function drawTowerContributionMeters() {
   const hoveredTowerId = this.hoverPlacement?.target?.id || null;
   const selectedTowerId = this.activeTowerMenu?.towerId || null;
   const inverseViewScale = 1 / Math.max(0.01, this.viewScale || 1);
-  const bodyRadius = Math.max(12, Math.min(this.renderWidth, this.renderHeight) * 0.03);
+  const bodyRadius = Math.max(
+    12,
+    Math.min(this.renderWidth, this.renderHeight) * ALPHA_BASE_RADIUS_FACTOR,
+  );
 
   this.towers.forEach((tower) => {
     if (!tower) {

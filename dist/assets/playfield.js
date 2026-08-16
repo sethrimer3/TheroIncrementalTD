@@ -43,6 +43,7 @@ import * as EnemyFocusSystem from './playfield/systems/EnemyFocusSystem.js';
 import * as GammaStarBurstSystem from './playfield/systems/GammaStarBurstSystem.js';
 import * as DecimalSwarmSystem from './playfield/systems/DecimalSwarmSystem.js';
 import * as TowerInteractionSystem from './playfield/systems/TowerInteractionSystem.js';
+import * as TowerContributionSystem from './playfield/systems/TowerContributionSystem.js';
 import * as TrackRiverSystem from './playfield/systems/TrackRiverSystem.js';
 import * as WaveQueueSystem from './playfield/systems/WaveQueueSystem.js';
 import * as ViewportCoordinateSystem from './playfield/systems/ViewportCoordinateSystem.js';
@@ -3278,6 +3279,9 @@ export class SimplePlayfield {
       rate: Number.isFinite(tower.rate) ? tower.rate : null,
       range: Number.isFinite(tower.range) ? tower.range : null,
       cooldown: Number.isFinite(tower.cooldown) ? tower.cooldown : 0,
+      // Persist contribution progression while omitting the transient rate-cap budget.
+      level: Number.isFinite(tower.level) ? tower.level : 1,
+      xp: Number.isFinite(tower.xp) ? tower.xp : 0,
       slotId: tower.slot?.id || null,
       deltaState:
         tower.type === 'delta' && tower.deltaState
@@ -4002,6 +4006,14 @@ Object.assign(SimplePlayfield.prototype, {
   resolveTowerShotDamage: TowerDispatchSystem.resolveTowerShotDamage,
   emitTowerAttackVisuals: TowerDispatchSystem.emitTowerAttackVisuals,
   fireAtTarget: TowerDispatchSystem.fireAtTarget,
+});
+
+// Contribution progression methods provide one reusable entry point for damage and future support mechanics.
+Object.assign(SimplePlayfield.prototype, {
+  ensureTowerContributionState: TowerContributionSystem.ensureTowerContributionState,
+  primeTowerContributionBudget: TowerContributionSystem.primeTowerContributionBudget,
+  updateTowerContributionBudget: TowerContributionSystem.updateTowerContributionBudget,
+  addTowerContribution: TowerContributionSystem.addTowerContribution,
 });
 
 // Projectile spawn system methods

@@ -513,9 +513,13 @@ export function applyEtaDamage(playfield, enemy, damage, options = {}) {
     return;
   }
   const sourceTower = options?.sourceTower || null;
+  const hpBefore = Number.isFinite(enemy.hp) ? Math.max(0, enemy.hp) : 0;
+  const effectiveDamage = Math.min(hpBefore, damage);
   if (sourceTower && typeof playfield.recordDamageEvent === 'function') {
     playfield.recordDamageEvent({ tower: sourceTower, enemy, damage });
   }
+  // η retains its bespoke beam resolution but reports only useful health removed to progression.
+  playfield.addTowerContribution?.(sourceTower, 'damage', effectiveDamage, { enemy });
   enemy.hp -= damage;
   if (enemy.hp <= 0) {
     playfield.processEnemyDefeat(enemy);

@@ -84,6 +84,19 @@ The tower roster now explicitly runs through the entire Greek alphabet from **α
 - **Merge ladder:** Players may still merge adjacent lowercase towers alphabetically (α into β, β into γ, and so on), but the prestige path offers a sideways option that preserves the flavor of the lowercase while unlocking late-game power spikes.
 - **Cost cadence:** Tower costs escalate exponentially with simultaneous copies. Building the `k`‑th instance of a given lowercase letter costs `(base cost)^k`. Fusing or prestiging refunds the cost pressure because active tower counts drop by four when five become one.
 
+### Contribution Levels
+
+Every placed tower begins at Level 1 and advances to a maximum of Level 5 through normalized combat contribution. Levels currently provide progression feedback only; they do not modify combat statistics.
+
+**Formula:** `normalized contribution = effective damage / (current damage × current attacks per second)`
+
+Where:
+- `effective damage` is post-mitigation health actually removed, excluding overkill.
+- `current damage × current attacks per second` is the tower's live expected output, so permanent upgrades raise both performance and the normalization baseline.
+- Sustained awards are capped at `2 XP/s`; expected productive output is approximately `1 XP/s`.
+
+Level thresholds are 0, 45, 120, 240, and 420 total XP for Levels 1–5. The five existing orbital ring sprites display the current level one-for-one. Hovering or selecting a tower reveals its total XP and progress to the next threshold.
+
 ### Universal Variable Glossary
 To keep formulas readable across the roster, every tower draws from a shared set of variable glyphs. The table below catalogs the evergreen symbols now surfaced in the in-game glossary. As new lattices unlock, additional situational variables (such as tempo `Tmp`) may join, but the core abbreviations will not change meaning from tower to tower.
 

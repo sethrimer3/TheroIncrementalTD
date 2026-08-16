@@ -2,7 +2,7 @@
 
 This appendix is the mechanically checked coverage record for the long-range roadmap in [`../JavaToTypeScriptConversionPlan.md`](../JavaToTypeScriptConversionPlan.md). It records the live source classification and assigns every active authored JavaScript module to one implementation phase. The phase order after Phase 21 is tentative.
 
-<!-- migration-roadmap-counts: ts=67 generated=67 active_js=169 candidates=45 -->
+<!-- migration-roadmap-counts: ts=67 generated=67 active_js=170 candidates=45 -->
 <!-- migration-roadmap-authorization: phase=23 -->
 
 ## Verified inventory
@@ -19,19 +19,19 @@ This appendix is the mechanically checked coverage record for the long-range roa
 |---|---:|---|
 | Authored TypeScript source | 67 | Converted; `.d.ts` files would be excluded, but none are present. |
 | Build-generated `.js` siblings of authored `.ts` | 67 | Runtime compatibility output; never count as backlog. |
-| Active authored JavaScript | 169 | Reachable from `assets/main.js` through static local imports; all assigned below. |
+| Active authored JavaScript | 170 | Reachable from `assets/main.js` through static local imports; all assigned below. |
 | Intentionally preserved legacy JavaScript | 0 | The previously documented 19-file Terrarium legacy tree was deleted by `64ebc5e`; no surviving file has evidence strong enough for this category. |
 | Retirement/deletion candidates or ambiguous authored JavaScript | 45 | Not reachable from the browser entry graph; excluded pending a separate retirement audit. |
 | Generated/vendor/dependency/distribution material | Not counted | `node_modules/`, `dist/`, `build/`, source maps, dependencies, assets, fixtures, and non-source artifacts. |
 
-The repository therefore has 236 active authored JS/TS modules: 67 TypeScript plus 169 active JavaScript. The raw authored-language tree has 281 modules when the 45 decision candidates are included. Active conversion is 28.4% by module count (`67 / 236`). The supplemental line snapshot is historical; line counts are informative, not scheduling weights.
+The repository therefore has 237 active authored JS/TS modules: 67 TypeScript plus 170 active JavaScript. The raw authored-language tree has 282 modules when the 45 decision candidates are included. Active conversion is 28.3% by module count (`67 / 237`). The supplemental line snapshot is historical; line counts are informative, not scheduling weights.
 
 ## Method and limits
 
 1. Enumerated `assets/**/*.ts`, `scripts/**/*.ts`, `assets/**/*.js`, and `scripts/**/*.js`, excluding `node_modules/`, `dist/`, and `build/`.
 2. Removed every `.js` file with a same-path `.ts` sibling from the backlog.
 3. Parsed static relative `import`, side-effect `import`, and `export ... from` specifiers and traversed from `assets/main.js`.
-4. Verified all resolved edges exist. The traversal found 233 reachable runtime `.js` modules: 64 generated siblings plus 169 authored JavaScript modules. The remaining generated siblings include type-only output that is correctly not imported at runtime.
+4. Verified all resolved edges exist. The traversal found 234 reachable runtime `.js` modules: 64 generated siblings plus 170 authored JavaScript modules. The remaining generated siblings include type-only output that is correctly not imported at runtime.
 5. Searched the 45 unreachable files in tests, retirement documentation, configuration, HTML harnesses, and recent retirement commits. Static reachability cannot prove runtime intent, so those files remain decision candidates rather than being deleted or migrated.
 6. Read representative owners at every risk tier, including equation definitions, core utilities, config loading, save boundaries, tower modules, powder simulation, playfield systems/managers/renderers, `assets/playfield.js`, and `assets/main.js`.
 7. Added `npm run check:migration-roadmap`, which repeats the source enumeration and static traversal; compares active and candidate paths to these tables; rejects duplicate assignments; verifies machine markers and visible count statements; checks decision-group subtotals, the total assigned backlog, and every remaining module count; and enforces the shared marker-named phase as the sole authorization.
@@ -81,7 +81,7 @@ Risk labels are relative migration risk: Low (pure/static), Medium (state or nar
 | 40 | `assets/playfield/orientationController.js`<br>`assets/playfield/playfieldPreferences.js`<br>`assets/playfield/systems/ViewportCoordinateSystem.js`<br>`assets/playfield/systems/PathGeometrySystem.js`<br>`assets/playfield/systems/TrackRiverSystem.js`<br>`assets/playfield/systems/BackgroundSwimmerSystem.js` | Playfield geometry and preferences | High | 26-31, 33 | Define normalized point, viewport, path, preference, and background entity contracts. |
 | 41 | `assets/playfield/systems/DirectionalSaturationSystem.js`<br>`assets/playfield/systems/EnemyMetadataSystem.js`<br>`assets/playfield/systems/HypernodeBossSystem.js`<br>`assets/playfield/systems/QuantumProjectionSystem.js`<br>`assets/playfield/systems/WeierstrassBossSystem.js`<br>`assets/playfield/systems/SpecialEnemyMechanicsSystem.js`<br>`assets/playfield/systems/IotaPhaseProjectionSystem.js`<br>`assets/playfield/systems/DecimalSwarmSystem.js`<br>`assets/playfield/systems/FloaterSystem.js`<br>`assets/playfield/systems/GammaStarBurstSystem.js` | Enemy metadata and specialist systems | High | 27, 34-40 | Share owner-defined enemy/effect shapes; characterize probabilistic and boss state transitions. |
 | 42 | `assets/playfield/systems/CombatDamageSystem.js`<br>`assets/playfield/systems/EnemyFocusSystem.js`<br>`assets/playfield/systems/EnemyLifecycleSystem.js`<br>`assets/playfield/systems/EnemyUpdateSystem.js`<br>`assets/playfield/systems/ProjectileSpawnSystem.js`<br>`assets/playfield/systems/ProjectileUpdateSystem.js`<br>`assets/playfield/systems/WaveQueueSystem.js`<br>`assets/playfield/systems/SupplyChainSystem.js`<br>`assets/playfield/systems/TowerGlyphTransitionSystem.js` | Combat, projectile, wave systems | High | 27, 34-41 | Establish damage event, projectile, wave queue, drop, and transition contracts. |
-| 43 | `assets/playfield/systems/ConnectionDragSystem.js`<br>`assets/playfield/systems/ConnectionSystem.js`<br>`assets/playfield/systems/TowerDispatchSystem.js`<br>`assets/playfield/systems/TowerInteractionSystem.js`<br>`assets/playfield/systems/VisualEffectsSystem.js`<br>`assets/playfield/systems/LevelResetSystem.js` | Tower interaction and effects systems | High | 31, 33-42 | Audio/input/timer effects and reset orchestration; requires shared playfield context interfaces. |
+| 43 | `assets/playfield/systems/ConnectionDragSystem.js`<br>`assets/playfield/systems/ConnectionSystem.js`<br>`assets/playfield/systems/TowerContributionSystem.js`<br>`assets/playfield/systems/TowerDispatchSystem.js`<br>`assets/playfield/systems/TowerInteractionSystem.js`<br>`assets/playfield/systems/VisualEffectsSystem.js`<br>`assets/playfield/systems/LevelResetSystem.js` | Tower interaction and effects systems | High | 31, 33-42 | Audio/input/timer effects and reset orchestration; requires shared playfield context interfaces. |
 | 44 | `assets/playfield/managers/TowerManager.js`<br>`assets/playfield/controllers/TowerOrchestrationController.js`<br>`assets/playfield/managers/CombatStateManager.js`<br>`assets/playfield/managers/CombatStatsManager.js`<br>`assets/playfield/managers/LevelLifecycleManager.js`<br>`assets/playfield/services/DeveloperToolsService.js` | Playfield managers and controllers | Critical | 27, 33-43 | Consolidate entity/state/context contracts; preserve dependency injection and level lifecycle order. |
 | 45 | `assets/playfield/input/GestureController.js`<br>`assets/playfield/input/InputController.js`<br>`assets/playfield/ui/HudBindings.js`<br>`assets/playfield/ui/TowerMenuSystem.js`<br>`assets/playfield/ui/TowerSelectionWheel.js`<br>`assets/playfield/ui/WaveTallyOverlays.js`<br>`assets/playfield/ui/WaveUIFormatter.js` | Input and playfield UI | High | 31, 33, 40-44 | Pointer/touch/DOM/audio boundaries; manual mobile portrait verification is mandatory. |
 | 46 | `assets/playfield/render/CrystalBackgroundRenderer.js`<br>`assets/playfield/render/CrystallineMosaic.js`<br>`assets/playfield/render/EulerFluidEffect.js`<br>`assets/playfield/render/GravityGridEffect.js`<br>`assets/playfield/render/SubstrateEffect.js`<br>`assets/playfield/render/TetrisBlockEffect.js`<br>`assets/playfield/render/VermiculateEffect.js`<br>`assets/playfield/render/layers/BackgroundRenderer.js` | Background effects and renderer | High | 26, 31, 40-45 | Canvas/randomness/image caches; use seeded state snapshots and pixel-invariant smoke checks where practical. |
@@ -111,10 +111,10 @@ Totals reconcile as 17 + 12 + 10 + 6 = 45.
 
 ## Mechanical reconciliation rules
 
-- Each of the 169 active authored `.js` paths appears in exactly one coverage row.
+- Each of the 170 active authored `.js` paths appears in exactly one coverage row.
 - No path with a same-path authored `.ts` sibling appears in the active coverage table.
 - The 45 decision candidates appear only in the retirement section and are excluded from phase totals.
-- Assigned phase counts sum to 171; Phase 54 adds no module and Phase 55 assigns only `assets/main.js`.
+- Assigned phase counts sum to 170; Phase 54 adds no module and Phase 55 assigns only `assets/main.js`.
 - No phase prerequisite cycle is intended: numeric prerequisites point backward; historical phases are already complete.
 - All implementation phases preserve `.js` import specifiers and the generated-sibling build architecture.
 - `npm run check:migration-roadmap` enforces these path and count invariants against the current checkout; a failing check is a replan trigger, not a reason to weaken the checker.

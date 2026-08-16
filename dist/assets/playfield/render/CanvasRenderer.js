@@ -53,6 +53,7 @@ import {
   drawDamageNumbers,
   drawWaveTallies,
   drawTowerMenu,
+  drawTowerContributionMeters,
 } from './layers/UIOverlayRenderer.js';
 import {
   drawPathLayerCache,
@@ -316,6 +317,7 @@ function draw() {
     this.drawWaveTallies();
     this.drawChiLightTrails();
     this.drawChiThralls();
+    drawTowerContributionMeters.call(this);
     this.drawTowerMenu();
   }
   this.updateEnemyTooltipPosition();
@@ -737,5 +739,6 @@ export {
   drawNuBursts,
   drawOmegaParticles,
   drawTowerMenu,
+  drawTowerContributionMeters,
   drawTunnelZones,
 };

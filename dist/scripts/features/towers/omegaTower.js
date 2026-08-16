@@ -321,6 +321,10 @@ function executeSlice(playfield, tower, state, particle, targetCounts) {
   const damage = (state.sliceFrac / slicesOnTarget) * maxHP;
 
   if (damage > 0) {
+    const hpBefore = Number.isFinite(particle.target.hp) ? Math.max(0, particle.target.hp) : 0;
+    playfield.addTowerContribution?.(tower, 'damage', Math.min(hpBefore, damage), {
+      enemy: particle.target,
+    });
     particle.target.hp = Math.max(0, particle.target.hp - damage);
 
     if (typeof playfield.recordDamage === 'function') {

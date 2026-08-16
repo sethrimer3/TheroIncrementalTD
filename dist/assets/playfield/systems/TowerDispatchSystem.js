@@ -22,6 +22,8 @@ import { PROJECTILE_TRAIL_STYLES } from '../../../scripts/features/towers/shared
  */
 export function updateTowers(delta) {
   this.towers.forEach((tower) => {
+    // Refill the sustained contribution allowance from elapsed combat time before damage events fire.
+    this.updateTowerContributionBudget(tower, delta);
     // Attribute work to the active tower type before branching into its custom logic.
     const finishTowerSample = beginTowerPerformanceSegment(tower?.type || 'unknown');
     try {

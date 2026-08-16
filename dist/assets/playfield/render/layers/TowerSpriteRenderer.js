@@ -27,6 +27,7 @@ import {
   resolveZoomRasterScale,
 } from '../../utils/rendering.js';
 import { clampSafe as clamp } from '../../../../scripts/core/mathUtils.js';
+import { getTowerVisibleRingCount } from '../../systems/TowerContributionSystem.js';
 import {
   drawZetaGraphs as drawZetaGraphsHelper,
   drawZetaOldPendulums as drawZetaOldPendulumsHelper,
@@ -415,6 +416,7 @@ export function drawTowerRings(ctx, tower, bodyRadius) {
 
   const elapsedMs = Math.max(0, getNowTimestamp() - placedAtMs);
   const sprites = getTowerRingSprites();
+  const visibleRingCount = getTowerVisibleRingCount(tower);
 
   // One save/translate pair wraps all five rings so each ring only needs
   // rotate/draw/rotate-undo rather than a full save/restore per sprite.
@@ -422,6 +424,10 @@ export function drawTowerRings(ctx, tower, bodyRadius) {
   ctx.save();
   ctx.translate(tower.x, tower.y);
   sprites.forEach((sprite, index) => {
+    // The existing five sprites now reveal one-for-one with contribution levels.
+    if (index >= visibleRingCount) {
+      return;
+    }
     if (!sprite || !sprite.complete || !Number.isFinite(sprite.naturalWidth) || sprite.naturalWidth <= 0) {
       return;
     }

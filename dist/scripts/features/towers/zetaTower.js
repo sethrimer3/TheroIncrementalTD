@@ -209,10 +209,17 @@ export function ensureZetaOldState(playfield, tower) {
 /**
  * Apply ζ damage and cleanly remove defeated enemies from the playfield.
  */
-export function applyZetaDamage(playfield, enemy, damage) {
+export function applyZetaDamage(playfield, enemy, damage, options = {}) {
   if (!playfield || !enemy || !Number.isFinite(damage) || damage <= 0) {
     return;
   }
+  const hpBefore = Number.isFinite(enemy.hp) ? Math.max(0, enemy.hp) : 0;
+  playfield.addTowerContribution?.(
+    options.sourceTower || null,
+    'damage',
+    Math.min(hpBefore, damage),
+    { enemy },
+  );
   enemy.hp -= damage;
   if (enemy.hp <= 0) {
     playfield.processEnemyDefeat(enemy);
@@ -306,7 +313,7 @@ export function updateZetaOldTower(playfield, tower, delta) {
       const distanceToHead = Math.hypot(position.x - pendulum.head.x, position.y - pendulum.head.y);
       const headContact = distanceToHead <= headRadius;
       if (headContact && !entry.headContact) { // Deal critical damage when the head first touches an enemy.
-        applyZetaDamage(playfield, enemy, state.criticalDamage);
+        applyZetaDamage(playfield, enemy, state.criticalDamage, { sourceTower: tower });
         entry.headContact = true;
       } else if (!headContact) {
         entry.headContact = false;
@@ -327,7 +334,7 @@ export function updateZetaOldTower(playfield, tower, delta) {
       }
 
       if (nearTrail && !entry.trailContact) { // Apply base damage when the trail is freshly re-entered.
-        applyZetaDamage(playfield, enemy, state.baseDamage);
+        applyZetaDamage(playfield, enemy, state.baseDamage, { sourceTower: tower });
         entry.trailContact = true;
       } else if (!nearTrail) {
         entry.trailContact = false;

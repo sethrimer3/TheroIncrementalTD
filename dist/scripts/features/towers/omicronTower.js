@@ -648,6 +648,10 @@ function updateOmicronUnit(playfield, tower, unit, state, delta) {
         if (unit.hasShield) {
           const enemyInitialHp = target.initialHp || target.hp;
           const shieldDamage = enemyInitialHp * unit.shieldDamagePercent;
+          const shieldHpBefore = Number.isFinite(target.hp) ? Math.max(0, target.hp) : 0;
+          playfield.addTowerContribution?.(tower, 'damage', Math.min(shieldHpBefore, shieldDamage), {
+            enemy: target,
+          });
           target.hp = Math.max(0, target.hp - shieldDamage);
           
           // Remove shield
@@ -663,6 +667,9 @@ function updateOmicronUnit(playfield, tower, unit, state, delta) {
         // Apply triangle attack damage
         if (target.hp > 0) {
           const _enemyHpBefore = target.hp;
+          playfield.addTowerContribution?.(tower, 'damage', Math.min(_enemyHpBefore, unit.attack), {
+            enemy: target,
+          });
           target.hp = Math.max(0, target.hp - unit.attack);
           
           if (target.hp <= 0) {

@@ -15,7 +15,7 @@ This file serves four functions:
 
 ## Current Migration Dashboard
 
-<!-- migration-roadmap-counts: ts=67 generated=67 active_js=169 candidates=45 -->
+<!-- migration-roadmap-counts: ts=67 generated=67 active_js=170 candidates=45 -->
 <!-- migration-roadmap-authorization: phase=23 -->
 
 | Item | Current state |
@@ -24,7 +24,7 @@ This file serves four functions:
 | Completed migration history | Phases 0-22 remain complete; historical phase identities are preserved |
 | Next authorized implementation | **Phase 23 only:** Omicron, Pi, Chi, Psi, and Omega terminal equations |
 | Delivery branch | Work directly on `main`; create or switch to another branch only when the user explicitly requests it |
-| Active authored modules | 236 total: 67 TypeScript and 169 JavaScript |
+| Active authored modules | 237 total: 67 TypeScript and 170 JavaScript |
 | Compatibility output | 67 generated `.js` siblings; they are runtime output, not backlog |
 | Decision candidates | 45 unreachable authored `.js` files requiring retirement, integration, or archival decisions |
 | Long-range sequence | Phases 22-55; Phase 54 is an extraction gate and assigns no backlog module |
@@ -114,10 +114,10 @@ Inventory was originally recalculated from the live tree on **2026-07-16**, star
 
 - **69 authored `.ts` modules** (excluding `.d.ts`; none exist).
 - **69 build-generated `.js` siblings** of those TypeScript modules. These are runtime output, not backlog.
-- **169 active authored `.js` modules**, verified reachable through static local imports from `assets/main.js`.
+- **170 active authored `.js` modules**, verified reachable through static local imports from `assets/main.js`.
 - **0 intentionally preserved legacy `.js` modules** with current repository evidence. The previously documented 19-file disabled Terrarium tree was deleted by `64ebc5e`.
 - **45 ambiguous or retirement/deletion-candidate `.js` modules**, all currently unreachable from the browser entry graph. They are excluded from the active backlog pending a separate decision.
-- **236 active authored modules** in total, so active module-count conversion is **28.4%** (`67 / 236`). The raw authored-language tree is 281 modules when the 45 decision candidates are included.
+- **237 active authored modules** in total, so active module-count conversion is **28.3%** (`67 / 237`). The raw authored-language tree is 282 modules when the 45 decision candidates are included.
 - Supplemental authored-line snapshot: **8,309 TypeScript lines** and **81,526 active JavaScript lines**. Line counts do not represent migration difficulty.
 
 Method: recursively enumerate `assets/` and `scripts/`; exclude `node_modules/`, `dist/`, `build/`, generated output, dependencies, fixtures, and non-source material; remove each `.js` file with a same-path `.ts` sibling; parse static relative `import`/`export ... from` edges; traverse from `assets/main.js`; and audit unreachable files against tests, retirement documentation, HTML harnesses, and recent commits. The full classification, dependency evidence, 168-module coverage map, and 45-file retirement list are in [`docs/TypeScriptMigrationRoadmapInventory.md`](docs/TypeScriptMigrationRoadmapInventory.md). Run `npm run check:migration-roadmap` to verify that classification against the current checkout.
@@ -285,7 +285,7 @@ Exact file lists and per-module risk notes are in the linked coverage appendix. 
 | 40 | **TENTATIVE LATER** | Playfield geometry/preferences/background systems; 6 modules | 26-31, 33 | Normalized points, paths, viewport, playfield preferences, background entities | `playfield.js`, input, rendering | Geometry invariants, storage and controlled-random tests; manual orientation/track checks. |
 | 41 | **TENTATIVE LATER** | Enemy metadata and specialist systems; 10 modules | 27, 34-40 | Shared enemy/effect/boss state types owned by enemy/playfield boundaries | Enemy update/damage/render consumers | Seeded state-machine tests per specialist; manual representative waves; do not migrate unreachable Integral scaffold. |
 | 42 | **TENTATIVE LATER** | Combat, projectile, wave, drop and transition systems; 9 modules | 27, 34-41 | Damage events, projectiles, queue entries, drops, transition states | Playfield root, managers, renderers | Update-order, mutation, collision, queue and seeded drop tests; manual full wave; high shared-mutation risk. |
-| 43 | **TENTATIVE LATER** | Connections, tower dispatch/interaction, effects, reset; 6 modules | 31, 33-42 | Narrow playfield context capabilities and reset lifecycle | Playfield root/managers/audio/UI | Interaction/reset/effect/audio trace tests; manual drag/touch/reset; no new global capability bag. |
+| 43 | **TENTATIVE LATER** | Connections, tower contribution/dispatch/interaction, effects, reset; 7 modules | 31, 33-42 | Narrow playfield context capabilities and reset lifecycle | Playfield root/managers/audio/UI | Interaction/reset/effect/audio trace tests; manual drag/touch/reset; no new global capability bag. |
 | 44 | **TENTATIVE LATER** | Tower/combat/stats/lifecycle managers, orchestration, developer service; 6 modules | 27, 33-43 | Consolidated owner interfaces for entities, state managers, level lifecycle and DI | Playfield root plus level/UI consumers | Dependency-injection contract tests, lifecycle order and developer-tool cases; manual level start/end; critical convergence point. |
 | 45 | **TENTATIVE LATER** | Gesture/input and playfield UI; 7 modules | 31, 33, 40-44 | Pointer/touch gesture, HUD, menu, wheel and tally contracts | Playfield root | Mouse/touch event harness, DOM timers, accessibility; mandatory portrait touch and desktop pointer verification. |
 | 46 | **TENTATIVE LATER** | Background effects and background layer; 8 modules | 26, 31, 40-45 | Canvas effect lifecycle and render-state contracts | CanvasRenderer/background layer | Seeded snapshot/render-call tests and visual browser comparisons; high Canvas cache/randomness risk. |
@@ -299,7 +299,7 @@ Exact file lists and per-module risk notes are in the linked coverage appendix. 
 | 54 | **TENTATIVE LATER** | Main responsibility-extraction gate; 0 backlog conversions | All active modules except `main.js` typed | Extract only still-owned cohesive responsibilities into new typed owners; define composition contract | Compatibility edits inside `assets/main.js` are expected, but it remains `.js` | Characterize startup order and globals before extraction; browser/Electron; completion means residual main is composition-only. No extension conversion yet. |
 | 55 | **TENTATIVE LATER** | Final `assets/main.js` → `assets/main.ts`; 1 module | 54 and every prior active-module phase | Typed application composition/startup/window API | `index.html` keeps loading generated `assets/main.js` | Startup order/global/API tests, browser portrait/desktop, save reload, full level, audio, and Electron. Complete only with no broad assertions and no owned feature logic left. |
 
-Phases 23-55 cover all 169 active authored JavaScript modules. Across Phases 21-55 there are **35 roadmap phases**: two completed conversion phases, one authorized conversion phase, 31 tentative conversion phases, and one tentative zero-module extraction gate (Phase 54). The remaining 32 conversion phases assign the active backlog and the gate prepares the final root without double-counting it. No active module is assigned twice.
+Phases 23-55 cover all 170 active authored JavaScript modules. Across Phases 21-55 there are **35 roadmap phases**: two completed conversion phases, one authorized conversion phase, 31 tentative conversion phases, and one tentative zero-module extraction gate (Phase 54). The remaining 32 conversion phases assign the active backlog and the gate prepares the final root without double-counting it. No active module is assigned twice.
 
 ### Critical path
 

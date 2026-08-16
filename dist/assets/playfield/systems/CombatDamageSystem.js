@@ -7,6 +7,7 @@ import {
   spawnNuKillParticle as spawnNuKillParticleHelper,
 } from '../../../scripts/features/towers/nuTower.js';
 import { projectIotaPhaseDamage } from './IotaPhaseProjectionSystem.js';
+import { resolveEffectiveDamage } from './TowerContributionSystem.js';
 
 // ── Constants ───────────────────────────────────────────────────────────
 const DERIVATIVE_SHIELD_SYMBOL = '∂';
@@ -139,6 +140,8 @@ export function applyDamageToEnemy(enemy, baseDamage, { sourceTower, attackType,
     console.log(`[Prime Hit Count Updated] id=${enemy.id} hits=${enemy.currentHitCount}/${enemy.requiredHitCount}`);
     if (sourceTower) {
       this.recordDamageEvent({ tower: sourceTower, enemy, damage: 1 });
+      // Prime enemies resolve one useful hit regardless of the projectile's theoretical damage.
+      this.addTowerContribution(sourceTower, 'damage', 1);
     }
     if (enemy.currentHitCount >= enemy.requiredHitCount) {
       if (sourceTower) {
@@ -262,6 +265,9 @@ export function applyDamageToEnemy(enemy, baseDamage, { sourceTower, attackType,
 
   if (sourceTower) {
     this.recordDamageEvent({ tower: sourceTower, enemy, damage: applied });
+    // Contribution uses only post-mitigation health removed, never overkill or attempted damage.
+    const effectiveDamage = resolveEffectiveDamage(applied, hpBefore);
+    this.addTowerContribution(sourceTower, 'damage', effectiveDamage, { enemy });
   }
   // Pass through pre-hit HP so the renderer can scale the damage number impact.
   this.spawnDamageNumber(enemy, applied, { sourceTower, enemyHpBefore: hpBefore });
