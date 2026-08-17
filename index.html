@@ -997,6 +997,10 @@
               <input type="checkbox" id="stage-developer-mode" />
               Developer Mode — unlock all towers, levels, and entries
             </label>
+            <label class="developer-mode-toggle stage-developer-mode-toggle" for="stage-alpha-production-mode">
+              <input type="checkbox" id="stage-alpha-production-mode" checked />
+              Alpha Production
+            </label>
           </div>
         </section>
 
@@ -2027,27 +2031,12 @@
                 </div>
               </div>
             </article>
-            <article class="card visual-settings-card">
+            <article class="card codex-visual-types-card" aria-labelledby="codex-visual-types-title">
               <div class="visual-settings-copy">
-                <h3>Visual Settings</h3>
-                <p>Fine-tune palettes, notation, and battlefield overlays.</p>
+                <h3 id="codex-visual-types-title">Palette &amp; Track</h3>
+                <p>Choose the color language and path rendering used across each defense.</p>
               </div>
-              <button
-                class="action-button visual-settings-trigger"
-                type="button"
-                id="visual-settings-menu-button"
-                aria-expanded="false"
-                aria-controls="visual-settings-menu"
-              >
-                Visual Settings
-              </button>
-              <div
-                class="visual-settings-menu"
-                id="visual-settings-menu"
-                data-open="false"
-                aria-hidden="true"
-                hidden
-              >
+              <div class="codex-visual-types-controls">
                 <button class="action-button ghost" type="button" id="color-scheme-button">
                   Palette · Aurora
                 </button>
@@ -2062,6 +2051,29 @@
                     <span class="track-render-preview-tracer" id="track-render-preview-tracer"></span>
                   </div>
                 </div>
+              </div>
+            </article>
+            <article class="card visual-settings-card">
+              <div class="visual-settings-copy">
+                <h3>Settings</h3>
+                <p>Fine-tune notation, graphics, battlefield overlays, and controls.</p>
+              </div>
+              <button
+                class="action-button visual-settings-trigger"
+                type="button"
+                id="visual-settings-menu-button"
+                aria-expanded="false"
+                aria-controls="visual-settings-menu"
+              >
+                SETTINGS
+              </button>
+              <div
+                class="visual-settings-menu"
+                id="visual-settings-menu"
+                data-open="false"
+                aria-hidden="true"
+                hidden
+              >
                 <div class="settings-toggle" id="track-tracer-toggle-row">
                   <div class="settings-toggle-text">
                     <span class="settings-toggle-title" id="track-tracer-toggle-title">Track Tracer</span>
@@ -2255,29 +2267,6 @@
                 </div>
               </div>
             </article>
-            <article class="card visual-settings-card">
-              <div class="visual-settings-copy">
-                <h3>Control Settings</h3>
-                <p>Adjust input controls and interaction preferences.</p>
-              </div>
-              <button
-                class="action-button visual-settings-trigger"
-                type="button"
-                id="control-settings-menu-button"
-                aria-expanded="false"
-                aria-controls="control-settings-menu"
-              >
-                Control Settings
-              </button>
-              <div
-                class="visual-settings-menu"
-                id="control-settings-menu"
-                data-open="false"
-                aria-hidden="true"
-                hidden
-              >
-              </div>
-            </article>
             <article class="card">
               <h3>Field Notes</h3>
               <p>Consult the archivist for a briefing on the current storyline.</p>
@@ -2293,38 +2282,6 @@
               </button>
             </article>
           </div>
-          <section class="level-legend codex-roadmap" aria-labelledby="codex-proof-roadmap-title">
-            <header class="codex-header">
-              <span class="codex-label">Codex</span>
-              <h3 id="codex-proof-roadmap-title">Proof Roadmap</h3>
-            </header>
-            <ul class="set-timeline">
-              <li class="set-card active-set">
-                <h4>Conjecture Levels 1-5</h4>
-                <p>Speculative math under siege. Examples highlight famous unsolved ideas.</p>
-              </li>
-              <li class="set-card">
-                <h4>Corollary Levels 6-10</h4>
-                <p>Statements that immediately bloom from the conjecture victories.</p>
-              </li>
-              <li class="set-card">
-                <h4>Lemma Levels 11-15</h4>
-                <p>Utility proofs and support tactics that bolster the main argument.</p>
-              </li>
-              <li class="set-card">
-                <h4>Proposition Levels 16-20</h4>
-                <p>Solid but modest claims—expect compound paths and multi-route assaults.</p>
-              </li>
-              <li class="set-card">
-                <h4>Theorem Levels 21-25</h4>
-                <p>Major revelations guarded by elite enemy archetypes.</p>
-              </li>
-              <li class="set-card">
-                <h4>Axiom Levels 26-30</h4>
-                <p>Foundational truths; everything loops back to primal glyph geometry.</p>
-              </li>
-            </ul>
-          </section>
           <article class="card powder-log-card codex-lab-chronicle">
             <h3>Lab Chronicle</h3>
             <p class="powder-footnote">Recent experiments echo here for quick review.</p>
@@ -2353,6 +2310,10 @@
               <label class="developer-mode-toggle" for="codex-developer-mode">
                 <input type="checkbox" id="codex-developer-mode" />
                 Developer Mode — unlock all towers, levels, and entries
+              </label>
+              <label class="developer-mode-toggle" for="codex-alpha-production-mode">
+                <input type="checkbox" id="codex-alpha-production-mode" checked />
+                Alpha Production
               </label>
               <button class="developer-reset-button" type="button" id="developer-reset-button">
                 Delete Player Data

@@ -1,7 +1,5 @@
 'use strict';
 
-import { transformPointForOrientation } from './geometryHelpers.js';
-
 /**
  * Factory that manages the level-selection grid: building level cards, campaign
  * diamonds, set expansion/collapse, lock states, and the active-level banner.
@@ -9,43 +7,10 @@ import { transformPointForOrientation } from './geometryHelpers.js';
  * construction from game orchestration.
  */
 
-const SVG_NS = 'http://www.w3.org/2000/svg';
-
-// Convert battlefield Catmull–Rom control points into native cubic SVG curves so card previews have no angular joins.
-function createSmoothPreviewPathData(points) {
-  if (!Array.isArray(points) || points.length < 2) {
-    return '';
-  }
-
-  const commands = [`M ${points[0].x.toFixed(2)} ${points[0].y.toFixed(2)}`];
-  for (let index = 0; index < points.length - 1; index += 1) {
-    const previous = index > 0 ? points[index - 1] : points[index];
-    const current = points[index];
-    const next = points[index + 1];
-    const afterNext = index + 2 < points.length ? points[index + 2] : next;
-    // A tension of 1/6 converts the uniform Catmull–Rom segment into an equivalent cubic Bézier curve.
-    const controlOne = {
-      x: current.x + (next.x - previous.x) / 6,
-      y: current.y + (next.y - previous.y) / 6,
-    };
-    const controlTwo = {
-      x: next.x - (afterNext.x - current.x) / 6,
-      y: next.y - (afterNext.y - current.y) / 6,
-    };
-    commands.push(
-      `C ${controlOne.x.toFixed(2)} ${controlOne.y.toFixed(2)} ` +
-      `${controlTwo.x.toFixed(2)} ${controlTwo.y.toFixed(2)} ` +
-      `${next.x.toFixed(2)} ${next.y.toFixed(2)}`,
-    );
-  }
-  return commands.join(' ');
-}
-
 export function createLevelGridController({
   // ── Data sources (mutable collections passed by reference) ──────────
   levelBlueprints,
   levelState,
-  levelConfigs,
   levelLookup,
   levelSetEntries,
 
@@ -54,9 +19,6 @@ export function createLevelGridController({
   isStoryOnlyLevel,
   isInteractiveLevel,
   isSecretLevelId,
-  getPreviewPointsForLevel,
-  clampNormalizedCoordinate,
-
   // ── Formatting & summaries ──────────────────────────────────────────
   formatWholeNumber,
   getLevelSummary,
@@ -77,6 +39,7 @@ export function createLevelGridController({
   // ── Callbacks ───────────────────────────────────────────────────────
   onLevelSelect = () => {},
   onMenuSelectSfx = () => {},
+  onLockedChapterSfx = () => {},
 } = {}) {
   // Resolve blueprints lazily because levels.js replaces the exported array after config load.
   const readLevelBlueprints = () => {
@@ -416,14 +379,15 @@ export function createLevelGridController({
       entry.element.setAttribute('aria-hidden', 'false');
       entry.element.classList.toggle('locked', !unlocked);
 
-      entry.trigger.disabled = !unlocked;
+      // Keep locked chapters interactive so taps can provide immediate error feedback.
+      entry.trigger.disabled = false;
       entry.trigger.setAttribute('aria-disabled', unlocked ? 'false' : 'true');
       if (unlocked) {
         entry.trigger.removeAttribute('tabindex');
         entry.trigger.setAttribute('aria-label', `${entry.name} level set`);
         entry.trigger.title = `${entry.name} level set`;
       } else {
-        entry.trigger.setAttribute('tabindex', '-1');
+        entry.trigger.removeAttribute('tabindex');
         entry.trigger.setAttribute('aria-label', 'Locked level set');
         entry.trigger.title = 'Locked level set';
       }
@@ -454,9 +418,10 @@ export function createLevelGridController({
       if (isLocked) {
         collapseCampaign(campaignButton.element);
         campaignButton.element.classList.add('campaign-button--locked');
-        campaignButton.trigger.disabled = true;
+        // Preserve button interaction while communicating the progression lock semantically.
+        campaignButton.trigger.disabled = false;
         campaignButton.trigger.setAttribute('aria-disabled', 'true');
-        campaignButton.trigger.setAttribute('tabindex', '-1');
+        campaignButton.trigger.removeAttribute('tabindex');
         campaignButton.trigger.title = `${displayName} campaign locked`;
         campaignButton.trigger.setAttribute('aria-label', `${displayName} campaign locked`);
         if (glyphEl) {
@@ -487,52 +452,6 @@ export function createLevelGridController({
   }
 
   // ── Level node preview (SVG path silhouette) ────────────────────────
-
-  function createLevelNodePreview(level) {
-    if (isStoryOnlyLevel(level?.id)) {
-      return null;
-    }
-    const previewPoints = getPreviewPointsForLevel(level, levelConfigs);
-    if (!Array.isArray(previewPoints) || previewPoints.length < 2) {
-      return null;
-    }
-
-    const preview = document.createElementNS(SVG_NS, 'svg');
-    preview.setAttribute('viewBox', '0 0 100 100');
-    preview.setAttribute('class', 'level-node-preview');
-    preview.setAttribute('aria-hidden', 'true');
-
-    const padding = 12;
-    const span = 100 - padding * 2;
-    // Generate both orientations from the actual level path. CSS selects the
-    // appropriate pair, so rotating a device does not require rebuilding cards.
-    ['portrait', 'landscape'].forEach((orientation) => {
-      const scaledPoints = previewPoints
-        .map((point) => transformPointForOrientation({
-          x: point?.x ?? 0.5,
-          y: point?.y ?? 0.5,
-        }, orientation))
-        .map((point) => ({
-          x: padding + clampNormalizedCoordinate(point.x) * span,
-          y: padding + clampNormalizedCoordinate(point.y) * span,
-        }));
-      // Draw the battlefield's Catmull–Rom geometry as native curves instead of a jagged polyline approximation.
-      const pathData = createSmoothPreviewPathData(scaledPoints);
-
-      const orientationClass = `level-node-preview__path--${orientation}`;
-      const glow = document.createElementNS(SVG_NS, 'path');
-      glow.setAttribute('d', pathData);
-      glow.setAttribute('class', `level-node-preview__glow ${orientationClass}`);
-      preview.append(glow);
-
-      const stroke = document.createElementNS(SVG_NS, 'path');
-      stroke.setAttribute('d', pathData);
-      stroke.setAttribute('class', `level-node-preview__stroke ${orientationClass}`);
-      preview.append(stroke);
-    });
-
-    return preview;
-  }
 
   // ── Build the full level card grid ──────────────────────────────────
 
@@ -589,6 +508,9 @@ export function createLevelGridController({
     trigger.setAttribute('aria-controls', containerId);
     trigger.addEventListener('click', () => {
       if (setElement.classList.contains('locked') || setElement.hidden) {
+        if (!setElement.hidden) {
+          onLockedChapterSfx();
+        }
         return;
       }
       if (setElement.classList.contains('expanded')) {
@@ -668,10 +590,6 @@ export function createLevelGridController({
       storySrLabel.className = 'screen-reader-only level-story-label';
       storySrLabel.textContent = 'Story chapter—no waves to defend.';
       core.append(storyMarker, storySrLabel);
-    }
-    const levelPreview = createLevelNodePreview(level);
-    if (levelPreview) {
-      card.append(levelPreview);
     }
     card.addEventListener('click', () => {
       onLevelSelect(level);
@@ -824,6 +742,7 @@ export function createLevelGridController({
 
       campaignTrigger.addEventListener('click', () => {
         if (campaignElement.classList.contains('campaign-button--locked')) {
+          onLockedChapterSfx();
           return;
         }
         const isExpanded = campaignElement.classList.contains('expanded');

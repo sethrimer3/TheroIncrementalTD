@@ -162,7 +162,7 @@ function scheduleAchievementSparkles(host) {
 
 // Enable or disable sparkles for a given host element.
 // When enabled, includes a 1-second initial delay to prevent buildup when becoming visible.
-function setAchievementSparkleEmitter(host, enabled) {
+export function setAchievementSparkleEmitter(host, enabled) {
   if (!host) {
     return;
   }

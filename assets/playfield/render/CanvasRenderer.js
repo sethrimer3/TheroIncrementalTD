@@ -317,8 +317,9 @@ function draw() {
     this.drawWaveTallies();
     this.drawChiLightTrails();
     this.drawChiThralls();
-    drawTowerContributionMeters.call(this);
     this.drawTowerMenu();
+    // Keep the compact contribution meter legible above the open radial tower controls.
+    drawTowerContributionMeters.call(this);
   }
   this.updateEnemyTooltipPosition();
   

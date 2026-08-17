@@ -81,12 +81,12 @@ export function updateTabLockStates(tutorialCompleted: boolean): void {
     });
   }
 
-  // Lock the Tower of Inspiration until the tutorial is complete.
+  // Unlock the Tower of Inspiration once the player has entered their first interactive level.
   const powderTab = document.getElementById('tab-powder') as HTMLButtonElement | null;
   if (powderTab) {
     setTabButtonState(powderTab, {
-      unlocked: tutorialCompleted,
-      lockedLabel: 'Locked - Complete Tutorial',
+      unlocked: tutorialCompleted || isTowersTabUnlocked(),
+      lockedLabel: 'Locked - Enter the First Level',
     });
   }
 

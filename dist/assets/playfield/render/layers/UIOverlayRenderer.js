@@ -24,9 +24,9 @@ import {
 
 const CONTRIBUTION_UI_FADE_IN_MS = 140;
 const CONTRIBUTION_UI_FADE_OUT_MS = 240;
-const CONTRIBUTION_UI_WIDTH = 108;
-const CONTRIBUTION_UI_HEIGHT = 31;
-const CONTRIBUTION_UI_BAR_HEIGHT = 5;
+const CONTRIBUTION_UI_WIDTH = 76;
+const CONTRIBUTION_UI_HEIGHT = 19;
+const CONTRIBUTION_UI_BAR_HEIGHT = 3;
 
 function resolveContributionUiAlpha(tower, visible, now) {
   const target = visible ? 1 : 0;
@@ -48,7 +48,7 @@ function resolveContributionUiAlpha(tower, visible, now) {
 }
 
 /**
- * Draw hover/selection contribution labels in screen-sized canvas coordinates above each tower.
+ * Draw hover/selection contribution labels in screen-sized canvas coordinates just below each tower.
  */
 export function drawTowerContributionMeters() {
   if (!this.ctx || !Array.isArray(this.towers) || !this.towers.length) {
@@ -76,7 +76,8 @@ export function drawTowerContributionMeters() {
     ensureTowerContributionState(tower);
     const progress = getTowerContributionProgress(tower);
     const label = `Lv. ${tower.level} (${Math.round(tower.xp)} XP)`;
-    const anchorY = tower.y - bodyRadius * 3.55;
+    // Tuck the compact meter into the lower edge of the tower while keeping it clear of the radial controls.
+    const anchorY = tower.y + bodyRadius * 0.65 + CONTRIBUTION_UI_HEIGHT;
 
     ctx.save();
     ctx.translate(tower.x, anchorY);
@@ -87,19 +88,19 @@ export function drawTowerContributionMeters() {
     ctx.strokeStyle = 'rgba(220, 232, 245, 0.32)';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(-CONTRIBUTION_UI_WIDTH / 2, -CONTRIBUTION_UI_HEIGHT, CONTRIBUTION_UI_WIDTH, CONTRIBUTION_UI_HEIGHT, 6);
+    ctx.roundRect(-CONTRIBUTION_UI_WIDTH / 2, -CONTRIBUTION_UI_HEIGHT, CONTRIBUTION_UI_WIDTH, CONTRIBUTION_UI_HEIGHT, 4);
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = '600 13px "Cormorant Garamond", serif';
+    ctx.font = '600 10px "Cormorant Garamond", serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = 'rgba(245, 247, 250, 0.96)';
-    ctx.fillText(label, 0, -19);
+    ctx.fillText(label, 0, -12);
 
-    const barX = -CONTRIBUTION_UI_WIDTH / 2 + 7;
-    const barY = -9;
-    const barWidth = CONTRIBUTION_UI_WIDTH - 14;
+    const barX = -CONTRIBUTION_UI_WIDTH / 2 + 5;
+    const barY = -6;
+    const barWidth = CONTRIBUTION_UI_WIDTH - 10;
     ctx.fillStyle = 'rgba(220, 232, 245, 0.16)';
     ctx.fillRect(barX, barY, barWidth, CONTRIBUTION_UI_BAR_HEIGHT);
     ctx.fillStyle = 'rgba(139, 247, 255, 0.9)';

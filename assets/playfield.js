@@ -714,9 +714,10 @@ export class SimplePlayfield {
     if (!definition) {
       return Number.POSITIVE_INFINITY;
     }
+    // Formula: each existing tower of this exact type raises the next placement cost by 50%.
     const activeCount = this.getActiveTowerCount(towerId);
-    const exponent = 1 + Math.max(0, activeCount);
-    return definition.baseCost ** exponent;
+    const baseCost = Number.isFinite(definition.baseCost) ? Math.max(0, definition.baseCost) : 0;
+    return Math.ceil(baseCost * (1.5 ** Math.max(0, activeCount)));
   }
 
   /**
@@ -2472,7 +2473,8 @@ export class SimplePlayfield {
     this.combatStateManager.startCombat({
       startingWaveIndex: 0,
       startingLives: this.levelConfig.lives,
-      startingEnergy: this.levelConfig.startThero || 0,
+      // Preserve the post-placement wallet instead of refunding pre-wave tower purchases.
+      startingEnergy: this.energy,
       endless: this.startInEndlessMode || false,
       endlessCycleStart: 0,
       initialSpawnDelay: this.initialSpawnDelay,

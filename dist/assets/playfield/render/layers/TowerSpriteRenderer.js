@@ -73,20 +73,20 @@ const PROMOTION_GLYPH_COLOR = { r: 139, g: 247, b: 255 };
 const DEMOTION_GLYPH_COLOR = { r: 255, g: 196, b: 150 };
 // Duration of the initial ramp-up phase for glyph flash effects (milliseconds).
 const GLYPH_FLASH_RAMP_MS = 120;
-// Blurred tower ring sprites are rendered from largest (index 1) to smallest (index 5).
+// Order the blurred tower ring sprites from innermost to outermost so contribution levels expand away from the tower.
 const TOWER_RING_SPRITE_PATHS = [
-  './assets/sprites/towers/towerRing/ring_blur (1).png',
-  './assets/sprites/towers/towerRing/ring_blur (2).png',
-  './assets/sprites/towers/towerRing/ring_blur (3).png',
-  './assets/sprites/towers/towerRing/ring_blur (4).png',
   './assets/sprites/towers/towerRing/ring_blur (5).png',
+  './assets/sprites/towers/towerRing/ring_blur (4).png',
+  './assets/sprites/towers/towerRing/ring_blur (3).png',
+  './assets/sprites/towers/towerRing/ring_blur (2).png',
+  './assets/sprites/towers/towerRing/ring_blur (1).png',
 ];
-// Ring radius multipliers keep each sprite wrapped around the tower body from outermost to innermost.
-const TOWER_RING_RADIUS_MULTIPLIERS = [3.15, 2.75, 2.35, 1.95, 1.6];
+// Ring radius multipliers keep the contribution sequence aligned from innermost to outermost.
+const TOWER_RING_RADIUS_MULTIPLIERS = [1.6, 1.95, 2.35, 2.75, 3.15];
 // Alternating rotation directions produce the requested CW/CCW/CW/CCW/CW motion pattern.
 const TOWER_RING_DIRECTIONS = [1, -1, 1, -1, 1];
 // Smaller rings rotate slightly faster to create a layered orbital effect.
-const TOWER_RING_BASE_SPEEDS = [0.24, 0.28, 0.32, 0.36, 0.4];
+const TOWER_RING_BASE_SPEEDS = [0.4, 0.36, 0.32, 0.28, 0.24];
 // Sequential ring reveal timings (milliseconds) for fast one-by-one fade-ins.
 const TOWER_RING_FADE_DELAY_MS = 65;
 const TOWER_RING_FADE_DURATION_MS = 120;
@@ -432,7 +432,7 @@ export function drawTowerRings(ctx, tower, bodyRadius) {
       return;
     }
 
-    // Fade each ring in sequence from largest to smallest with a compact reveal interval.
+    // Fade each ring in sequence from the tower core outward with a compact reveal interval.
     const ringStartMs = index * TOWER_RING_FADE_DELAY_MS;
     const fadeProgress = clamp((elapsedMs - ringStartMs) / TOWER_RING_FADE_DURATION_MS, 0, 1);
     if (fadeProgress <= 0) {

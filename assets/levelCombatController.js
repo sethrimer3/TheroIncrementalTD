@@ -55,6 +55,7 @@ export function createLevelCombatController(deps) {
     unlockTowersTab,
     unlockAchievements,
     unlockAchievementsTab,
+    unlockTower,
 
     // ── Resource / display helpers ───────────────────────────────────
     ensureResourceTicker,
@@ -283,6 +284,8 @@ export function createLevelCombatController(deps) {
               
               // Special unlock for Prologue - Story: unlock Achievements and first Trial.
               if (level.id === 'Prologue - Story') {
+                // Reading the closing Prologue story reveals the passive Shadow Gate card.
+                unlockTower('shadow-gate');
                 unlockAchievements();
                 unlockAchievementsTab();
                 // Unlock first trial after completing prologue
@@ -434,6 +437,8 @@ export function createLevelCombatController(deps) {
     if (isInteractive && !currentState.entered && !isTowersTabUnlocked()) {
       unlockTowersTabState();
       unlockTowersTab();
+      // The first defense also reveals the Tower of Inspiration tab immediately.
+      updateTabLockStates(isTutorialCompleted());
     }
 
     levelState.forEach((state, id) => {

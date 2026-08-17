@@ -7,6 +7,7 @@ const DEVELOPER_RESET_CONFIRM_LABEL = 'Are you sure?';
 const DEVELOPER_RESET_CONFIRM_WINDOW_MS = 5000;
 const DEVELOPER_RESET_RELOAD_DELAY_MS = 900;
 const DEVELOPER_MODE_STORAGE_KEY = 'glyph-defense-idle:developer-mode';
+const ALPHA_PRODUCTION_STORAGE_KEY = 'glyph-defense-idle:alpha-production';
 const DEVELOPER_GLYPH_BALANCE = 500;
 
 export function createDeveloperModeManager(options = {}) {
@@ -89,6 +90,8 @@ export function createDeveloperModeManager(options = {}) {
   const developerModeElements = {
     toggle: null,
     stageToggle: null,
+    alphaProductionToggle: null,
+    stageAlphaProductionToggle: null,
     note: null,
     resetButton: null,
   };
@@ -119,6 +122,30 @@ export function createDeveloperModeManager(options = {}) {
     }
   }
 
+  // Alpha Production is the App Store-ready state and defaults on for fresh installs.
+  function persistAlphaProductionState(active) {
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return;
+    }
+    try {
+      window.localStorage.setItem(ALPHA_PRODUCTION_STORAGE_KEY, active ? 'true' : 'false');
+    } catch (error) {
+      console.warn('Failed to persist alpha production state.', error);
+    }
+  }
+
+  // Keep both settings surfaces synchronized while making production and developer modes exclusive.
+  function setAlphaProductionState(active) {
+    const productionActive = Boolean(active);
+    if (developerModeElements.alphaProductionToggle) {
+      developerModeElements.alphaProductionToggle.checked = productionActive;
+    }
+    if (developerModeElements.stageAlphaProductionToggle) {
+      developerModeElements.stageAlphaProductionToggle.checked = productionActive;
+    }
+    persistAlphaProductionState(productionActive);
+  }
+
   function setDeveloperNoteVisibility(visible) {
     if (developerModeElements.note) {
       developerModeElements.note.hidden = !visible;
@@ -128,6 +155,7 @@ export function createDeveloperModeManager(options = {}) {
   function enableDeveloperMode() {
     const developerModeWasActive = isDeveloperModeActive();
     setDeveloperModeFlag(true);
+    setAlphaProductionState(false);
     if (developerModeElements.toggle && !developerModeElements.toggle.checked) {
       developerModeElements.toggle.checked = true;
     }
@@ -535,6 +563,35 @@ export function createDeveloperModeManager(options = {}) {
     developerModeElements.resetButton = document.getElementById('developer-reset-button');
     // Bind the stage tab developer mode toggle for quick access.
     developerModeElements.stageToggle = document.getElementById('stage-developer-mode');
+    developerModeElements.alphaProductionToggle = document.getElementById('codex-alpha-production-mode');
+    developerModeElements.stageAlphaProductionToggle = document.getElementById('stage-alpha-production-mode');
+
+    // Production mode wins during startup so a release build cannot restore a stale developer session.
+    let alphaProductionActive = true;
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        const savedProductionState = window.localStorage.getItem(ALPHA_PRODUCTION_STORAGE_KEY);
+        if (savedProductionState !== null) {
+          alphaProductionActive = savedProductionState === 'true';
+        }
+      } catch (error) {
+        console.warn('Failed to restore alpha production state.', error);
+      }
+    }
+    setAlphaProductionState(alphaProductionActive);
+
+    const handleAlphaProductionChange = (event) => {
+      if (!event.isTrusted) {
+        return;
+      }
+      const productionEnabled = Boolean(event.target.checked);
+      setAlphaProductionState(productionEnabled);
+      if (productionEnabled && isDeveloperModeActive()) {
+        disableDeveloperMode();
+      }
+    };
+    developerModeElements.alphaProductionToggle?.addEventListener('change', handleAlphaProductionChange);
+    developerModeElements.stageAlphaProductionToggle?.addEventListener('change', handleAlphaProductionChange);
 
     if (developerModeElements.resetButton) {
       developerModeElements.resetButton.addEventListener('click', handleDeveloperResetClick);
@@ -572,8 +629,10 @@ export function createDeveloperModeManager(options = {}) {
       if (developerModeElements.stageToggle) {
         developerModeElements.stageToggle.checked = shouldEnableDeveloperMode;
       }
-      if (shouldEnableDeveloperMode) {
+      if (shouldEnableDeveloperMode && !alphaProductionActive) {
         enableDeveloperMode();
+      } else if (shouldEnableDeveloperMode) {
+        disableDeveloperMode();
       }
       return;
     }
@@ -606,8 +665,10 @@ export function createDeveloperModeManager(options = {}) {
     if (developerModeElements.stageToggle) {
       developerModeElements.stageToggle.checked = shouldEnableDeveloperMode;
     }
-    if (shouldEnableDeveloperMode) {
+    if (shouldEnableDeveloperMode && !alphaProductionActive) {
       enableDeveloperMode();
+    } else if (shouldEnableDeveloperMode) {
+      disableDeveloperMode();
     } else {
       setDeveloperNoteVisibility(false);
     }

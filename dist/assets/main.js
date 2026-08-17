@@ -255,7 +255,7 @@ import { initializeTowerTreeMap, refreshTowerTreeMap } from './towerTreeMap.js';
 // Particle-based visual scrollbar for reliable touch scrolling on Android.
 import { initParticleScrollbar, notifyParticleScrollbarTabChanged } from './particleScrollbar.js';
 import { createLevelEditorController } from './levelEditor.js';
-import { createLevelPreviewRenderer, getPreviewPointsForLevel } from './levelPreviewRenderer.js';
+import { createLevelPreviewRenderer } from './levelPreviewRenderer.js';
 import { createLevelOverlayController } from './levelOverlayController.js';
 import { createLevelGridController } from './levelGridController.js';
 import { createLevelStoryScreen } from './levelStoryScreen.js';
@@ -343,9 +343,9 @@ import {
   scrollPanelToElement,
   enablePanelWheelScroll,
 } from './uiHelpers.js';
-import { clampNormalizedCoordinate } from './geometryHelpers.js';
 import { createPlayfieldLayoutController } from './playfieldLayoutController.js';
 import { createSpireCameraController } from './spireCameraController.js';
+import { initializeTabAttentionManager, clearTabAttention } from './tabAttentionManager.js';
 
 (() => {
   'use strict';
@@ -975,6 +975,7 @@ import { createSpireCameraController } from './spireCameraController.js';
     unlockTowersTab,
     unlockAchievements,
     unlockAchievementsTab,
+    unlockTower,
     ensureResourceTicker,
     updateActiveLevelBanner,
     updateLevelCards,
@@ -1113,15 +1114,12 @@ import { createSpireCameraController } from './spireCameraController.js';
   const levelGridCtrl = createLevelGridController({
     levelBlueprints,
     levelState,
-    levelConfigs,
     levelLookup,
     levelSetEntries,
     isLevelUnlocked,
     isStoryOnlyLevel,
     isInteractiveLevel,
     isSecretLevelId,
-    getPreviewPointsForLevel,
-    clampNormalizedCoordinate,
     formatWholeNumber,
     getLevelSummary,
     describeLevelLastResult,
@@ -1136,6 +1134,11 @@ import { createSpireCameraController } from './spireCameraController.js';
     onMenuSelectSfx: () => {
       if (audioManager) {
         audioManager.playSfx('menuSelect');
+      }
+    },
+    onLockedChapterSfx: () => {
+      if (audioManager) {
+        audioManager.playSfx('error');
       }
     },
   });
@@ -1218,7 +1221,7 @@ import { createSpireCameraController } from './spireCameraController.js';
 
   const POWDER_WALL_TEXTURE_ASPECT = 800 / 300; // Preserve the native 1.5:4 wall sprite ratio (300px × 800px).
   const POWDER_WALL_TEXTURE_FALLBACK_PX = 192; // Fallback repeat distance when wall sizing has not been measured yet.
-  const ALEPH_RIGHT_WALL_SPRITE_OFFSET_PX = 3; // Shift the right Aleph wall sprite outward so it no longer overlaps the mote pile.
+  const ALEPH_RIGHT_WALL_SPRITE_OFFSET_PX = 0; // Align the right Tower of Inspiration wall sprite one additional pixel left.
   // ── Aleph tier-transition controller (extracted from main.js) ─────────
   const alephTierCtrl = createAlephTierTransitionController({
     powderState,
@@ -1549,7 +1552,6 @@ import { createSpireCameraController } from './spireCameraController.js';
   }
 
   function bindControlSettingsMenu() {
-    bindCollapsibleMenu({ triggerId: 'control-settings-menu-button', menuId: 'control-settings-menu' });
   }
 
   function bindLeaveLevelButton() {
@@ -1717,6 +1719,10 @@ import { createSpireCameraController } from './spireCameraController.js';
         const newlyEarned = glyphsLit - previousAwarded;
         addGlyphCurrency(newlyEarned);
         powderState.glyphsAwarded = glyphsLit;
+        // A newly illuminated glyph should call the player back only when they are elsewhere.
+        document.dispatchEvent(new CustomEvent('inspiration-glyph-level-unlocked', {
+          detail: { glyphsLit, newlyEarned },
+        }));
       } else if (!Number.isFinite(powderState.glyphsAwarded) || powderState.glyphsAwarded < glyphsLit) {
         powderState.glyphsAwarded = Math.max(previousAwarded, glyphsLit);
       }
@@ -1963,6 +1969,7 @@ import { createSpireCameraController } from './spireCameraController.js';
       getOverlayActiveState: () => Boolean(levelOverlayController?.isOverlayActive()),
       isFieldNotesOverlayVisible,
       onTabChange: (tabId) => {
+        clearTabAttention(tabId);
         closeAllSpireDropdowns();
         // Hide the tower selection wheel whenever players leave the Stage tab.
         if (tabId !== 'tower' && playfield && typeof playfield.closeTowerSelectionWheel === 'function') {
@@ -2001,6 +2008,7 @@ import { createSpireCameraController } from './spireCameraController.js';
         }
       },
     });
+    initializeTabAttentionManager();
 
     initializeTabs();
     await initializeFieldNotesOverlay();
@@ -2091,6 +2099,10 @@ import { createSpireCameraController } from './spireCameraController.js';
     loadTutorialState();
     // Check if tutorial should be completed based on level progress
     checkTutorialCompletion(isLevelCompleted);
+    // Migrate completed Prologue saves that predate the Shadow Gate story reward.
+    if (isLevelCompleted('Prologue - Story')) {
+      unlockTower('shadow-gate', { silent: true });
+    }
     // Initialize tab lock states based on tutorial completion
     initializeTabLockStates(isTutorialCompleted());
     // Unlock tabs based on saved state

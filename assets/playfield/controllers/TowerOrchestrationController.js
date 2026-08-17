@@ -12,6 +12,9 @@ import {
 import { notifyTowerPlaced } from '../../achievementsTab.js';
 import { formatCombatNumber } from '../utils/formatting.js';
 
+// Each exact tower type may occupy at most five active lattices in a level.
+const MAX_TOWERS_PER_TYPE = 5;
+
 /**
  * Creates a tower orchestration controller that handles tower lifecycle operations.
  * This controller is a stateful factory that encapsulates tower placement, upgrade,
@@ -45,7 +48,6 @@ export function createTowerOrchestrationController(config) {
 
   // References to external systems
   const playfield = config.playfield;
-  const combatState = config.combatState;
   const towerManager = config.towerManager;
   const audio = config.audio;
   const messageEl = config.messageEl;
@@ -157,6 +159,17 @@ export function createTowerOrchestrationController(config) {
       }
     }
 
+    // Free level-authored anchors may load as configured; merges replace rather than add this type.
+    if (!free && !merging && playfield.getActiveTowerCount(selectedType) >= MAX_TOWERS_PER_TYPE) {
+      if (messageEl && !silent) {
+        messageEl.textContent = `${definition.symbol} has reached its five-lattice limit.`;
+      }
+      if (audio && !silent) {
+        audio.playSfx('error');
+      }
+      return false;
+    }
+
     if (!isTowerUnlocked(selectedType)) {
       unlockTower(selectedType, { silent: true });
     }
@@ -168,8 +181,8 @@ export function createTowerOrchestrationController(config) {
     const actionCost = merging ? mergeCost : baseCost;
 
     // Pre-placed towers (free: true) are placed at no cost.
-    if (!free && combatState.energy < actionCost) {
-      const needed = Math.max(0, actionCost - combatState.energy);
+    if (!free && playfield.energy < actionCost) {
+      const needed = Math.max(0, actionCost - playfield.energy);
       const neededLabel = formatCombatNumber(needed);
       if (messageEl && !silent) {
         if (merging && nextDefinition) {
@@ -185,7 +198,8 @@ export function createTowerOrchestrationController(config) {
     }
 
     if (!free) {
-      combatState.energy = Math.max(0, combatState.energy - actionCost);
+      // Use the playfield accessor so the combat manager's private Thero balance is actually updated.
+      playfield.energy = Math.max(0, playfield.energy - actionCost);
     }
 
     if (merging && mergeTarget && nextDefinition) {
@@ -362,9 +376,18 @@ export function createTowerOrchestrationController(config) {
     }
 
     const cost = Number.isFinite(quotedCost) ? quotedCost : playfield.getCurrentTowerCost(nextDefinition.id);
-    if (combatState.energy < cost) {
+    if (playfield.getActiveTowerCount(nextDefinition.id) >= MAX_TOWERS_PER_TYPE) {
       if (messageEl && !silent) {
-        const deficit = Math.max(0, cost - combatState.energy);
+        messageEl.textContent = `${nextDefinition.symbol} has reached its five-lattice limit.`;
+      }
+      if (audio && !silent) {
+        audio.playSfx('error');
+      }
+      return false;
+    }
+    if (playfield.energy < cost) {
+      if (messageEl && !silent) {
+        const deficit = Math.max(0, cost - playfield.energy);
         const deficitLabel = formatCombatNumber(deficit);
         messageEl.textContent = `Need ${deficitLabel} ${theroSymbol} more to merge into ${nextDefinition.symbol}.`;
       }
@@ -374,7 +397,7 @@ export function createTowerOrchestrationController(config) {
       return false;
     }
 
-    combatState.energy = Math.max(0, combatState.energy - cost);
+    playfield.energy = Math.max(0, playfield.energy - cost);
     playfield.recordTowerCost(tower, cost);
 
     const previousSymbol = tower.symbol || tower.definition?.symbol || 'Tower';
@@ -484,13 +507,23 @@ export function createTowerOrchestrationController(config) {
       return false;
     }
 
+    if (playfield.getActiveTowerCount(previousDefinition.id) >= MAX_TOWERS_PER_TYPE) {
+      if (messageEl && !silent) {
+        messageEl.textContent = `${previousDefinition.symbol} has reached its five-lattice limit.`;
+      }
+      if (audio && !silent) {
+        audio.playSfx('error');
+      }
+      return false;
+    }
+
     const history = playfield.ensureTowerCostHistory(tower);
     const removedCost = history.length ? history.pop() : null;
     const currentCost = Number.isFinite(removedCost) ? removedCost : playfield.getCurrentTowerCost(tower.type);
     const charge = playfield.getCurrentTowerCost(previousDefinition.id);
     const cap = playfield.getEnergyCap();
     const refundAmount = Math.max(0, Number.isFinite(currentCost) ? currentCost : 0);
-    const cappedEnergy = Math.min(cap, combatState.energy + refundAmount);
+    const cappedEnergy = Math.min(cap, playfield.energy + refundAmount);
 
     if (cappedEnergy < charge) {
       if (removedCost !== null && removedCost !== undefined) {
@@ -508,7 +541,7 @@ export function createTowerOrchestrationController(config) {
     }
 
     const chargeAmount = Math.max(0, Number.isFinite(charge) ? charge : 0);
-    combatState.energy = Math.max(0, cappedEnergy - chargeAmount);
+    playfield.energy = Math.max(0, cappedEnergy - chargeAmount);
     if (history.length) {
       history[history.length - 1] = chargeAmount;
     } else if (chargeAmount > 0) {
@@ -667,7 +700,7 @@ export function createTowerOrchestrationController(config) {
     if (playfield.levelConfig) {
       const cap = playfield.getEnergyCap();
       const refund = Math.max(0, playfield.calculateTowerSellRefund(tower));
-      combatState.energy = Math.min(cap, combatState.energy + refund);
+      playfield.energy = Math.min(cap, playfield.energy + refund);
       if (messageEl && !silent) {
         const refundLabel = formatCombatNumber(refund);
         messageEl.textContent = `Lattice dissolved—refunded ${refundLabel} ${theroSymbol}.`;

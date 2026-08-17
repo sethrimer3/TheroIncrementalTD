@@ -48,6 +48,19 @@ export function createTowerLoadoutController({
     dragEndHandler: null,
   };
   const loadoutUiState = { collapsed: false, toggleHandler: null };
+  // Remember rendered costs per button so increases can count upward instead of snapping.
+  const displayedCostState = new WeakMap();
+
+  // Inline tower SVGs can use SMIL, so pause their own timeline when affordability disables the button.
+  const syncTowerIconMotion = (item) => {
+    const svg = item?.querySelector?.('.tower-loadout-art svg');
+    if (!svg) return;
+    if (item.dataset.valid === 'false') {
+      svg.pauseAnimations?.();
+    } else {
+      svg.unpauseAnimations?.();
+    }
+  };
 
   const safeGetLoadoutState = () => (typeof getLoadoutState === 'function' ? getLoadoutState() : null);
   const safeGetLoadoutElements = () => (typeof getLoadoutElements === 'function' ? getLoadoutElements() : null);
@@ -104,13 +117,19 @@ export function createTowerLoadoutController({
     const anchorCostValue = typeof playfield?.getCurrentTowerCost === 'function'
       ? playfield.getCurrentTowerCost(towerId)
       : baseCost;
+    const activeCount = typeof playfield?.getActiveTowerCount === 'function'
+      ? playfield.getActiveTowerCount(towerId)
+      : 0;
+    const hasReachedTypeLimit = activeCount >= 5;
     return {
       playfield,
       isInteractiveLevelActive,
       energy,
       definition,
       anchorCostValue,
-      canAffordAnchor: isInteractiveLevelActive && energy >= anchorCostValue,
+      activeCount,
+      hasReachedTypeLimit,
+      canAffordAnchor: isInteractiveLevelActive && !hasReachedTypeLimit && energy >= anchorCostValue,
     };
   }
 
@@ -254,6 +273,34 @@ export function createTowerLoadoutController({
       }
       return safeFormatCombatNumber(Math.max(0, value));
     };
+    const renderAnimatedCost = (costEl, nextValue) => {
+      const previousState = displayedCostState.get(costEl);
+      if (previousState?.frameId) cancelAnimationFrame(previousState.frameId);
+      const previousValue = Number.isFinite(previousState?.value) ? previousState.value : nextValue;
+      if (!Number.isFinite(nextValue) || nextValue <= previousValue) {
+        costEl.textContent = `${formatCostLabel(nextValue)} ${safeGetTheroSymbol()}`;
+        displayedCostState.set(costEl, { value: nextValue, frameId: 0 });
+        return;
+      }
+      const startedAt = performance.now();
+      const durationMs = 280;
+      const tick = (timestamp) => {
+        const progress = Math.min(1, Math.max(0, (timestamp - startedAt) / durationMs));
+        // Ease out so rapidly changing digits settle cleanly on the exact new price.
+        const eased = 1 - ((1 - progress) ** 3);
+        const displayedValue = previousValue + ((nextValue - previousValue) * eased);
+        costEl.textContent = `${formatCostLabel(displayedValue)} ${safeGetTheroSymbol()}`;
+        if (progress < 1) {
+          const frameId = requestAnimationFrame(tick);
+          displayedCostState.set(costEl, { value: previousValue, frameId });
+        } else {
+          costEl.textContent = `${formatCostLabel(nextValue)} ${safeGetTheroSymbol()}`;
+          displayedCostState.set(costEl, { value: nextValue, frameId: 0 });
+        }
+      };
+      const frameId = requestAnimationFrame(tick);
+      displayedCostState.set(costEl, { value: previousValue, frameId });
+    };
 
     items.forEach((item) => {
       const towerId = item.dataset.towerId;
@@ -268,7 +315,7 @@ export function createTowerLoadoutController({
       const anchorCostLabel = formatCostLabel(costState.anchorCostValue);
       const costEl = item.querySelector('.tower-loadout-cost');
       if (costEl) {
-        costEl.textContent = `${anchorCostLabel} ${safeGetTheroSymbol()}`;
+        renderAnimatedCost(costEl, costState.anchorCostValue);
         costEl.dataset.affordable = costState.canAffordAnchor ? 'true' : 'false';
       }
       const definition = costState.definition;
@@ -276,10 +323,14 @@ export function createTowerLoadoutController({
         definition?.name || 'Tower',
         `${anchorCostLabel} ${safeGetTheroSymbol()}`,
       ];
+      if (costState.hasReachedTypeLimit) {
+        labelParts.push('maximum 5 placed');
+      }
       item.setAttribute('aria-label', labelParts.join(' — '));
       item.dataset.valid = costState.canAffordAnchor ? 'true' : 'false';
-      item.dataset.disabled = 'false';
-      item.disabled = false;
+      item.dataset.disabled = costState.hasReachedTypeLimit ? 'true' : 'false';
+      item.disabled = costState.hasReachedTypeLimit;
+      syncTowerIconMotion(item);
     });
   }
 
@@ -334,6 +385,9 @@ export function createTowerLoadoutController({
 
         if (artwork) {
           item.append(artwork, costEl);
+          // Palette-aware SVG content arrives asynchronously; freeze it as soon as it is injected if unaffordable.
+          const artworkObserver = new MutationObserver(() => syncTowerIconMotion(item));
+          artworkObserver.observe(artwork, { childList: true, subtree: true });
         } else {
           item.append(costEl);
         }

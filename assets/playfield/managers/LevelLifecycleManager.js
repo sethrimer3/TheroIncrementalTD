@@ -229,7 +229,6 @@ export function createLevelLifecycleManager(config) {
       triggerPsiClusterAoE: (enemy) => playfield.triggerPsiClusterAoE(enemy),
       notifyEnemyDeath: (enemy) => playfield.notifyEnemyDeath(enemy),
     });
-
     // Initialize tower orchestration controller
     playfield.towerOrchestrationController = createTowerOrchestrationController({
       playfield: playfield,
@@ -314,6 +313,9 @@ export function createLevelLifecycleManager(config) {
     playfield.setAvailableTowers(getTowerLoadoutState().selected);
     playfield.shouldAnimate = true;
     playfield.resetState();
+    // resetState clears the combat wallet, so seed level Thero afterward for pre-wave tower placement.
+    playfield.energy = clonedConfig.startThero;
+    playfield.updateHud();
     playfield.loadLevelCrystals();
     playfield.enableSlots();
     playfield.syncCanvasSize();
