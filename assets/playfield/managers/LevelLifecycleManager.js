@@ -190,9 +190,11 @@ export function createLevelLifecycleManager(config) {
       const calculateStartingThero = playfield.dependencies.calculateStartingThero;
       const getBaseStartThero = playfield.dependencies.getBaseStartThero;
       const baseStart =
-        typeof getBaseStartThero === 'function' ? getBaseStartThero() : 0;
+        Number.isFinite(config.startThero)
+          ? Math.max(0, config.startThero)
+          : (typeof getBaseStartThero === 'function' ? getBaseStartThero() : 0);
       const dynamicStartThero =
-        typeof calculateStartingThero === 'function' ? calculateStartingThero() : 0;
+        typeof calculateStartingThero === 'function' ? calculateStartingThero(baseStart) : baseStart;
       clonedConfig.startThero = Number.isFinite(dynamicStartThero)
         ? dynamicStartThero
         : baseStart;

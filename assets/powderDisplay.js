@@ -43,8 +43,6 @@ export function createPowderDisplaySystem({
     ledgerCurrentScore: null,
     ledgerFlux: null,
     ledgerEnergy: null,
-    logList: null,
-    logEmpty: null,
     simulationCanvas: null,
     simulationCard: null,
     basin: null,
@@ -145,8 +143,6 @@ export function createPowderDisplaySystem({
       document.getElementById('powder-ledger-current-score') || document.getElementById('powder-ledger-score');
     powderElements.ledgerFlux = document.getElementById('powder-ledger-flux');
     powderElements.ledgerEnergy = document.getElementById('powder-ledger-energy');
-    powderElements.logList = document.getElementById('powder-log');
-    powderElements.logEmpty = document.getElementById('powder-log-empty');
     powderElements.simulationCanvas = document.getElementById('powder-canvas');
     powderElements.simulationCard = document.getElementById('powder-simulation-card');
     powderElements.stage = document.getElementById('powder-stage');

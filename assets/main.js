@@ -198,7 +198,6 @@ import {
   getEnemyCodexEntries,
   renderEnemyCodex,
   bindCodexControls,
-  initializePerformanceCodex,
   initializeEnemyCodexOverlay,
 } from './codex.js';
 import {
@@ -340,7 +339,6 @@ import {
 import {
   createOverlayHelpers,
   triggerButtonRipple,
-  scrollPanelToElement,
   enablePanelWheelScroll,
 } from './uiHelpers.js';
 import { createPlayfieldLayoutController } from './playfieldLayoutController.js';
@@ -2015,11 +2013,8 @@ import { initializeTabAttentionManager, clearTabAttention } from './tabAttention
     bindCodexControls({
       setActiveTab,
       openFieldNotesOverlay,
-      scrollPanelToElement,
       onOpenButtonReady: setFieldNotesOpenButton,
     });
-    // Hydrate the diagnostics card once codex controls exist.
-    initializePerformanceCodex();
     try {
       await ensureGameplayConfigLoaded();
     } catch (error) {

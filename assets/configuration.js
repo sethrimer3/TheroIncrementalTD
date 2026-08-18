@@ -244,8 +244,11 @@ export async function ensureGameplayConfigLoaded() {
   throw lastError || new Error('Unable to load gameplay configuration');
 }
 
-export function calculateStartingThero() {
-  return BASE_START_THERO * getStartingTheroMultiplier();
+export function calculateStartingThero(baseStartThero = BASE_START_THERO) {
+  const normalizedBase = Number.isFinite(baseStartThero) && baseStartThero >= 0
+    ? baseStartThero
+    : BASE_START_THERO;
+  return normalizedBase * getStartingTheroMultiplier();
 }
 
 export function getTowerLoadoutLimit() {

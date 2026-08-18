@@ -25,6 +25,23 @@ const DEVELOPER_TEST_RANGE_BASE_HP = 10000;
 const DEVELOPER_TEST_RANGE_INTERVAL = 5;
 const DEFAULT_BOSS_HP_MULTIPLIER = 1.25;
 
+/** Formula: campaign level n starts with n × 100 base Thero before progression multipliers. */
+export function resolveCampaignStartingThero(level = {}) {
+  const id = String(level.id || '').replace(/^Ladder - /, '');
+  const numberedLevelMatch = id.match(/^level-(\d{2})-/i);
+  if (numberedLevelMatch) {
+    const levelNumber = Number.parseInt(numberedLevelMatch[1], 10);
+    return levelNumber > 0 ? levelNumber * 100 : level.startThero;
+  }
+  const chapterLevelMatch = id.match(/^(\d+) - (\d+)$/);
+  if (chapterLevelMatch) {
+    const chapterNumber = Number.parseInt(chapterLevelMatch[1], 10);
+    const levelWithinChapter = Number.parseInt(chapterLevelMatch[2], 10);
+    return ((chapterNumber - 1) * 5 + levelWithinChapter) * 100;
+  }
+  return level.startThero;
+}
+
 // Friendly campaign steps replace the former exponent ladder. The final level uses
 // ×200, making its 40-HP Combination Cohorts reach 8,000 HP and its boss 10,000 HP.
 const CAMPAIGN_DIFFICULTY_MULTIPLIERS = Object.freeze([
@@ -217,6 +234,7 @@ export function setLevelConfigs(levels = []) {
 
     const normalizedLevel = {
       ...level,
+      startThero: resolveCampaignStartingThero(level),
       isStoryLevel: Boolean(level?.isStoryLevel),
       isGlyphTrialLevel: Boolean(level?.isGlyphTrialLevel),
       preplacedTowers: Array.isArray(level?.preplacedTowers)
