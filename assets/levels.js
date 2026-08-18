@@ -28,6 +28,10 @@ const DEFAULT_BOSS_HP_MULTIPLIER = 1.25;
 /** Formula: campaign level n starts with n × 100 base Thero before progression multipliers. */
 export function resolveCampaignStartingThero(level = {}) {
   const id = String(level.id || '').replace(/^Ladder - /, '');
+  const prologueLevelMatch = id.match(/^Prologue - ([123])$/i);
+  if (prologueLevelMatch) {
+    return Number.parseInt(prologueLevelMatch[1], 10) * 100;
+  }
   const numberedLevelMatch = id.match(/^level-(\d{2})-/i);
   if (numberedLevelMatch) {
     const levelNumber = Number.parseInt(numberedLevelMatch[1], 10);
