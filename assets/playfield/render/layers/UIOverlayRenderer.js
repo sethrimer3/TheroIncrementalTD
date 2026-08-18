@@ -24,9 +24,8 @@ import {
 
 const CONTRIBUTION_UI_FADE_IN_MS = 140;
 const CONTRIBUTION_UI_FADE_OUT_MS = 240;
-const CONTRIBUTION_UI_WIDTH = 76;
 const CONTRIBUTION_UI_HEIGHT = 19;
-const CONTRIBUTION_UI_BAR_WIDTH_SCALE = 0.6;
+const CONTRIBUTION_UI_BAR_WIDTH = (76 - 10) * 0.6;
 const CONTRIBUTION_UI_BAR_HEIGHT = 4;
 
 function resolveContributionUiAlpha(tower, visible, now) {
@@ -85,22 +84,27 @@ export function drawTowerContributionMeters() {
     // Counter-scale the overlay so zoom changes its position with the tower without blurring or enlarging the UI.
     ctx.scale(inverseViewScale, inverseViewScale);
     ctx.globalAlpha = alpha;
+    ctx.font = '600 10px "Cormorant Garamond", serif';
+    // Fit the box sides to the rendered label while retaining five pixels of horizontal breathing room.
+    const contributionUiWidth = Math.ceil(Math.max(
+      ctx.measureText(label).width,
+      CONTRIBUTION_UI_BAR_WIDTH,
+    ) + 10);
     ctx.fillStyle = 'rgba(8, 12, 22, 0.84)';
     ctx.strokeStyle = 'rgba(220, 232, 245, 0.32)';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(-CONTRIBUTION_UI_WIDTH / 2, -CONTRIBUTION_UI_HEIGHT, CONTRIBUTION_UI_WIDTH, CONTRIBUTION_UI_HEIGHT, 4);
+    ctx.roundRect(-contributionUiWidth / 2, -CONTRIBUTION_UI_HEIGHT, contributionUiWidth, CONTRIBUTION_UI_HEIGHT, 4);
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = '600 10px "Cormorant Garamond", serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = 'rgba(245, 247, 250, 0.96)';
     ctx.fillText(label, 0, -12);
 
     // Keep the XP bar compact beneath the label: 60% of its former length and slightly taller.
-    const barWidth = (CONTRIBUTION_UI_WIDTH - 10) * CONTRIBUTION_UI_BAR_WIDTH_SCALE;
+    const barWidth = CONTRIBUTION_UI_BAR_WIDTH;
     const barX = -barWidth / 2;
     const barY = -6;
     ctx.fillStyle = 'rgba(220, 232, 245, 0.16)';
