@@ -26,7 +26,8 @@ const CONTRIBUTION_UI_FADE_IN_MS = 140;
 const CONTRIBUTION_UI_FADE_OUT_MS = 240;
 const CONTRIBUTION_UI_WIDTH = 76;
 const CONTRIBUTION_UI_HEIGHT = 19;
-const CONTRIBUTION_UI_BAR_HEIGHT = 3;
+const CONTRIBUTION_UI_BAR_WIDTH_SCALE = 0.6;
+const CONTRIBUTION_UI_BAR_HEIGHT = 4;
 
 function resolveContributionUiAlpha(tower, visible, now) {
   const target = visible ? 1 : 0;
@@ -98,9 +99,10 @@ export function drawTowerContributionMeters() {
     ctx.fillStyle = 'rgba(245, 247, 250, 0.96)';
     ctx.fillText(label, 0, -12);
 
-    const barX = -CONTRIBUTION_UI_WIDTH / 2 + 5;
+    // Keep the XP bar compact beneath the label: 60% of its former length and slightly taller.
+    const barWidth = (CONTRIBUTION_UI_WIDTH - 10) * CONTRIBUTION_UI_BAR_WIDTH_SCALE;
+    const barX = -barWidth / 2;
     const barY = -6;
-    const barWidth = CONTRIBUTION_UI_WIDTH - 10;
     ctx.fillStyle = 'rgba(220, 232, 245, 0.16)';
     ctx.fillRect(barX, barY, barWidth, CONTRIBUTION_UI_BAR_HEIGHT);
     ctx.fillStyle = 'rgba(139, 247, 255, 0.9)';

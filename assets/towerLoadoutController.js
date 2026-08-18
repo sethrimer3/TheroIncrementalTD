@@ -275,11 +275,18 @@ export function createTowerLoadoutController({
     };
     const renderAnimatedCost = (costEl, nextValue) => {
       const previousState = displayedCostState.get(costEl);
+      // HUD refreshes can occur every frame; keep an animation running when its target has not changed.
+      if (previousState && Object.is(previousState.targetValue, nextValue)) {
+        if (!previousState.frameId) {
+          costEl.textContent = `${formatCostLabel(nextValue)} ${safeGetTheroSymbol()}`;
+        }
+        return;
+      }
       if (previousState?.frameId) cancelAnimationFrame(previousState.frameId);
       const previousValue = Number.isFinite(previousState?.value) ? previousState.value : nextValue;
       if (!Number.isFinite(nextValue) || nextValue <= previousValue) {
         costEl.textContent = `${formatCostLabel(nextValue)} ${safeGetTheroSymbol()}`;
-        displayedCostState.set(costEl, { value: nextValue, frameId: 0 });
+        displayedCostState.set(costEl, { value: nextValue, targetValue: nextValue, frameId: 0 });
         return;
       }
       const startedAt = performance.now();
@@ -292,14 +299,14 @@ export function createTowerLoadoutController({
         costEl.textContent = `${formatCostLabel(displayedValue)} ${safeGetTheroSymbol()}`;
         if (progress < 1) {
           const frameId = requestAnimationFrame(tick);
-          displayedCostState.set(costEl, { value: previousValue, frameId });
+          displayedCostState.set(costEl, { value: displayedValue, targetValue: nextValue, frameId });
         } else {
           costEl.textContent = `${formatCostLabel(nextValue)} ${safeGetTheroSymbol()}`;
-          displayedCostState.set(costEl, { value: nextValue, frameId: 0 });
+          displayedCostState.set(costEl, { value: nextValue, targetValue: nextValue, frameId: 0 });
         }
       };
       const frameId = requestAnimationFrame(tick);
-      displayedCostState.set(costEl, { value: previousValue, frameId });
+      displayedCostState.set(costEl, { value: previousValue, targetValue: nextValue, frameId });
     };
 
     items.forEach((item) => {
