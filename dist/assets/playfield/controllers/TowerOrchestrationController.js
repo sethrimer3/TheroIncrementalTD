@@ -48,11 +48,37 @@ export function createTowerOrchestrationController(config) {
 
   // References to external systems
   const playfield = config.playfield;
+  const combatState = config.combatState;
   const towerManager = config.towerManager;
   const audio = config.audio;
   const messageEl = config.messageEl;
   const dependencies = config.dependencies;
   const theroSymbol = config.theroSymbol || 'Θ';
+
+  function setTheroBalance(balance) {
+    if (typeof combatState?.setEnergy === 'function') {
+      combatState.setEnergy(balance);
+    } else {
+      playfield.energy = balance;
+    }
+    playfield.updateHud();
+  }
+
+  // Spend from the combat manager because it owns the authoritative in-level Thero balance.
+  function spendThero(amount) {
+    const cost = Number.isFinite(amount) ? Math.max(0, amount) : 0;
+    const currentBalance = typeof combatState?.getEnergy === 'function'
+      ? combatState.getEnergy()
+      : playfield.energy;
+    if (currentBalance < cost) {
+      return false;
+    }
+    const nextBalance = Number.isFinite(currentBalance)
+      ? Math.max(0, currentBalance - cost)
+      : currentBalance;
+    setTheroBalance(nextBalance);
+    return true;
+  }
 
   /**
    * Add a tower at the specified normalized position.
@@ -198,8 +224,7 @@ export function createTowerOrchestrationController(config) {
     }
 
     if (!free) {
-      // Use the playfield accessor so the combat manager's private Thero balance is actually updated.
-      playfield.energy = Math.max(0, playfield.energy - actionCost);
+      spendThero(actionCost);
     }
 
     if (merging && mergeTarget && nextDefinition) {
@@ -397,7 +422,7 @@ export function createTowerOrchestrationController(config) {
       return false;
     }
 
-    playfield.energy = Math.max(0, playfield.energy - cost);
+    spendThero(cost);
     playfield.recordTowerCost(tower, cost);
 
     const previousSymbol = tower.symbol || tower.definition?.symbol || 'Tower';
@@ -541,7 +566,7 @@ export function createTowerOrchestrationController(config) {
     }
 
     const chargeAmount = Math.max(0, Number.isFinite(charge) ? charge : 0);
-    playfield.energy = Math.max(0, cappedEnergy - chargeAmount);
+    setTheroBalance(Math.max(0, cappedEnergy - chargeAmount));
     if (history.length) {
       history[history.length - 1] = chargeAmount;
     } else if (chargeAmount > 0) {
