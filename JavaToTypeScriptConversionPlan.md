@@ -15,7 +15,7 @@ This file serves four functions:
 
 ## Current Migration Dashboard
 
-<!-- migration-roadmap-counts: ts=68 generated=68 active_js=172 candidates=45 -->
+<!-- migration-roadmap-counts: ts=69 generated=69 active_js=172 candidates=45 -->
 <!-- migration-roadmap-authorization: phase=23 -->
 
 | Item | Current state |
@@ -24,8 +24,8 @@ This file serves four functions:
 | Completed migration history | Phases 0-22 remain complete; historical phase identities are preserved |
 | Next authorized implementation | **Phase 23 only:** Omicron, Pi, Chi, Psi, and Omega terminal equations |
 | Delivery branch | Work directly on `main`; create or switch to another branch only when the user explicitly requests it |
-| Active authored modules | 240 total: 68 TypeScript and 172 JavaScript |
-| Compatibility output | 68 generated `.js` siblings; they are runtime output, not backlog |
+| Active authored modules | 241 total: 69 TypeScript and 172 JavaScript |
+| Compatibility output | 69 generated `.js` siblings; they are runtime output, not backlog |
 | Decision candidates | 45 unreachable authored `.js` files requiring retirement, integration, or archival decisions |
 | Long-range sequence | Phases 22-55; Phase 54 is an extraction gate and assigns no backlog module |
 | Mechanical check | `npm run check:migration-roadmap` validates reachability, classifications, duplicate assignments, totals, and per-phase counts |
@@ -117,7 +117,7 @@ Inventory was originally recalculated from the live tree on **2026-07-16**, star
 - **172 active authored `.js` modules**, verified reachable through static local imports from `assets/main.js`.
 - **0 intentionally preserved legacy `.js` modules** with current repository evidence. The previously documented 19-file disabled Terrarium tree was deleted by `64ebc5e`.
 - **45 ambiguous or retirement/deletion-candidate `.js` modules**, all currently unreachable from the browser entry graph. They are excluded from the active backlog pending a separate decision.
-- **240 active authored modules** in total, so active module-count conversion is **28.3%** (`68 / 240`). The raw authored-language tree is 285 modules when the 45 decision candidates are included.
+- **241 active authored modules** in total, so active module-count conversion is **28.6%** (`69 / 241`). The raw authored-language tree is 286 modules when the 45 decision candidates are included.
 - Supplemental authored-line snapshot: **8,309 TypeScript lines** and **81,526 active JavaScript lines**. Line counts do not represent migration difficulty.
 
 Method: recursively enumerate `assets/` and `scripts/`; exclude `node_modules/`, `dist/`, `build/`, generated output, dependencies, fixtures, and non-source material; remove each `.js` file with a same-path `.ts` sibling; parse static relative `import`/`export ... from` edges; traverse from `assets/main.js`; and audit unreachable files against tests, retirement documentation, HTML harnesses, and recent commits. The full classification, dependency evidence, 168-module coverage map, and 45-file retirement list are in [`docs/TypeScriptMigrationRoadmapInventory.md`](docs/TypeScriptMigrationRoadmapInventory.md). Run `npm run check:migration-roadmap` to verify that classification against the current checkout.

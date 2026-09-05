@@ -280,7 +280,7 @@ function updateProjectiles(delta) {
           const distanceSq = distanceSquaredToSegment(enemyPosition, currentPosition, nextPosition);
           if (distanceSq <= combined * combined) {
             // Apply damage to this enemy
-            this.applyDamageToEnemy(enemy, projectile.damage, { sourceTower: tower });
+            this.applyDamageToEnemy(enemy, projectile.damage, { sourceTower: tower || projectile.killSource });
             hitEnemies.add(enemy.id);
             
             // Create star burst effect on this enemy
@@ -450,7 +450,7 @@ function updateProjectiles(delta) {
         while (projectile.hitsApplied < BETA_STICK_HIT_COUNT && projectile.hitTimer >= BETA_STICK_HIT_INTERVAL) {
           projectile.hitTimer -= BETA_STICK_HIT_INTERVAL;
           if (enemy) {
-            this.applyDamageToEnemy(enemy, projectile.damage, { sourceTower: tower });
+            this.applyDamageToEnemy(enemy, projectile.damage, { sourceTower: tower || projectile.killSource });
             this.applyBetaStickSlow(enemy, tower, projectile.bet1);
             const enemyStillAlive = !!this.getEnemyById(enemy.id);
             if (!enemyStillAlive) {
@@ -686,7 +686,7 @@ function updateProjectiles(delta) {
           continue;
         }
         const tower = this.getTowerById(projectile.towerId);
-        this.applyDamageToEnemy(enemy, projectile.damage, { sourceTower: tower });
+        this.applyDamageToEnemy(enemy, projectile.damage, { sourceTower: tower || projectile.killSource });
         this.projectiles.splice(index, 1);
         continue;
       }

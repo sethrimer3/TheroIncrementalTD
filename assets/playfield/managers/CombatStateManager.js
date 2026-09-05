@@ -92,7 +92,6 @@ export function createCombatStateManager(config) {
   const onVictory = config.onVictory;
   const onDefeat = config.onDefeat;
   const onCombatStart = config.onCombatStart;
-  const recordKillEvent = config.recordKillEvent;
   const tryConvertEnemyToChiThrall = config.tryConvertEnemyToChiThrall;
   const triggerPsiClusterAoE = config.triggerPsiClusterAoE;
   const notifyEnemyDeath = config.notifyEnemyDeath;
@@ -459,21 +458,7 @@ export function createCombatStateManager(config) {
       notifyEnemyDeath(enemy);
     }
 
-    // Record kill event for tower attribution
-    if (recordKillEvent && enemy.damageContributors) {
-      // Find the tower that dealt the most damage
-      let maxDamage = 0;
-      let killingTower = null;
-      enemy.damageContributors.forEach((damage, towerId) => {
-        if (damage > maxDamage) {
-          maxDamage = damage;
-          killingTower = towerId;
-        }
-      });
-      if (killingTower) {
-        recordKillEvent(killingTower);
-      }
-    }
+    // EnemyLifecycleSystem credits the finishing tower exactly once before death effects.
 
     // Try chi tower conversion
     if (tryConvertEnemyToChiThrall && Math.random() < 0.1) {

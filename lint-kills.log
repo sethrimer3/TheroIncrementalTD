@@ -1,0 +1,75 @@
+
+> thero-incremental-td@1.0.0 lint
+> eslint .
+
+
+C:\Users\srime\Documents\GitHub\TheroIncrementalTD\.codex-build-recovery-20260815-1457\scripts\build-static.cjs
+  1:12  warning  'require' is not defined    no-undef
+  2:14  warning  'require' is not defined    no-undef
+  4:30  warning  '__dirname' is not defined  no-undef
+
+C:\Users\srime\Documents\GitHub\TheroIncrementalTD\.codex-build-recovery-20260815-1457\scripts\check-migration-roadmap.cjs
+  1:12  warning  'require' is not defined    no-undef
+  2:14  warning  'require' is not defined    no-undef
+  5:30  warning  '__dirname' is not defined  no-undef
+
+C:\Users\srime\Documents\GitHub\TheroIncrementalTD\.codex-build-recovery-20260815-1457\scripts\smoke-test.cjs
+    1:12  warning  'require' is not defined    no-undef
+    2:14  warning  'require' is not defined    no-undef
+    4:30  warning  '__dirname' is not defined  no-undef
+  149:3   warning  'process' is not defined    no-undef
+
+C:\Users\srime\Documents\GitHub\TheroIncrementalTD\.codex-build-recovery-20260815-1457\scripts\sync-ts-output.cjs
+  25:12  warning  'require' is not defined    no-undef
+  26:14  warning  'require' is not defined    no-undef
+  28:30  warning  '__dirname' is not defined  no-undef
+  53:3   warning  'process' is not defined    no-undef
+
+C:\Users\srime\Documents\GitHub\TheroIncrementalTD\.codex-build-recovery-20260815-1457\scripts\test-algebraic-upgrades.cjs
+    8:16  warning  'require' is not defined    no-undef
+    9:12  warning  'require' is not defined    no-undef
+   10:12  warning  'require' is not defined    no-undef
+   11:14  warning  'require' is not defined    no-undef
+   12:27  warning  'require' is not defined    no-undef
+   14:30  warning  '__dirname' is not defined  no-undef
+  185:5   warning  'global' is not defined     no-undef
+  201:12  warning  'global' is not defined     no-undef
+  294:5   warning  'process' is not defined    no-undef
+
+C:\Users\srime\Documents\GitHub\TheroIncrementalTD\.codex-build-recovery-20260815-1457\scripts\test-retired-spires.cjs
+  3:16  warning  'require' is not defined    no-undef
+  4:12  warning  'require' is not defined    no-undef
+  5:14  warning  'require' is not defined    no-undef
+  7:27  warning  '__dirname' is not defined  no-undef
+
+C:\Users\srime\Documents\GitHub\TheroIncrementalTD\.codex-build-recovery-20260815-1457\scripts\unit-test-core.cjs
+     9:16  warning  'require' is not defined    no-undef
+    10:12  warning  'require' is not defined    no-undef
+    11:12  warning  'require' is not defined    no-undef
+    12:14  warning  'require' is not defined    no-undef
+    13:27  warning  'require' is not defined    no-undef
+    15:30  warning  '__dirname' is not defined  no-undef
+   370:39  warning  'global' is not defined     no-undef
+   442:25  warning  'global' is not defined     no-undef
+   443:25  warning  'global' is not defined     no-undef
+   444:25  warning  'global' is not defined     no-undef
+   469:31  warning  'global' is not defined     no-undef
+   471:16  warning  'global' is not defined     no-undef
+   575:3   warning  'global' is not defined     no-undef
+   594:5   warning  'global' is not defined     no-undef
+   610:3   warning  'global' is not defined     no-undef
+   627:5   warning  'global' is not defined     no-undef
+   633:18  warning  'global' is not defined     no-undef
+   652:18  warning  'global' is not defined     no-undef
+   668:18  warning  'global' is not defined     no-undef
+   683:18  warning  'global' is not defined     no-undef
+   696:5   warning  'global' is not defined     no-undef
+   701:5   warning  'global' is not defined     no-undef
+   983:28  warning  'global' is not defined     no-undef
+   985:7   warning  'global' is not defined     no-undef
+   989:7   warning  'global' is not defined     no-undef
+  3455:5   warning  'process' is not defined    no-undef
+  3464:3   warning  'process' is not defined    no-undef
+
+✖ 54 problems (0 errors, 54 warnings)
+

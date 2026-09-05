@@ -693,7 +693,7 @@ function updateDeltaSoldier(playfield, tower, soldier, delta, state) {
         soldier.health = Math.max(0, soldier.health - loss);
 
         if (target.hp <= 0) {
-          playfield.processEnemyDefeat(target);
+          playfield.processEnemyDefeat(target, tower);
           soldier.targetId = null;
         }
         if (soldier.health <= 0) {

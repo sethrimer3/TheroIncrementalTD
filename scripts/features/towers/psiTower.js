@@ -425,7 +425,7 @@ export function triggerPsiClusterAoE(playfield, cluster, deathPosition) {
 
       // Check if enemy died from AoE
       if (enemy.hp <= 0 && typeof playfield.processEnemyDefeat === 'function') {
-        playfield.processEnemyDefeat(enemy);
+        playfield.processEnemyDefeat(enemy, sourceTower || { type: 'psi' });
       }
     }
   });

@@ -1,0 +1,27 @@
+
+> thero-incremental-td@1.0.0 test:unit
+> node scripts/unit-test-core.cjs && node scripts/test-retired-spires.cjs && node scripts/test-algebraic-upgrades.cjs && node scripts/test-tower-contribution.cjs && node scripts/test-greek-variable-progression.cjs && node scripts/test-tower-kills.cjs
+
+Storage parse failed SyntaxError: Expected property name or '}' in JSON at position 1 (line 1 column 2)
+    at JSON.parse (<anonymous>)
+    at Module.readStorageJson (file:///C:/Users/srime/AppData/Local/Temp/thero-unit-test-QUpVB3/autoSave.mjs:150:21)
+    at C:\Users\srime\Documents\GitHub\TheroIncrementalTD\scripts\unit-test-core.cjs:600:27
+    at test (C:\Users\srime\Documents\GitHub\TheroIncrementalTD\scripts\unit-test-core.cjs:532:13)
+    at run (C:\Users\srime\Documents\GitHub\TheroIncrementalTD\scripts\unit-test-core.cjs:598:9)
+Unit tests passed: 187/187
+Retired-Spire checks passed (240 active modules inspected).
+
+Algebraic upgrade tests: 22 passed, 0 failed.
+Tower contribution tests passed.
+✓ fresh state initializes alpha through zeta to 1
+✓ ordinal costs are flat from alpha=1 through zeta=6
+✓ a successful upgrade deducts once and increments exactly once
+✓ insufficient Glyphs prevent deduction and progression
+✓ save snapshots round-trip and old saves default every variable to 1
+✓ persistence envelope stores and restores the global snapshot
+✓ one global beta value changes every consuming tower equation
+✓ two tower instances read the same player-owned value
+Greek-variable progression tests passed: 8/8
+[Prime Hit Count Updated] id=undefined hits=1/2
+[Prime Hit Count Updated] id=undefined hits=2/2
+Tower kill attribution, duplicate protection, prime deaths, and session persistence passed.

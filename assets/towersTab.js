@@ -1,3 +1,4 @@
+import { getTowerKillCount, subscribeTowerKills } from './towerKillStats.js';
 import {
   renderMathElement,
   convertMathExpressionToPlainText,
@@ -1932,7 +1933,24 @@ export function synchronizeTowerCardMasterEquations() {
   });
 }
 
+// Keep lifetime totals at the bottom of every tower card, including free gates.
+function updateTowerKillCards(type = null) {
+  document.querySelectorAll(TOWER_CARD_SELECTOR).forEach((card) => {
+    const towerId = card.dataset.towerId;
+    if (!towerId || (type && type !== towerId)) return;
+    let total = card.querySelector('.tower-lifetime-kills');
+    if (!total) {
+      total = document.createElement('p');
+      total.className = 'tower-lifetime-kills';
+      card.appendChild(total);
+    }
+    total.textContent = `Total Kills: ${formatWholeNumber(getTowerKillCount(towerId))}`;
+  });
+}
+subscribeTowerKills((type) => updateTowerKillCards(type));
+
 export function annotateTowerCardsWithCost() {
+  updateTowerKillCards();
   const cards = document.querySelectorAll(TOWER_CARD_SELECTOR);
   cards.forEach((card) => {
     const towerId = card.dataset.towerId;

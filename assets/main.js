@@ -1,3 +1,4 @@
+import { TOWER_KILLS_STORAGE_KEY } from './towerKillStats.js';
 import {
   alephChainUpgradeState,
   getAlephChainUpgrades,
@@ -439,6 +440,7 @@ import { initializeTabAttentionManager, clearTabAttention } from './tabAttention
   let levelCombatCtrl;
 
   const PERSISTENT_STORAGE_KEYS = [
+    TOWER_KILLS_STORAGE_KEY, // Include lifetime totals in the explicit reset action.
     GRAPHICS_MODE_STORAGE_KEY,
     NOTATION_STORAGE_KEY,
     GLYPH_EQUATIONS_STORAGE_KEY,

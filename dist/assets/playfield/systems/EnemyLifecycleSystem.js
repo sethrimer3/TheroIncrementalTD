@@ -1,6 +1,7 @@
 // Enemy lifecycle system extracted from SimplePlayfield.
 // These functions use 'this' (the SimplePlayfield instance) via prototype assignment.
 
+import { recordTowerLifetimeKill } from '../../towerKillStats.js';
 import { formatCombatNumber } from '../utils/formatting.js';
 import { cleanupHypernode } from './HypernodeBossSystem.js';
 
@@ -184,7 +185,14 @@ export function handleEnemyBreach(enemy) {
   this.scheduleStatsPanelRefresh();
 }
 
-export function processEnemyDefeat(enemy) {
+export function processEnemyDefeat(enemy, sourceTower = null) {
+  // Claim the defeat before chained explosions can re-enter this enemy's death path.
+  if (!enemy || enemy.defeatProcessed) return;
+  enemy.defeatProcessed = true;
+  if (sourceTower) {
+    recordTowerLifetimeKill(sourceTower);
+    this.recordKillEvent(sourceTower);
+  }
   const defeatPosition = this.getEnemyPosition(enemy);
   
   // First, handle playfield-specific defeat logic

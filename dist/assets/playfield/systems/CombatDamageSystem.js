@@ -106,7 +106,7 @@ export function getEnemyDebuffIndicators(enemy) {
  * and special enemy mechanics (Prime-Counter, Imaginary Strider, Quantum Tunneler, etc.).
  */
 export function applyDamageToEnemy(enemy, baseDamage, { sourceTower, attackType, isPhaseProjection } = {}) {
-  if (!enemy || !Number.isFinite(baseDamage) || baseDamage <= 0) {
+  if (!enemy || enemy.defeatProcessed || enemy.hp <= 0 || !Number.isFinite(baseDamage) || baseDamage <= 0) {
     return 0;
   }
 
@@ -144,10 +144,7 @@ export function applyDamageToEnemy(enemy, baseDamage, { sourceTower, attackType,
       this.addTowerContribution(sourceTower, 'damage', 1);
     }
     if (enemy.currentHitCount >= enemy.requiredHitCount) {
-      if (sourceTower) {
-        this.recordKillEvent(sourceTower);
-      }
-      this.processEnemyDefeat(enemy);
+      this.processEnemyDefeat(enemy, sourceTower);
     }
     return 1;
   }
@@ -293,10 +290,7 @@ export function applyDamageToEnemy(enemy, baseDamage, { sourceTower, attackType,
     if ((enemy.codexId || enemy.typeId) === 'nullifier' && sourceTower) {
       this.disableTower(sourceTower, 5.0);
     }
-    if (sourceTower) {
-      this.recordKillEvent(sourceTower);
-    }
-    this.processEnemyDefeat(enemy);
+    this.processEnemyDefeat(enemy, sourceTower);
   }
   return applied;
 }

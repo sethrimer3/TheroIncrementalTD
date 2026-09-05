@@ -222,7 +222,7 @@ export function applyZetaDamage(playfield, enemy, damage, options = {}) {
   );
   enemy.hp -= damage;
   if (enemy.hp <= 0) {
-    playfield.processEnemyDefeat(enemy);
+    playfield.processEnemyDefeat(enemy, options.sourceTower);
   }
 }
 

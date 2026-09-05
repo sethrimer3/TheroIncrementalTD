@@ -522,7 +522,7 @@ export function applyEtaDamage(playfield, enemy, damage, options = {}) {
   playfield.addTowerContribution?.(sourceTower, 'damage', effectiveDamage, { enemy });
   enemy.hp -= damage;
   if (enemy.hp <= 0) {
-    playfield.processEnemyDefeat(enemy);
+    playfield.processEnemyDefeat(enemy, sourceTower);
   }
 }
 

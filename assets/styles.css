@@ -15224,3 +15224,13 @@ body[data-spire-options-placement='footer'] .spire-options-trigger--corner {
   width: auto;
   padding-inline: 0.8rem;
 }
+
+/* Lifetime totals stay beneath tower controls without adding a fixed card height. */
+.tower-lifetime-kills {
+  margin: auto 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--panel-border);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  order: 100;
+}

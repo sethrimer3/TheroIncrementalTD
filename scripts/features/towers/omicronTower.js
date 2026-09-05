@@ -656,7 +656,7 @@ function updateOmicronUnit(playfield, tower, unit, state, delta) {
           unit.shieldParticles = [];
           
           if (target.hp <= 0) {
-            playfield.processEnemyDefeat(target);
+            playfield.processEnemyDefeat(target, tower);
             unit.targetId = null;
           }
         }
@@ -670,7 +670,7 @@ function updateOmicronUnit(playfield, tower, unit, state, delta) {
           target.hp = Math.max(0, target.hp - unit.attack);
           
           if (target.hp <= 0) {
-            playfield.processEnemyDefeat(target);
+            playfield.processEnemyDefeat(target, tower);
             unit.targetId = null;
             
             // If unit killed the enemy without shield, regain shield

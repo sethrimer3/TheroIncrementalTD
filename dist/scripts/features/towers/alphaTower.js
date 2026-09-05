@@ -999,6 +999,8 @@ export function spawnTowerAttackBurst(playfield, tower, targetInfo = {}, options
   const burst = {
     id: `${config.idPrefix || config.towerType || 'burst'}-${(burstIdCounter += 1)}`,
     towerId: tower.id,
+    // Retain attribution if this shot lands after its tower is sold.
+    killSource: { id: tower.id, type: tower.type },
     targetId: enemyId,
     fallbackTarget: targetPosition,
     origin: { x: tower.x, y: tower.y },
