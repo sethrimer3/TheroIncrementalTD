@@ -125,7 +125,7 @@ Method: recursively enumerate `assets/` and `scripts/`; exclude `node_modules/`,
 Phases 17–20 converted Sigma, Phi, Upsilon, and Tau in committed implementation `2bad789`; they are not prompt-only assignments. The retired `spireFloatingMenu` and `spireTabVisibility` TypeScript modules and the former Cognitive Realm typed state remain part of phase history but not the live source count.
 
 **Plan created:** 2026-07-13  
-**Repository:** `sethrimer3/TheroMathTD`  
+**Repository:** `sethrimer3/TheroIncrementalTD`
 **Active game referred to as “Thero”:** this repository, not `sethrimer3/Thero_Idle_TD`.
 
 At the time this plan was created (historical snapshot, not the current baseline):
@@ -185,7 +185,7 @@ The original statement that no conversion phase was complete is superseded by th
 
 ## 2026-07-16 Reconciled History and Long-Range Roadmap
 
-This section supersedes the old seven-item “Tentative Later Migration Areas” list and the stale next-step material in `TheroMathTD_TS_Migration_Plan.md`. Historical implementation sections and logs below remain authoritative evidence and are not renumbered. Exact future file coverage is normative in [`docs/TypeScriptMigrationRoadmapInventory.md`](docs/TypeScriptMigrationRoadmapInventory.md); phases beyond the single marker-named authorization are recommendations that must be re-inventoried before authorization.
+This section supersedes the old seven-item “Tentative Later Migration Areas” list and the stale next-step material in `TheroIncrementalTD_TS_Migration_Plan.md`. Historical implementation sections and logs below remain authoritative evidence and are not renumbered. Exact future file coverage is normative in [`docs/TypeScriptMigrationRoadmapInventory.md`](docs/TypeScriptMigrationRoadmapInventory.md); phases beyond the single marker-named authorization are recommendations that must be re-inventoried before authorization.
 
 ### Reconciled phase history
 
@@ -460,7 +460,7 @@ Convert those files to strict `.ts` sources and regenerate only their same-path 
 
 ## Documentation and Tooling Repair (COMPLETE, 2026-07-13)
 
-Before Phase 4, this document and `TheroMathTD_TS_Migration_Plan.md` were audited and found to contain stale/incorrect facts, and the build tooling did not scale past an explicit file list. Corrected:
+Before Phase 4, this document and `TheroIncrementalTD_TS_Migration_Plan.md` were audited and found to contain stale/incorrect facts, and the build tooling did not scale past an explicit file list. Corrected:
 
 ### Migration count methodology (used from here on)
 
@@ -469,7 +469,7 @@ Before Phase 4, this document and `TheroMathTD_TS_Migration_Plan.md` were audite
 - **Excluded from both counts:** anything under `dist/`, `build/`, `node_modules/`, or other generated-output directories.
 - **Not counted as "remaining unconverted":** a compiled `.js` file that is the build-generated sibling of an already-migrated `.ts` file (i.e. it has a same-path `.ts` sibling) — counting it would double-count the same module as both "converted" and "remaining."
 
-Before this repair, `TheroMathTD_TS_Migration_Plan.md` reported "**358 `.js` files**" as the remaining-JS count and "8 of ~366 JS/TS source files converted." That 358 figure was the *raw* JS file count on disk, which already included the 8 compiled `.js` siblings of the 8 migrated `.ts` files — i.e. those 8 modules were being counted twice (once as "converted," once inside "remaining"). Recomputed via a full recursive scan (excluding `dist/`, `build/`, `node_modules/`) immediately before Phase 4 started:
+Before this repair, `TheroIncrementalTD_TS_Migration_Plan.md` reported "**358 `.js` files**" as the remaining-JS count and "8 of ~366 JS/TS source files converted." That 358 figure was the *raw* JS file count on disk, which already included the 8 compiled `.js` siblings of the 8 migrated `.ts` files — i.e. those 8 modules were being counted twice (once as "converted," once inside "remaining"). Recomputed via a full recursive scan (excluding `dist/`, `build/`, `node_modules/`) immediately before Phase 4 started:
 
 - Converted `.ts` source modules (excl. `.d.ts`): **8**
 - Raw `.js` files on disk: **358**
@@ -485,7 +485,7 @@ After Phase 4 (this session), recomputed the same way:
 
 ### `assets/data/towers/` re-inventory
 
-`TheroMathTD_TS_Migration_Plan.md` described this folder as "~24 files." The registry (`assets/data/towers/index.js`, now `index.ts`) was read directly and its imports counted exactly: it imports **32** tower-definition modules (`t1`, `t2`, `mind-gate`, `shadow-gate`, `alpha` through `omega` — the 24 Greek-letter-tier towers plus 2 gates plus 2 experimental T-towers — plus `regression`, `density-collapse`, `orbital-collapse`, `polynomial-engine`, the 4-tower "graph-based test arsenal"). Including `index.js`/`index.ts` itself, the folder held **33 files** before this phase, not ~24. Both plan documents are corrected below.
+`TheroIncrementalTD_TS_Migration_Plan.md` described this folder as "~24 files." The registry (`assets/data/towers/index.js`, now `index.ts`) was read directly and its imports counted exactly: it imports **32** tower-definition modules (`t1`, `t2`, `mind-gate`, `shadow-gate`, `alpha` through `omega` — the 24 Greek-letter-tier towers plus 2 gates plus 2 experimental T-towers — plus `regression`, `density-collapse`, `orbital-collapse`, `polynomial-engine`, the 4-tower "graph-based test arsenal"). Including `index.js`/`index.ts` itself, the folder held **33 files** before this phase, not ~24. Both plan documents are corrected below.
 
 ### Core Migration Principle 9 reconciled with actual build architecture
 
@@ -1262,7 +1262,7 @@ The equipment/gem retirement removed five active JavaScript modules from future 
 
 ### 2026-07-16 — Keep one authoritative ledger and one exact inventory appendix
 
-`JavaToTypeScriptConversionPlan.md` remains the status, history, execution, and authorization ledger. `docs/TypeScriptMigrationRoadmapInventory.md` remains the exact file-assignment and decision-candidate appendix. `TheroMathTD_TS_Migration_Plan.md` is archived historical orientation and must not authorize work. This division keeps implementation evidence without requiring contributors to reconcile two competing current plans.
+`JavaToTypeScriptConversionPlan.md` remains the status, history, execution, and authorization ledger. `docs/TypeScriptMigrationRoadmapInventory.md` remains the exact file-assignment and decision-candidate appendix. `TheroIncrementalTD_TS_Migration_Plan.md` is archived historical orientation and must not authorize work. This division keeps implementation evidence without requiring contributors to reconcile two competing current plans.
 
 ### 2026-07-13 — Use an incremental subsystem migration
 
@@ -1468,10 +1468,10 @@ See the "Phase 3 — User Preferences Module (`assets/preferences.js`) (COMPLETE
 A fresh session re-read every required doc (`AGENT_START_HERE.md`, `AGENTS.md`, `docs/JAVASCRIPT_MODULE_SYSTEM.md`, both migration plan documents, `tsconfig.json`, `scripts/sync-ts-output.cjs`, `scripts/build-static.cjs`) and ran baselines. `npm run typecheck`/`npm run build` initially failed with `'tsc' is not recognized` because `node_modules/typescript` was absent despite being listed in `package.json`; `npm install` resolved this (1 package added, no `package.json` changes). After that, baseline `npm run typecheck`, `npm run build`, `npm run lint` were clean, `npm run test:unit` was 29/29, and `npm test` failed with the same 4 pre-existing favicon errors as every prior phase.
 
 **Documentation repair (see "Documentation and Tooling Repair" section above for full detail):**
-- Recomputed migration counts using an explicit, stated methodology (converted = authored `.ts` excl. `.d.ts`; remaining = authored `.js` with no `.ts` sibling; generated `dist`/`build`/`node_modules` excluded; compiled `.js` siblings of migrated `.ts` not double-counted as "remaining"). Found `TheroMathTD_TS_Migration_Plan.md`'s prior "358 remaining `.js` files" / "366 total" figures conflated raw JS-file count with true remaining-unconverted count (the 8 already-migrated modules' compiled `.js` siblings were being counted twice). Corrected pre-Phase-4 baseline: 8 converted, 350 remaining, 358 total. Corrected post-Phase-4: 43 converted, 316 remaining, 359 total.
-- Corrected `assets/data/towers/` file count from the stale "~24" in `TheroMathTD_TS_Migration_Plan.md` to the verified **33** (32 tower-definition imports in `index.js` + `index.js` itself), confirmed by reading the registry directly and counting.
+- Recomputed migration counts using an explicit, stated methodology (converted = authored `.ts` excl. `.d.ts`; remaining = authored `.js` with no `.ts` sibling; generated `dist`/`build`/`node_modules` excluded; compiled `.js` siblings of migrated `.ts` not double-counted as "remaining"). Found `TheroIncrementalTD_TS_Migration_Plan.md`'s prior "358 remaining `.js` files" / "366 total" figures conflated raw JS-file count with true remaining-unconverted count (the 8 already-migrated modules' compiled `.js` siblings were being counted twice). Corrected pre-Phase-4 baseline: 8 converted, 350 remaining, 358 total. Corrected post-Phase-4: 43 converted, 316 remaining, 359 total.
+- Corrected `assets/data/towers/` file count from the stale "~24" in `TheroIncrementalTD_TS_Migration_Plan.md` to the verified **33** (32 tower-definition imports in `index.js` + `index.js` itself), confirmed by reading the registry directly and counting.
 - Rewrote Core Migration Principle 9 (see the Core Migration Principles section above) to prohibit duplicate hand-authored JS/TS implementations of the same module while explicitly permitting the project's existing build-generated `.js`-sibling strategy — no change to the actual build architecture, only to the principle's wording, since the old wording contradicted the project's own accepted Decision Log entries.
-- Reworked TypeScript-source discovery for scalability: `tsconfig.json`'s `include` changed from an explicit 8-file list to glob patterns (`assets/**/*.ts`, `scripts/**/*.ts`) plus a `build`/`dist`/`node_modules` `exclude`; `scripts/sync-ts-output.cjs` rewritten to recursively walk `build/ts-out/` with Node's built-in `fs`/`path` (no glob package added) and copy back only compiled `.js` files that have a matching `.ts` source still present in the repo, rather than reading `tsconfig.json`'s (now glob-based) `include` list directly. Both `tsconfig.json` and `TheroMathTD_TS_Migration_Plan.md` updated to reflect this.
+- Reworked TypeScript-source discovery for scalability: `tsconfig.json`'s `include` changed from an explicit 8-file list to glob patterns (`assets/**/*.ts`, `scripts/**/*.ts`) plus a `build`/`dist`/`node_modules` `exclude`; `scripts/sync-ts-output.cjs` rewritten to recursively walk `build/ts-out/` with Node's built-in `fs`/`path` (no glob package added) and copy back only compiled `.js` files that have a matching `.ts` source still present in the repo, rather than reading `tsconfig.json`'s (now glob-based) `include` list directly. Both `tsconfig.json` and `TheroIncrementalTD_TS_Migration_Plan.md` updated to reflect this.
 
 **Phase 4 migration performed:** See the "Phase 4 — Static Tower Definition Data (`assets/data/towers/`) (COMPLETE)" section above for full detail. Summary:
 - Migrated all 33 files in `assets/data/towers/` (32 tower-definition modules + `index.js`) to strict TypeScript, plus introduced a new `assets/data/towers/types.ts` defining the shared `TowerDefinition` interface (9 required + 6 optional fields, each field's optionality/presence verified against all 33 original files before writing the interface, not assumed from a single example).

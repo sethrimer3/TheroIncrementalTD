@@ -1,4 +1,4 @@
-// Shared enemy shell utilities for Thero Idle.
+// Shared enemy shell utilities for TheroIncrementalTD.
 // Each shell has a front sprite (rendered in front of enemy)
 // and a back sprite (rendered behind enemy). Shells are randomly assigned to enemies.
 export const ENEMY_SHELL_DEFINITIONS = [

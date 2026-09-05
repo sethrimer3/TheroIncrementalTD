@@ -1,7 +1,7 @@
 {
-  "name": "thero_idle_td",
+  "name": "thero-incremental-td",
   "version": "1.0.0",
-  "description": "",
+  "description": "TheroIncrementalTD: a mathematical tower-defense game with incremental progression.",
   "main": "electron/main.cjs",
   "directories": {
     "doc": "docs"
@@ -19,20 +19,21 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sethrimer3/TheroMathTD.git"
+    "url": "git+https://github.com/sethrimer3/TheroIncrementalTD.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/sethrimer3/TheroMathTD/issues"
+    "url": "https://github.com/sethrimer3/TheroIncrementalTD/issues"
   },
-  "homepage": "https://github.com/sethrimer3/TheroMathTD#readme",
+  "homepage": "https://sethrimer3.github.io/TheroIncrementalTD/",
   "devDependencies": {
     "electron": "^42.2.0",
     "eslint": "^10.2.0",
     "typescript": "^5.7.0",
     "vite": "^7.1.1"
-  }
+  },
+  "productName": "TheroIncrementalTD"
 }

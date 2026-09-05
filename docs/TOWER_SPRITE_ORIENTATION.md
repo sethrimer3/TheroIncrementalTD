@@ -1,6 +1,6 @@
 # Tower Sprite Orientation Guide
 
-This document describes the orientation conventions for tower projectile and ship sprites in Thero Idle.
+This document describes the orientation conventions for tower projectile and ship sprites in TheroIncrementalTD.
 
 ## Sprite Orientation Convention
 

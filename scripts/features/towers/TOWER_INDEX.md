@@ -1,6 +1,6 @@
 # Tower Index – Quick Reference
 
-Quick lookup table for all implemented towers in Thero Idle.
+Quick lookup table for all implemented towers in TheroIncrementalTD.
 
 ## Implemented Towers
 

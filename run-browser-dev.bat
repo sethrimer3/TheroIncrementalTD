@@ -13,7 +13,7 @@ if not exist node_modules (
   if errorlevel 1 goto error
 )
 
-echo Starting Thero Idle at http://127.0.0.1:8000/ ...
+echo Starting TheroIncrementalTD at http://127.0.0.1:8000/ ...
 echo The browser will refresh automatically when game files change.
 call npm run dev -- --open
 if errorlevel 1 goto error

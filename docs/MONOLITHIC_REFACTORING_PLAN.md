@@ -7,7 +7,7 @@
 
 ## Executive Summary
 
-This document provides a detailed, actionable plan for refactoring the largest monolithic files in Thero Idle TD without degrading functionality or performance. The plan prioritizes surgical, incremental changes that maintain API boundaries, preserve existing behavior, and enable parallel development across multiple systems.
+This document provides a detailed, actionable plan for refactoring the largest monolithic files in TheroIncrementalTD without degrading functionality or performance. The plan prioritizes surgical, incremental changes that maintain API boundaries, preserve existing behavior, and enable parallel development across multiple systems.
 
 **Key Principles:**
 - **Preserve functionality:** Every refactor must maintain identical game behavior
@@ -1823,7 +1823,7 @@ When the project adds automated testing:
 
 ## Conclusion
 
-This refactoring plan provides a comprehensive, incremental approach to breaking down monolithic files in Thero Idle TD. By following the phased strategy, validating at each step, and maintaining strict performance requirements, we can improve code maintainability without degrading the player experience.
+This refactoring plan provides a comprehensive, incremental approach to breaking down monolithic files in TheroIncrementalTD. By following the phased strategy, validating at each step, and maintaining strict performance requirements, we can improve code maintainability without degrading the player experience.
 
 **Key Success Factors:**
 1. **Incremental changes** - Small, testable modifications

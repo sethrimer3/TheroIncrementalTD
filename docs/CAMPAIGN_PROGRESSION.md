@@ -2,7 +2,7 @@
 
 ## Overview
 
-Thero Idle features multiple interconnected campaigns with a progression system that unlocks content based on completing story milestones.
+TheroIncrementalTD features multiple interconnected campaigns with a progression system that unlocks content based on completing story milestones.
 
 ## Campaign Types
 

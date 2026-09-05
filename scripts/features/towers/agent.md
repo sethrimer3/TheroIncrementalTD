@@ -1,7 +1,7 @@
 # Towers Directory - Agent Guide
 
 ## Purpose
-Individual tower implementations for Thero Idle's Greek-letter-themed defense system. Each tower has unique mechanics, particle effects, and mathematical upgrade formulas.
+Individual tower implementations for TheroIncrementalTD's Greek-letter-themed defense system. Each tower has unique mechanics, particle effects, and mathematical upgrade formulas.
 
 ## Existing Towers
 

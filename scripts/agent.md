@@ -1,7 +1,7 @@
 # Scripts Directory – Quick Reference
 
 ## Purpose
-Modular JavaScript architecture for Thero Idle's core systems.
+Modular JavaScript architecture for TheroIncrementalTD's core systems.
 
 ## Structure
 ```

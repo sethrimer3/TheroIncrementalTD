@@ -1,4 +1,4 @@
-# Steam Production Checklist — Thero Idle TD
+# Steam Production Checklist — TheroIncrementalTD
 
 Status of the project today: a **browser-first static HTML/JS/TS game** (`index.html`
 + `assets/` + `scripts/`, built to `dist/` via `npm run build`) with an existing
@@ -51,7 +51,7 @@ A Steam game must run fully offline. Vendor both locally:
   `buildContentSecurityPolicy`, leaving `'self' file:`.
 
 Also fix `electron/main.cjs:8` — it points at `assets/icon/Thero_icon.ico`, but the
-file on disk is `assets/icon/TheroMathTD_Icon.ico`, so the window icon silently
+file on disk is `assets/icon/TheroIncrementalTD_Icon.ico`, so the window icon silently
 falls back to the Electron default.
 
 ---

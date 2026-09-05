@@ -1,8 +1,8 @@
-# Thero Idle – Agent Guide
+# TheroIncrementalTD – Agent Guide
 
-**Live build:** https://sethrimer3.github.io/TheroMathTD/
+**Live build:** https://sethrimer3.github.io/TheroIncrementalTD/
 
-Welcome to the Thero Idle project. This document provides shared context and
+Welcome to the TheroIncrementalTD project. This document provides shared context and
 conventions for all AI collaborators working anywhere inside this repository.
 
 ## Quick Start for Agents
@@ -125,4 +125,4 @@ Each agent.md file is optimized for its scope:
 3. Follow patterns and avoid documented mistakes
 4. Update agent.md when adding new patterns or conventions
 
-Thank you for contributing to the mystical mathematics of Thero Idle!
+Thank you for contributing to the mystical mathematics of TheroIncrementalTD!

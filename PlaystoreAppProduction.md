@@ -1,4 +1,4 @@
-# Google Play Store Production Checklist — Thero Idle TD
+# Google Play Store Production Checklist — TheroIncrementalTD
 
 Status of the project today: a **browser-first static HTML/JS/TS game** (`index.html`
 + `assets/` + `scripts/`, built to `dist/` via `npm run build`), with an Electron
@@ -108,7 +108,7 @@ Android auto-backup by default.
   Android set — adaptive icon (foreground + background layers, 108×108 dp) and a
   512×512 PNG for the store listing.
   - Note: `electron/main.cjs:8` points at `assets/icon/Thero_icon.ico`, but the file
-    on disk is `TheroMathTD_Icon.ico`. Fix that mismatch while doing icon work.
+    on disk is `TheroIncrementalTD_Icon.ico`. Fix that mismatch while doing icon work.
 - **Splash screen**: add one so there's no white flash while the WebView boots.
 - **App name**: final display name, ≤30 chars for the Play listing.
 

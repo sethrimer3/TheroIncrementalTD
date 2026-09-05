@@ -20,7 +20,7 @@ if not exist node_modules (
   if errorlevel 1 goto error
 )
 
-echo Starting Thero Idle TD desktop launcher with: npm run desktop
+echo Starting TheroIncrementalTD desktop launcher with: npm run desktop
 call npm run desktop
 if errorlevel 1 goto error
 

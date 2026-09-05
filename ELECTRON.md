@@ -1,6 +1,6 @@
 # Electron Local Runner
 
-Thero Idle TD remains a browser-first static game. The Electron setup only wraps
+TheroIncrementalTD remains a browser-first static game. The Electron setup only wraps
 the same HTML, JavaScript, and assets for local desktop testing.
 
 ## Install
@@ -36,14 +36,14 @@ npm run electron
 
 You can also use the root batch files:
 
-- `Rebuild and Run Thero Idle TD.bat`
-- `Run Thero Idle TD.bat`
+- `Rebuild and Run TheroIncrementalTD.bat`
+- `Run TheroIncrementalTD.bat`
 
 ## GitHub Pages Build
 
-GitHub Pages currently deploys the repository root as static content. This is
-unchanged; `index.html`, `assets/`, and `scripts/` still use relative paths that
-work under `https://sethrimer3.github.io/TheroMathTD/`.
+The GitHub Actions Pages workflow runs `npm run build` and deploys `dist/` on
+every push to `main`. `index.html`, `assets/`, and `scripts/` use relative paths
+that work under `https://sethrimer3.github.io/TheroIncrementalTD/`.
 
 ## Troubleshooting
 

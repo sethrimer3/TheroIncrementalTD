@@ -1,4 +1,4 @@
-# Thero Idle – Progression Notes
+# TheroIncrementalTD – Progression Notes
 
 > Current product note (2026-08-10): Bet, Lamed, Tsadi, Shin, and Kuf Spires are retired. Aleph is presented as the **Tower of Inspiration**. Achievements remains active, while the Achievements Terrarium is disabled legacy JavaScript. The former Collective Unconscious/Cognitive Realm map is also retired and removed. Older sections below describe historical designs and are not active progression.
 
@@ -180,7 +180,7 @@ All enemies adopt a shared **power-of-ten health notation** that appends a brigh
 | \(\Im^{k}\) – **Imaginary Strider** | Gains evasion stacks whenever damage arrives out of phase; alternating damage types strip stacks and reveal the true form. Each collapsed stack dims the exponent, making progress legible. | Imaginary components pair with real ones; alternating inputs cancel the complex parts. | Shatters into 4×4 indigo grains streaked with silver to suggest complex planes. |
 | \(^{n}C_{k}^{\;m}\) – **Combination Cohort** | Spawns in squads whose health redistributes combinatorially when one member falls, making focus fire risky. A highlighted superscript `m` communicates the shared `10^{m}` pool sustaining the group. | Binomial coefficients enumerate combinations; the enemy constantly recomputes group defenses. | The squad collectively sheds 3×3 bronze grains stamped with Pascal triangle dots. |
 
-Future symbol variants will continue to draw from global mathematical alphabets (Cyrillic, Hebrew, kana, operator glyphs, etc.), ensuring each enemy feels fresh while still harmonizing with Thero Idle's mystic numeracy.
+Future symbol variants will continue to draw from global mathematical alphabets (Cyrillic, Hebrew, kana, operator glyphs, etc.), ensuring each enemy feels fresh while still harmonizing with TheroIncrementalTD's mystic numeracy.
 
 ## Achievements & Tower Progression
 

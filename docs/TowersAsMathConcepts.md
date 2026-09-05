@@ -1,6 +1,6 @@
 # Towers as Mathematical Concepts
 
-Every tower in Thero Idle TD is rooted in a mathematical concept that directly shapes its offensive mechanics. This document catalogs each tower, the math behind it, and how that math becomes a weapon.
+Every tower in TheroIncrementalTD is rooted in a mathematical concept that directly shapes its offensive mechanics. This document catalogs each tower, the math behind it, and how that math becomes a weapon.
 
 ---
 

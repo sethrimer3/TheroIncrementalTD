@@ -1,6 +1,6 @@
 # Agent Start Here – Universal Navigation
 
-**Welcome to Thero Idle.** This is your entry point for efficient context loading.
+**Welcome to TheroIncrementalTD.** This is your entry point for efficient context loading.
 
 ## First-Time Setup
 
@@ -45,7 +45,7 @@
 
 ### Directory Structure
 ```
-TheroMathTD/
+TheroIncrementalTD/
 ├── assets/               # Main game loop, UI, resources
 │   ├── main.js          # Integration hub (wiring only)
 │   └── playfield/       # Playfield subsystems

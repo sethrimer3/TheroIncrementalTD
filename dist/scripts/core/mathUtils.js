@@ -1,4 +1,4 @@
-// Shared math utility functions for the Thero Idle game.
+// Shared math utility functions for the TheroIncrementalTD game.
 // Consolidates helpers that were previously duplicated across tower, terrarium,
 // and renderer modules.  See docs/JAVASCRIPT_MODULE_SYSTEM.md §Shared Utility Patterns.
 

@@ -13,7 +13,7 @@ if not exist node_modules (
   if errorlevel 1 goto error
 )
 
-echo Building Thero Idle TD with: npm run build
+echo Building TheroIncrementalTD with: npm run build
 call npm run build
 if errorlevel 1 goto error
 

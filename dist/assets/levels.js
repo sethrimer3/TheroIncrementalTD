@@ -1,4 +1,4 @@
-// Shared level configuration helpers for Thero Idle.
+// Shared level configuration helpers for TheroIncrementalTD.
 // This module stores interactive level blueprints alongside utility functions for progression logic.
 
 import { parseCompactWaveString, ENEMY_TYPES } from './waveEncoder.js';

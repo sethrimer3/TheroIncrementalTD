@@ -2018,7 +2018,7 @@ import { initializeTabAttentionManager, clearTabAttention } from './tabAttention
     try {
       await ensureGameplayConfigLoaded();
     } catch (error) {
-      console.error('Thero Idle failed to load gameplay data', error);
+      console.error('TheroIncrementalTD failed to load gameplay data', error);
       if (playfieldElements.message) {
         playfieldElements.message.textContent =
           'Unable to load gameplay data—refresh the page to retry.';
